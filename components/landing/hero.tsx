@@ -50,18 +50,18 @@ export default function Hero() {
 
           <div className="mt-10 flex sm:flex-row flex-col w-full md:w-auto items-center gap-4">
             <SignedIn>
-              <Link href="/generate" className="w-full md:w-auto">
+              <Link href="/dashboard/generate" className="w-full md:w-auto">
                 <Button className="h-8 w-full px-6 py-5 transition-all hover:opacity-90 hover:scale-105">
                   Try for free! <IconPointerFilled className="w-4 h-4" />
                 </Button>
               </Link>
             </SignedIn>
             <SignedOut>
-              <SignInButton
-                signUpForceRedirectUrl={`${domain}/generate`}
-                forceRedirectUrl={`${domain}/generate`}
-                mode="modal"
-              >
+            <SignInButton
+              signUpForceRedirectUrl={`${domain}/dashboard`}
+              forceRedirectUrl={`${domain}/dashboard`}
+              mode="modal"
+            >
                 <Button className="h-8 w-full px-6 py-5 transition-all hover:opacity-90 hover:scale-105">
                   Try for free! <IconPointerFilled className="w-4 h-4" />
                 </Button>

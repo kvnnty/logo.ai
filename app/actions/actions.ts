@@ -93,7 +93,7 @@ export async function generateLogo(formData: z.infer<typeof FormSchema>) {
       n: 1,
     });
 
-    const imageUrl = response.data[0].url || "";
+    const imageUrl = response.data?.[0]?.url || "";
 
     const DatabaseData = {
       image_url: imageUrl,
@@ -133,7 +133,17 @@ export async function checkHistory() {
     const userIdToQuery = user.externalId ? user.externalId : user.id;
     const userLogos = await Logo.find({ userId: userIdToQuery }).sort({ createdAt: -1 });
 
-    return userLogos;
+    return userLogos.map(logo => ({
+      id: logo._id.toString(),
+      _id: logo._id.toString(),
+      image_url: logo.image_url,
+      primary_color: logo.primary_color,
+      background_color: logo.background_color,
+      username: logo.username,
+      userId: logo.userId,
+      createdAt: logo.createdAt,
+      updatedAt: logo.updatedAt,
+    }));
   } catch (error) {
     console.error('Error fetching user logos:', error);
     return null;
@@ -144,7 +154,17 @@ export async function allLogos(){
   try{
     await ensureDbConnected();
     const allLogos = await Logo.find({}).sort({ createdAt: -1 });
-    return allLogos
+    return allLogos.map(logo => ({
+      id: logo._id.toString(),
+      _id: logo._id.toString(),
+      image_url: logo.image_url,
+      primary_color: logo.primary_color,
+      background_color: logo.background_color,
+      username: logo.username,
+      userId: logo.userId,
+      createdAt: logo.createdAt,
+      updatedAt: logo.updatedAt,
+    }));
   }catch(error){
     console.error('Error fetchiing logos'+error)
     return null;
@@ -176,6 +196,27 @@ export async function downloadImage(url: string) {
       success: false,
       error: 'Failed to download image'
     };
+  }
+}
+
+export async function getCredits() {
+  'use server';
+  try {
+    const user = await currentUser();
+    if (!user) {
+      return { remaining: 10, limit: 10 };
+    }
+
+    // Get credits from Clerk metadata
+    const remaining = user.unsafeMetadata?.remaining as number | undefined;
+    
+    return { 
+      remaining: remaining ?? 10, 
+      limit: 10 
+    };
+  } catch (error) {
+    console.error('Error fetching credits:', error);
+    return { remaining: 10, limit: 10 };
   }
 }
 

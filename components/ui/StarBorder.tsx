@@ -2,14 +2,14 @@ import React from 'react';
 import './StarBorder.css';
 
 interface StarBorderProps {
-  as?: keyof JSX.IntrinsicElements | React.ComponentType<any>;
+  as?: keyof React.JSX.IntrinsicElements | React.ComponentType<Record<string, unknown>>;
   className?: string;
   color?: string;
   speed?: string;
   thickness?: number;
   children?: React.ReactNode;
   style?: React.CSSProperties;
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 const StarBorder = ({

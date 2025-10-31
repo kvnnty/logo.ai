@@ -15,9 +15,9 @@ const LogoCard = ({ logo, onDownload }: LogoCardProps) => {
   const [imageLoaded, setImageLoaded] = useState(false);
 
   return (
-    <Card className="group rounded-2xl">
-      <CardContent className="w-full rounded-2xl">
-        <div className="w-full rounded-t-2xl overflow-hidden aspect-square relative">
+    <Card className="group">
+      <CardContent className="w-full p-0">
+        <div className="w-full rounded-t-md overflow-hidden aspect-square relative bg-muted/30">
           {!imageLoaded && (
             <div className="absolute inset-0 bg-slate-200 animate-pulse" />
           )}
@@ -30,33 +30,35 @@ const LogoCard = ({ logo, onDownload }: LogoCardProps) => {
           />
         </div>
         <div
-          className={`rounded-b-xl border-t p-4 transition-opacity duration-300 ${
+          className={`border-t p-2 transition-opacity duration-300 ${
             imageLoaded ? "opacity-100" : "opacity-40"
           }`}
         >
-          <div className="flex justify-between items-center">
-            <h3 className="text-lg font-semibold">{logo.username}</h3>
-            <div className="flex gap-2 text-xs text-muted-foreground">
-              <span>{new Date(logo.createdAt).toLocaleDateString()}</span>
-            </div>
+          <div className="flex justify-between items-center mb-1.5">
+            <h3 className="text-xs font-medium truncate">{logo.username}</h3>
+            <span className="text-[10px] text-muted-foreground">
+              {new Date(logo.createdAt).toLocaleDateString()}
+            </span>
           </div>
-          <div className="flex gap-2 my-2">
+          <div className="flex gap-1 mb-1.5">
             <div
-              className="w-6 h-6 border rounded-[8px]"
+              className="w-3 h-3 border rounded"
               style={{ backgroundColor: logo.primary_color }}
               title="Primary Color"
             />
             <div
-              className="w-6 h-6 border rounded-[8px]"
+              className="w-3 h-3 border rounded"
               style={{ backgroundColor: logo.background_color }}
               title="Background Color"
             />
           </div>
           <Button
             onClick={() => onDownload(logo.image_url)}
-            className="w-full text-foreground group-hover:text-white bg-transparent border rounded-sm transition-all duration-500 ease-in-out group-hover:bg-primary mt-2"
+            variant="outline"
+            size="sm"
+            className="w-full h-7 text-[10px]"
           >
-            <Download className="mr-2 h-4 w-4" />
+            <Download className="mr-1 h-3 w-3" />
             Download
           </Button>
         </div>

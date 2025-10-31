@@ -44,8 +44,8 @@ export default function Footer() {
             <div className="mt-8">
               <SignedOut>
                 <SignInButton
-                  signUpForceRedirectUrl={`${domain}/generate`}
-                  forceRedirectUrl={`${domain}/generate`}
+                  signUpForceRedirectUrl={`${domain}/dashboard`}
+                  forceRedirectUrl={`${domain}/dashboard`}
                 >
                   <Button className="text-sm">
                     Start Generating <IconSparkles className="size-4" />
@@ -53,12 +53,12 @@ export default function Footer() {
                 </SignInButton>
               </SignedOut>
               <SignedIn>
-                <Link href="/generate" className="w-full md:w-auto">
+                <Link href="/dashboard/generate" className="w-full md:w-auto">
                   <Button className="text-sm">
                     Start Generating <IconSparkles className="size-4" />
                   </Button>
                 </Link>
-                {/* <Link href="/generate">
+                {/* <Link href="/dashboard/generate">
               <Button className="text-white">
                 Get Started
               </Button> 

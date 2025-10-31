@@ -44,8 +44,8 @@ export default function Navbar() {
             )}
             <SignedOut>
               <SignInButton
-                signUpForceRedirectUrl={`${domain}/generate`}
-                forceRedirectUrl={`${domain}/generate`}
+                signUpForceRedirectUrl={`${domain}/dashboard`}
+                forceRedirectUrl={`${domain}/dashboard`}
                 mode="modal"
               >
                 <Button className="text-sm">Sign In</Button>
