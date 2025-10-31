@@ -36,7 +36,7 @@ export default function Footer() {
               <span className="text-muted-foreground/40 text-3xl md:text-5xl">
                 <br /> Creativity with{" "}
                 <span className="bg-gradient-to-tr mx-2 from-white via-primary to-white bg-clip-text text-transparent">
-                  LogoAI
+                  LogoAIpro
                 </span>
               </span>
               ?
@@ -70,7 +70,7 @@ export default function Footer() {
           <div className="flex border-border/40 pt-8 w-full">
             <div className="max-w-6xl mx-auto px-4 w-full flex items-center justify-between">
               <div className="text-sm md:text-base">
-                &copy; {new Date().getFullYear()} LogoAI
+                &copy; {new Date().getFullYear()} LogoAIpro
               </div>
               <div className="flex gap-4 items-center justify-center">
                 <Link 

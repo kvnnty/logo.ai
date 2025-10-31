@@ -13,7 +13,7 @@ const manrope = Manrope({
 });
 
 export const metadata: Metadata = {
-  title: "Logo AI - Create Professional Logos in Minutes",
+  title: "LogoAIpro - Create Professional Logos in Minutes",
   description: "Generate unique, professional logos for your brand using AI. Choose from multiple styles, customize colors, and download high-quality logos instantly.",
   keywords: [
     "AI logo generator",
@@ -25,19 +25,19 @@ export const metadata: Metadata = {
     "professional logo",
     "custom logo",
     "logo creation",
-    "Logo AI"
+    "LogoAIpro"
   ],
   openGraph: {
     type: "website",
     locale: "en_US",
     url: "https://www.logoai.in",
-    title: "LogoAI - Create Professional Logos in Minutes",
+    title: "LogoAIpro - Create Professional Logos in Minutes",
     description: "Generate unique, professional logos for your brand using AI. Choose from multiple styles, customize colors, and download high-quality logos instantly.",
-    siteName: "Logo AI",
+    siteName: "LogoAIpro",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Logo AI - Create Professional Logos in Minutes",
+    title: "LogoAIpro - Create Professional Logos in Minutes",
     description: "Generate unique, professional logos for your brand using AI. Choose from multiple styles, customize colors, and download high-quality logos instantly.",
     creator: "@Webbuddy_1729",
   },

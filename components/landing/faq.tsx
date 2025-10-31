@@ -24,7 +24,7 @@ export default function Faq() {
               </span>
             </h2>
             <p className="text-base md:text-lg text-muted-foreground max-w-2xl mx-auto mb-6">
-              Everything you need to know about creating your perfect logo with LogoAI
+              Everything you need to know about creating your perfect logo with LogoAIpro
             </p>
             <div className="w-24 h-1 bg-primary mx-auto rounded-full"></div>
           </div>

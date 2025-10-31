@@ -27,7 +27,7 @@ export default function Navbar() {
       >
         <div className="flex justify-between items-center py-2 px-5 text-sm backdrop-blur-md bg-background/50">
           <Link href="/" className="font-semibold">
-            LogoAI
+            LogoAIpro
           </Link>
           <div className="hidden md:flex items-center font-semibold space-x-8 flex-1 justify-center">
             <Link href="/#features">Features</Link>

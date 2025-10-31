@@ -13,7 +13,7 @@ export default function LogoShowcase() {
             Easy to use, beautiful results.
           </h2>
           <p className="text-base md:text-lg text-muted-foreground max-w-2xl mx-auto mb-4">
-            Powered by AI, LogoAI helps business owners create beautiful logos.
+            Powered by AI, LogoAIpro helps business owners create beautiful logos.
           </p>
           <div className="w-24 h-1 bg-primary mx-auto rounded-full mb-8"></div>
         </div>

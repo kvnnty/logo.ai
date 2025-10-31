@@ -7,7 +7,7 @@ services:
       dockerfile: Dockerfile
       args:
         NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY}
-    container_name: logoai
+    container_name: logoaipro
     ports:
       - "3000:3000"
     env_file:

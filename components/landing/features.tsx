@@ -11,7 +11,7 @@ export default function Features() {
             Why Choose
             <br />
             <span className="bg-gradient-to-r from-primary via-purple-500 to-primary bg-clip-text text-transparent">
-              LogoAI?
+              LogoAIpro?
             </span>
           </div>
           <p className="text-lg md:text-xl text-center text-muted-foreground max-w-2xl mx-auto">

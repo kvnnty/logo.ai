@@ -57,7 +57,7 @@ export default function DashboardSidebar() {
                 L
               </div>
             </div>
-            <span className="text-xl font-bold">LogoAI</span>
+            <span className="text-xl font-bold">LogoAIpro</span>
           </Link>
         </div>
 
