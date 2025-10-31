@@ -7,7 +7,6 @@ import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import { Button } from "../ui/button";
 import { LoaderIcon } from "lucide-react";
-import { ToggleTheme } from "../theme-toggler";
 import StarBorder from "../ui/StarBorder";
 
 export default function Navbar() {
@@ -36,7 +35,6 @@ export default function Navbar() {
             
           </div>
           <div className="flex items-center justify-end space-x-4">
-            <ToggleTheme />
             {!isMounted && (
               <Button>
                 <LoaderIcon className="animate-spin" />

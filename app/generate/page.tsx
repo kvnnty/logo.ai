@@ -296,7 +296,7 @@ export default function Home() {
         <div className="grid grid-cols-1 relative lg:grid-cols-2 gap-8">
           {/* Left Column */}
           <div>
-            <Card className="dark:bg-accent/20 border-2 border-primary/10 h-full">
+            <Card className="border-2 border-primary/10 h-full">
               <CardContent className="p-6 space-y-4">
                 {/* Brand Name */}
                 <div className="flex flex-col gap-2">
@@ -520,7 +520,7 @@ export default function Home() {
 
           {/* Right Column */}
           <div className="">
-            <Card className="h-full rounded-3xl dark:bg-accent/20 ">
+            <Card className="h-full rounded-3xl">
               <CardContent className="p-6 h-full">
                 {generatedLogo ? (
                   <motion.div
@@ -559,7 +559,7 @@ export default function Home() {
                   </motion.div>
                 ) : (
                   <motion.div
-                    className="h-full rounded-2xl flex items-center border-2 dark:border-primary/40 border-dashed justify-center text-center p-8"
+                    className="h-full rounded-2xl flex items-center border-2 border-dashed justify-center text-center p-8"
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ duration: 0.4 }}

@@ -21,7 +21,7 @@ export default function Footer() {
   return (
     <>
       <footer className="h-[30rem] border-t md:h-[40rem] relative py-10 mt-20">
-        <div className="bg-background z-[-1] opacity-95 absolute inset-0 dark:bg-dot-white/[0.2] bg-dot-black/[0.2]"></div>
+        <div className="bg-background z-[-1] opacity-95 absolute inset-0 bg-dot-black/[0.2]"></div>
         <FooterGradient />
         <div className="flex z-[20] flex-col items-center justify-between h-full">
           <div className="flex flex-col items-center justify-center">

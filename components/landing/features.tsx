@@ -45,7 +45,7 @@ export default function Features() {
                     <h3 className="text-3xl md:text-4xl font-bold mb-4 text-foreground">
                       {feature.title}
                     </h3>
-                    <p className="text-base md:text-lg text-gray-600 dark:text-gray-400 leading-relaxed">
+                    <p className="text-base md:text-lg text-gray-600 leading-relaxed">
                       {feature.description}
                     </p>
                   </div>

@@ -20,7 +20,7 @@ export default function Hero() {
         <section className="flex max-w-full mx-auto relative flex-col items-center justify-center h-full pt-24 px-4 sm:pt-36 pb-24 border-b border-border/40 z-0">
         <div
           className={cn(
-            "group relative rounded-full border border-black/5 bg-neutral-100 text-sm sm:text-base max-sm:mb-2 text-white transition-all ease-in hover:cursor-pointer hover:bg-neutral-200 dark:border-white/5 dark:bg-neutral-900 dark:hover:bg-neutral-800",
+            "group relative rounded-full border border-black/5 bg-neutral-100 text-sm sm:text-base max-sm:mb-2 text-white transition-all ease-in hover:cursor-pointer hover:bg-neutral-200",
           )}
         >
           <AnimatedShinyText className="inline-flex items-center justify-center px-3 py-0.5">
@@ -38,11 +38,11 @@ export default function Hero() {
 
           <div className="text-base md:text-lg mt-8 font-bold w-full lg:w-[50%] text-center text-neutral-500">
             Transform your brand identity with{" "}
-            <span className="text-neutral-900 font-extrabold dark:font-bold dark:text-neutral-300">
+            <span className="text-neutral-900 font-extrabold">
               AI-powered logo design
             </span>
             . <br className="md:block hidden" />
-            <span className="text-neutral-900 font-extrabold dark:font-bold dark:text-neutral-300">
+            <span className="text-neutral-900 font-extrabold">
               No design skills needed
             </span>
             {" "}— just describe your vision and watch it come to life.
@@ -73,7 +73,7 @@ export default function Hero() {
                 className="h-8 w-full px-6 py-5 transition-all hover:shadow-[0_0_20px_2px_hsl(var(--primary))]"
               >
                 See Examples{" "}
-                <IconSparkles className="fill-[hsl(var(--primary))] text-primary dark:fill-[hsl(var(--foreground))] dark:text-foreground" />
+                <IconSparkles className="fill-[hsl(var(--primary))] text-primary" />
               </Button>
             </Link>
           </div>
