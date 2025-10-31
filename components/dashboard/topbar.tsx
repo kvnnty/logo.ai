@@ -38,14 +38,9 @@ export default function DashboardTopbar() {
           {/* Credits UI - Right Aligned */}
           <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-primary/10 border border-primary/20">
             <IconSparkles className="h-4 w-4 text-primary" />
-            <div className="flex items-center gap-1">
-              <span className="text-sm font-semibold text-primary">
-                {credits.remaining}
-              </span>
-              <span className="text-xs text-muted-foreground">
-                / {credits.limit}
-              </span>
-            </div>
+            <span className="text-sm font-semibold text-primary">
+              {credits.remaining} Credits
+            </span>
           </div>
         </div>
       </div>

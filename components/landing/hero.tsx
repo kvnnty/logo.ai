@@ -57,11 +57,11 @@ export default function Hero() {
               </Link>
             </SignedIn>
             <SignedOut>
-            <SignInButton
+              <SignInButton
               signUpForceRedirectUrl={`${domain}/dashboard`}
               forceRedirectUrl={`${domain}/dashboard`}
-              mode="modal"
-            >
+                mode="modal"
+              >
                 <Button className="h-8 w-full px-6 py-5 transition-all hover:opacity-90 hover:scale-105">
                   Try for free! <IconPointerFilled className="w-4 h-4" />
                 </Button>

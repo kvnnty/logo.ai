@@ -3,17 +3,21 @@
 import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { getCredits } from "@/app/actions/actions";
+import { getCredits, createStripeCheckoutSession } from "@/app/actions/actions";
+import { useToast } from "@/hooks/use-toast";
 import {
   IconCreditCard,
   IconSparkles,
   IconCheck,
   IconX,
+  IconLoader2,
 } from "@tabler/icons-react";
 
 export default function CreditsPage() {
+  const { toast } = useToast();
   const [credits, setCredits] = useState({ remaining: 10, limit: 10 });
   const [isLoading, setIsLoading] = useState(true);
+  const [processingPlan, setProcessingPlan] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchCredits = async () => {
@@ -24,8 +28,35 @@ export default function CreditsPage() {
     fetchCredits();
   }, []);
 
+  const handlePurchase = async (planId: string) => {
+    setProcessingPlan(planId);
+    try {
+      const result = await createStripeCheckoutSession(planId);
+      
+      if (result.success && result.url) {
+        window.location.href = result.url;
+      } else {
+        toast({
+          title: "Error",
+          description: result.error || "Failed to create checkout session",
+          variant: "destructive",
+        });
+        setProcessingPlan(null);
+      }
+    } catch (error) {
+      console.error('Error handling purchase:', error);
+      toast({
+        title: "Error",
+        description: "An unexpected error occurred",
+        variant: "destructive",
+      });
+      setProcessingPlan(null);
+    }
+  };
+
   const creditPlans = [
     {
+      id: "basic",
       name: "Basic",
       credits: 50,
       price: "$9.99",
@@ -38,6 +69,7 @@ export default function CreditsPage() {
       popular: false,
     },
     {
+      id: "pro",
       name: "Pro",
       credits: 150,
       price: "$24.99",
@@ -51,6 +83,7 @@ export default function CreditsPage() {
       popular: true,
     },
     {
+      id: "enterprise",
       name: "Enterprise",
       credits: 500,
       price: "$79.99",
@@ -89,7 +122,7 @@ export default function CreditsPage() {
               <div>
                 <p className="text-sm text-muted-foreground">Current Credits</p>
                 <p className="text-2xl font-bold">
-                  {credits.remaining} / {credits.limit}
+                  {credits.remaining} Credits
                 </p>
               </div>
             </div>
@@ -137,7 +170,7 @@ export default function CreditsPage() {
                   <h3 className="text-xl font-bold mb-1">{plan.name}</h3>
                   <div className="flex items-baseline gap-1">
                     <span className="text-3xl font-bold">{plan.price}</span>
-                    <span className="text-sm text-muted-foreground">/month</span>
+                    <span className="text-sm text-muted-foreground">one-time</span>
                   </div>
                 </div>
 
@@ -165,8 +198,17 @@ export default function CreditsPage() {
                   }
                   variant={plan.popular ? "default" : "outline"}
                   size="lg"
+                  onClick={() => handlePurchase(plan.id)}
+                  disabled={processingPlan === plan.id}
                 >
-                  Get Started
+                  {processingPlan === plan.id ? (
+                    <>
+                      <IconLoader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Processing...
+                    </>
+                  ) : (
+                    "Get Started"
+                  )}
                 </Button>
               </CardContent>
             </Card>

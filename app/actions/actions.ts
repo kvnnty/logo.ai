@@ -5,7 +5,7 @@ import { z } from 'zod';
 import dedent from 'dedent';
 import { clerkClient, currentUser } from "@clerk/nextjs/server";
 import { ensureDbConnected, Logo } from '@/db';
-import { rateLimit } from '@/lib/upstash';
+import Stripe from 'stripe';
 
 const apiKey = process.env.NEBIUS_API_KEY;
 if (!apiKey) {
@@ -26,6 +26,11 @@ const clientOptions: ConstructorParameters<typeof OpenAI>[0] = {
 };
 
 const client = new OpenAI(clientOptions);
+
+// Initialize Stripe
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
+  apiVersion: '2025-10-29.clover',
+});
 
 const FormSchema = z.object({
   companyName: z.string(),
@@ -48,6 +53,25 @@ const styleLookup: { [key: string]: string } = {
   minimal: "minimal, simple, timeless, versatile, single color logo, use negative space, flat design with minimal details, Light, soft, and subtle.",
 };
 
+// Helper function to convert hex to color name
+function hexToColorName(hex: string): string {
+  const colorMap: Record<string, string> = {
+    '#2563eb': 'blue',
+    '#dc2626': 'red',
+    '#d97706': 'orange',
+    '#16a34a': 'green',
+    '#9333ea': 'purple',
+    '#000000': 'black',
+    '#ffffff': 'white',
+    '#f8fafc': 'light gray',
+    '#fee2e2': 'light red',
+    '#fef2f2': 'light pink',
+    '#eff6ff': 'light blue',
+    '#f0fff4': 'light green',
+  };
+  return colorMap[hex.toLowerCase()] || hex;
+}
+
 export async function generateLogo(formData: z.infer<typeof FormSchema>) {
   'use server';
   try {
@@ -56,33 +80,38 @@ export async function generateLogo(formData: z.infer<typeof FormSchema>) {
       return { success: false, error: 'User not authenticated' };
     }
 
-    const { success: rateLimitSuccess, remaining } = await rateLimit.limit(user.id);
+    // Check credits from Clerk metadata
+    const currentRemaining = (user.unsafeMetadata?.remaining as number) || 0;
+    
+    if (currentRemaining <= 0) {
+      return { 
+        success: false, 
+        error: "You've run out of credits. Please purchase more credits to continue." 
+      };
+    }
+
+    // Deduct 1 credit
+    const newRemaining = currentRemaining - 1;
     
     await (await clerkClient()).users.updateUserMetadata(user.id, {
       unsafeMetadata: {
-        remaining,
+        remaining: newRemaining,
       },
     });
 
-    console.log("your remaining logo generation limit is", remaining)
-    // if (remaining === 1) {
-    //   await toast({
-    //     title: "Warning",
-    //     description: "You only have 1 logo generation remaining",
-    //     variant: "destructive",
-    //   });
-    // }
-
-    if (!rateLimitSuccess) {
-      return { 
-        success: false, 
-        error: "You've reached your logo generation limit. Please try again later." 
-      };
+    console.log("your remaining credits:", newRemaining)
+    
+    if (newRemaining === 0) {
+      console.log("Warning: Last credit used!");
     }
 
     const validatedData = FormSchema.parse(formData);
     
-    const prompt = dedent`A single logo, high-quality, award-winning professional design, made for both digital and print media, only contains a few vector shapes, ${styleLookup[validatedData.style]}.Primary color is ${validatedData.primaryColor.toLowerCase()} and background color is ${validatedData.secondaryColor.toLowerCase()}. The company name is ${validatedData.companyName}, make sure to include the company name in the logo. ${validatedData ? `Additional info: ${validatedData.additionalInfo}` : ""}`;
+    // Convert hex colors to color names for better AI understanding
+    const primaryColorName = hexToColorName(validatedData.primaryColor);
+    const secondaryColorName = hexToColorName(validatedData.secondaryColor);
+    
+    const prompt = dedent`A single logo, high-quality, award-winning professional design, made for both digital and print media, only contains a few vector shapes, ${styleLookup[validatedData.style]}. Primary color is ${primaryColorName} and background color is ${secondaryColorName}. The company name is ${validatedData.companyName}, make sure to include the company name in the logo. ${validatedData.additionalInfo ? `Additional info: ${validatedData.additionalInfo}` : ""}`;
     
     const response = await client.images.generate({
       model: validatedData.model,
@@ -204,19 +233,95 @@ export async function getCredits() {
   try {
     const user = await currentUser();
     if (!user) {
-      return { remaining: 10, limit: 10 };
+      return { remaining: 0, limit: 999999 };
     }
 
-    // Get credits from Clerk metadata
-    const remaining = user.unsafeMetadata?.remaining as number | undefined;
+    // Initialize free credits for first-time users
+    const FREE_CREDITS = 10;
+    if (!user.unsafeMetadata || user.unsafeMetadata.remaining === undefined) {
+      await (await clerkClient()).users.updateUserMetadata(user.id, {
+        unsafeMetadata: {
+          remaining: FREE_CREDITS,
+        },
+      });
+      return {
+        remaining: FREE_CREDITS,
+        limit: 999999
+      };
+    }
     
+    // Get credits from Clerk metadata
+    const remaining = (user.unsafeMetadata.remaining as number) || 0;
+    
+    // Return unlimited display - credits are tracked individually
     return { 
-      remaining: remaining ?? 10, 
-      limit: 10 
+      remaining,
+      limit: 999999
     };
   } catch (error) {
     console.error('Error fetching credits:', error);
-    return { remaining: 10, limit: 10 };
+    return { remaining: 0, limit: 999999 };
+  }
+}
+
+export async function createStripeCheckoutSession(planId: string) {
+  'use server';
+  try {
+    const user = await currentUser();
+    if (!user) {
+      return { success: false, error: 'User not authenticated' };
+    }
+
+    // Map plan IDs to Stripe price IDs and credit amounts
+    const planConfig: Record<string, { priceId: string; credits: number }> = {
+      basic: {
+        priceId: process.env.STRIPE_PRICE_ID_BASIC || '',
+        credits: 50,
+      },
+      pro: {
+        priceId: process.env.STRIPE_PRICE_ID_PRO || '',
+        credits: 150,
+      },
+      enterprise: {
+        priceId: process.env.STRIPE_PRICE_ID_ENTERPRISE || '',
+        credits: 500,
+      },
+    };
+
+    const config = planConfig[planId];
+    if (!config || !config.priceId) {
+      return { success: false, error: 'Invalid plan or Stripe not configured' };
+    }
+
+    // Create Stripe checkout session
+    const session = await stripe.checkout.sessions.create({
+      customer_email: user.emailAddresses[0]?.emailAddress,
+      payment_method_types: ['card'],
+      line_items: [
+        {
+          price: config.priceId,
+          quantity: 1,
+        },
+      ],
+      mode: 'payment',
+      success_url: `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/dashboard/credits?success=true`,
+      cancel_url: `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/dashboard/credits?canceled=true`,
+      client_reference_id: user.id,
+      metadata: {
+        userId: user.id,
+        planId,
+        credits: config.credits.toString(),
+      },
+    });
+
+    return {
+      success: true,
+      url: session.url,
+      sessionId: session.id,
+    };
+  } catch (error) {
+    console.error('Error creating checkout session:', error);
+    return { success: false, error: 'Failed to create checkout session' };
   }
 }
 

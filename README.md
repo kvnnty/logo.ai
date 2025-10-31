@@ -17,17 +17,18 @@
 - **User History**: Track and manage previously generated logos
 - **Public Gallery**: Browse logos created by other users
 - **Secure Authentication**: User authentication powered by Clerk
-- **Database Integration**: PostgreSQL with Drizzle ORM for reliable data storage
+- **Payment Integration**: Stripe-powered credit system with flexible pricing plans
+- **Database Integration**: MongoDB with Mongoose ODM for reliable data storage
 
 ## Tech Stack
 
 - **Frontend**: Next.js, TypeScript
 - **Styling**: Tailwind CSS, Shadcn UI
 - **Authentication**: Clerk
-- **Database**: PostgreSQL (NeonDB)
+- **Database**: MongoDB with Mongoose
 - **Rate Limiting**: Upstash Redis
-- **ORM**: Drizzle ORM
 - **AI Integration**: Nebius AI
+- **Payments**: Stripe Checkout
 - **Animations**: Framer Motion
 - **Analytics**: Umami
 - **Deployment**: Vercel
@@ -47,6 +48,7 @@ Before you begin, you'll need to create accounts and obtain API keys from the fo
 - [Upstash Account](https://upstash.com/) - For Ratelimiting
 - [Helicone Account](https://www.helicone.ai/) - For Observability
 - [Umami Account](https://umami.is/) - For Analytics
+- [Stripe Account](https://stripe.com/) - For payment processing
 
 ### Environment Variables
 
@@ -70,7 +72,15 @@ UPSTASH_REDIS_REST_TOKEN=your_upstash_redis_token
 # Observability (from Helicone)
 HELICONE_API_KEY=your_helicone_api_key
 
+# Stripe Payments (from Stripe Dashboard)
+STRIPE_SECRET_KEY=your_stripe_secret_key
+STRIPE_WEBHOOK_SECRET=your_stripe_webhook_secret
+STRIPE_PRICE_ID_BASIC=your_stripe_basic_price_id
+STRIPE_PRICE_ID_PRO=your_stripe_pro_price_id
+STRIPE_PRICE_ID_ENTERPRISE=your_stripe_enterprise_price_id
+
 # Development
+NEXT_PUBLIC_APP_URL=http://localhost:3000
 NEXT_PUBLIC_DEVELOPMENT_URL=http://localhost:3000
 ```
 
