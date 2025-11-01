@@ -64,6 +64,8 @@ NEBIUS_API_KEY=your_nebius_api_key
 # Auth (from Clerk Dashboard)
 NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=your_clerk_publishable_key
 CLERK_SECRET_KEY=your_clerk_secret_key
+NEXT_PUBLIC_CLERK_SIGN_IN_FORCE_REDIRECT_URL=/dashboard
+NEXT_PUBLIC_CLERK_SIGN_UP_FORCE_REDIRECT_URL=/dashboard
 
 # Rate Limiting (from Upstash)
 UPSTASH_REDIS_REST_URL=your_upstash_redis_url

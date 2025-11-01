@@ -1,6 +1,5 @@
 import { Button } from "./button";
 import Link from "next/link";
-import { domain } from "@/lib/domain";
 import {
   SignInButton,
   SignedIn,
@@ -41,8 +40,8 @@ const Navigation = () => {
         <div className="flex items-center space-x-4">
           <SignedOut>
             <SignInButton
-              signUpForceRedirectUrl={`${domain}/dashboard`}
-              forceRedirectUrl={`${domain}/dashboard`}
+              signUpForceRedirectUrl="/dashboard"
+              forceRedirectUrl="/dashboard"
             >
               <Button className="inline-flex text-white">Sign In</Button>
             </SignInButton>

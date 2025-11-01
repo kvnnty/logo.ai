@@ -1,6 +1,5 @@
 "use client";
 import { SignedIn, UserButton } from "@clerk/nextjs";
-import { domain } from "@/lib/domain";
 import { SignInButton } from "@clerk/nextjs";
 import { SignedOut } from "@clerk/nextjs";
 import Link from "next/link";
@@ -42,8 +41,8 @@ export default function Navbar() {
             )}
             <SignedOut>
               <SignInButton
-                signUpForceRedirectUrl={`${domain}/dashboard`}
-                forceRedirectUrl={`${domain}/dashboard`}
+                signUpForceRedirectUrl="/dashboard"
+                forceRedirectUrl="/dashboard"
                 mode="modal"
               >
                 <Button className="text-sm">Sign In</Button>

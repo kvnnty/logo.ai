@@ -14,7 +14,6 @@ import { UserButton } from "@clerk/nextjs";
 import { SignedIn } from "@clerk/nextjs";
 import { SignInButton } from "@clerk/nextjs";
 import { SignedOut } from "@clerk/nextjs";
-import { domain } from "@/lib/domain";
 import Link from "next/link";
 
 export default function Footer() {
@@ -44,8 +43,8 @@ export default function Footer() {
             <div className="mt-8">
               <SignedOut>
                 <SignInButton
-                  signUpForceRedirectUrl={`${domain}/dashboard`}
-                  forceRedirectUrl={`${domain}/dashboard`}
+                  signUpForceRedirectUrl="/dashboard"
+                  forceRedirectUrl="/dashboard"
                 >
                   <Button className="text-sm">
                     Start Generating <IconSparkles className="size-4" />
