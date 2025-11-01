@@ -100,28 +100,28 @@ export default function CreditsPage() {
   ];
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       {/* Hero Section */}
       <div>
-        <h1 className="text-3xl font-bold mb-2">
+        <h1 className="text-2xl sm:text-3xl font-bold mb-2">
           Credits & Plans
         </h1>
-        <p className="text-muted-foreground">
+        <p className="text-sm sm:text-base text-muted-foreground">
           Purchase credits to create amazing logos
         </p>
       </div>
 
       {/* Current Credits */}
       <Card className="border border-border/50 bg-card hover:shadow-xl transition-all duration-300">
-        <CardContent className="p-6">
-          <div className="flex items-center justify-between">
+        <CardContent className="p-4 sm:p-6">
+          <div className="flex items-center justify-between flex-wrap gap-4">
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
-                <IconSparkles className="h-6 w-6 text-primary" />
+              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-primary/10 flex items-center justify-center">
+                <IconSparkles className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">Current Credits</p>
-                <p className="text-2xl font-bold">
+                <p className="text-xs sm:text-sm text-muted-foreground">Current Credits</p>
+                <p className="text-xl sm:text-2xl font-bold">
                   {credits.remaining} Credits
                 </p>
               </div>
@@ -129,18 +129,18 @@ export default function CreditsPage() {
             <div className="flex items-center gap-2">
               {credits.remaining > 3 ? (
                 <>
-                  <IconCheck className="h-5 w-5 text-green-600" />
-                  <span className="text-sm text-green-600 font-medium">Good</span>
+                  <IconCheck className="h-4 w-4 sm:h-5 sm:w-5 text-green-600" />
+                  <span className="text-xs sm:text-sm text-green-600 font-medium">Good</span>
                 </>
               ) : credits.remaining > 0 ? (
                 <>
-                  <IconX className="h-5 w-5 text-orange-600" />
-                  <span className="text-sm text-orange-600 font-medium">Low</span>
+                  <IconX className="h-4 w-4 sm:h-5 sm:w-5 text-orange-600" />
+                  <span className="text-xs sm:text-sm text-orange-600 font-medium">Low</span>
                 </>
               ) : (
                 <>
-                  <IconX className="h-5 w-5 text-red-600" />
-                  <span className="text-sm text-red-600 font-medium">Empty</span>
+                  <IconX className="h-4 w-4 sm:h-5 sm:w-5 text-red-600" />
+                  <span className="text-xs sm:text-sm text-red-600 font-medium">Empty</span>
                 </>
               )}
             </div>
@@ -150,8 +150,8 @@ export default function CreditsPage() {
 
       {/* Credit Plans */}
       <div>
-        <h2 className="text-xl font-bold mb-4">Choose a Plan</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <h2 className="text-lg sm:text-xl font-bold mb-4">Choose a Plan</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {creditPlans.map((plan) => (
             <Card
               key={plan.name}
@@ -165,26 +165,26 @@ export default function CreditsPage() {
                   Most Popular
                 </div>
               )}
-              <CardContent className={`p-6 ${plan.popular ? "pt-10" : ""}`}>
+              <CardContent className={`p-4 sm:p-6 ${plan.popular ? "pt-8 sm:pt-10" : ""}`}>
                 <div className="mb-4">
-                  <h3 className="text-xl font-bold mb-1">{plan.name}</h3>
+                  <h3 className="text-lg sm:text-xl font-bold mb-1">{plan.name}</h3>
                   <div className="flex items-baseline gap-1">
-                    <span className="text-3xl font-bold">{plan.price}</span>
-                    <span className="text-sm text-muted-foreground">one-time</span>
+                    <span className="text-2xl sm:text-3xl font-bold">{plan.price}</span>
+                    <span className="text-xs sm:text-sm text-muted-foreground">one-time</span>
                   </div>
                 </div>
 
                 <div className="mb-6">
                   <div className="flex items-center gap-2 mb-4">
-                    <IconCreditCard className="h-5 w-5 text-primary" />
-                    <span className="text-lg font-semibold">
+                    <IconCreditCard className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
+                    <span className="text-base sm:text-lg font-semibold">
                       {plan.credits} Credits
                     </span>
                   </div>
                   <ul className="space-y-2">
                     {plan.features.map((feature, index) => (
-                      <li key={index} className="flex items-center gap-2 text-sm">
-                        <IconCheck className="h-4 w-4 text-green-600" />
+                      <li key={index} className="flex items-start gap-2 text-xs sm:text-sm">
+                        <IconCheck className="h-3 w-3 sm:h-4 sm:w-4 text-green-600 mt-0.5 flex-shrink-0" />
                         <span>{feature}</span>
                       </li>
                     ))}
@@ -193,11 +193,11 @@ export default function CreditsPage() {
 
                 <Button
                   className={plan.popular
-                    ? "w-full bg-primary hover:bg-primary/90"
-                    : "w-full"
+                    ? "w-full bg-primary hover:bg-primary/90 text-sm"
+                    : "w-full text-sm"
                   }
                   variant={plan.popular ? "default" : "outline"}
-                  size="lg"
+                  size="default"
                   onClick={() => handlePurchase(plan.id)}
                   disabled={processingPlan === plan.id}
                 >

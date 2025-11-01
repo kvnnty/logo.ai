@@ -309,9 +309,9 @@ export default function GeneratePage() {
             transition={{ duration: 0.3 }}
             className="space-y-6"
           >
-            <div className="text-center space-y-2 mb-8">
-              <h2 className="text-3xl font-bold">What's your brand name?</h2>
-              <p className="text-muted-foreground">Enter the name you want to appear in your logo</p>
+            <div className="text-center space-y-2 mb-6 sm:mb-8">
+              <h2 className="text-2xl sm:text-3xl font-bold">What's your brand name?</h2>
+              <p className="text-sm sm:text-base text-muted-foreground">Enter the name you want to appear in your logo</p>
             </div>
             <div className="flex flex-col gap-2">
               <label className="text-sm font-medium ml-2">Brand Name</label>
@@ -319,7 +319,7 @@ export default function GeneratePage() {
                 value={companyName}
                 onChange={(e) => setCompanyName(e.target.value)}
                 placeholder="Enter your brand name"
-                className="h-14 text-lg border-2"
+                className="h-12 sm:h-14 text-base sm:text-lg border-2"
                 autoFocus
               />
             </div>
@@ -336,28 +336,28 @@ export default function GeneratePage() {
             transition={{ duration: 0.3 }}
             className="space-y-6"
           >
-            <div className="text-center space-y-2 mb-8">
-              <h2 className="text-3xl font-bold">Choose a style</h2>
-              <p className="text-muted-foreground">Select the design style that matches your brand</p>
+            <div className="text-center space-y-2 mb-6 sm:mb-8">
+              <h2 className="text-2xl sm:text-3xl font-bold">Choose a style</h2>
+              <p className="text-sm sm:text-base text-muted-foreground">Select the design style that matches your brand</p>
             </div>
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4">
               {STYLE_OPTIONS.map((style) => (
                 <motion.button
                   key={style.id}
                   onClick={() => setSelectedStyle(style.id)}
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
-                  className={`p-6 rounded-xl border-2 flex flex-col items-center gap-3 text-center transition-all ${
+                  className={`p-4 sm:p-6 rounded-xl border-2 flex flex-col items-center gap-2 sm:gap-3 text-center transition-all ${
                     selectedStyle === style.id
                       ? "border-primary bg-primary/10 text-foreground font-semibold ring-2 ring-primary shadow-lg"
                       : "border-border hover:bg-accent/50 hover:border-primary/50"
                   }`}
                 >
                   <style.icon
-                    className={`w-8 h-8 ${selectedStyle === style.id ? "text-primary" : "text-muted-foreground"}`}
+                    className={`w-6 h-6 sm:w-8 sm:h-8 ${selectedStyle === style.id ? "text-primary" : "text-muted-foreground"}`}
                     strokeWidth={1.5}
                   />
-                  <div className="font-semibold">{style.name}</div>
+                  <div className="font-semibold text-sm sm:text-base">{style.name}</div>
                 </motion.button>
               ))}
             </div>
@@ -374,15 +374,15 @@ export default function GeneratePage() {
             transition={{ duration: 0.3 }}
             className="space-y-6"
           >
-            <div className="text-center space-y-2 mb-8">
-              <h2 className="text-3xl font-bold">Colors & AI Model</h2>
-              <p className="text-muted-foreground">Customize colors and choose your AI model</p>
+            <div className="text-center space-y-2 mb-6 sm:mb-8">
+              <h2 className="text-2xl sm:text-3xl font-bold">Colors & AI Model</h2>
+              <p className="text-sm sm:text-base text-muted-foreground">Customize colors and choose your AI model</p>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
               <div className="space-y-2">
                 <label className="text-sm font-medium ml-2">Primary Color</label>
                 <Select value={primaryColor} onValueChange={setPrimaryColor}>
-                  <SelectTrigger className="h-14 border-2">
+                  <SelectTrigger className="h-12 sm:h-14 border-2">
                     <SelectValue>
                       <div className="flex items-center gap-3">
                         <div
@@ -411,7 +411,7 @@ export default function GeneratePage() {
               <div className="space-y-2">
                 <label className="text-sm font-medium ml-2">Background</label>
                 <Select value={backgroundColor} onValueChange={setBackgroundColor}>
-                  <SelectTrigger className="h-14 border-2">
+                  <SelectTrigger className="h-12 sm:h-14 border-2">
                     <SelectValue>
                       <div className="flex items-center gap-3">
                         <div
@@ -443,7 +443,7 @@ export default function GeneratePage() {
                   value={selectedModel}
                   onValueChange={(value: "dall-e-3" | "black-forest-labs/flux-schnell" | "black-forest-labs/flux-dev") => setSelectedModel(value)}
                 >
-                  <SelectTrigger className="h-14 border-2">
+                  <SelectTrigger className="h-12 sm:h-14 border-2">
                     <SelectValue placeholder="Select Model" />
                   </SelectTrigger>
                   <SelectContent>
@@ -472,18 +472,18 @@ export default function GeneratePage() {
             transition={{ duration: 0.3 }}
             className="space-y-6"
           >
-            <div className="text-center space-y-2 mb-8">
-              <h2 className="text-3xl font-bold">Size & Quality</h2>
-              <p className="text-muted-foreground">Choose the output size and quality</p>
+            <div className="text-center space-y-2 mb-6 sm:mb-8">
+              <h2 className="text-2xl sm:text-3xl font-bold">Size & Quality</h2>
+              <p className="text-sm sm:text-base text-muted-foreground">Choose the output size and quality</p>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
               <div className="space-y-2">
                 <label className="text-sm font-medium ml-2">Image Size</label>
                 <Select
                   value={selectedSize}
                   onValueChange={(value: "256x256" | "512x512" | "1024x1024") => setSelectedSize(value)}
                 >
-                  <SelectTrigger className="h-14 border-2">
+                  <SelectTrigger className="h-12 sm:h-14 border-2">
                     <SelectValue placeholder="Select Size" />
                   </SelectTrigger>
                   <SelectContent>
@@ -501,7 +501,7 @@ export default function GeneratePage() {
                   value={selectedQuality}
                   onValueChange={(value: "standard" | "hd") => setSelectedQuality(value)}
                 >
-                  <SelectTrigger className="h-14 border-2">
+                  <SelectTrigger className="h-12 sm:h-14 border-2">
                     <SelectValue placeholder="Select Quality" />
                   </SelectTrigger>
                   <SelectContent>
@@ -524,16 +524,16 @@ export default function GeneratePage() {
             transition={{ duration: 0.3 }}
             className="space-y-6"
           >
-            <div className="text-center space-y-2 mb-8">
-              <h2 className="text-3xl font-bold">Additional Details</h2>
-              <p className="text-muted-foreground">Tell us more about your brand (optional)</p>
+            <div className="text-center space-y-2 mb-6 sm:mb-8">
+              <h2 className="text-2xl sm:text-3xl font-bold">Additional Details</h2>
+              <p className="text-sm sm:text-base text-muted-foreground">Tell us more about your brand (optional)</p>
             </div>
             <div className="space-y-2">
               <Textarea
                 value={additionalInfo}
                 onChange={(e) => setAdditionalInfo(e.target.value)}
                 placeholder="Describe your brand personality, target audience, or any specific preferences..."
-                className="min-h-[200px] text-base border-2 p-4"
+                className="min-h-[150px] sm:min-h-[200px] text-sm sm:text-base border-2 p-3 sm:p-4"
               />
             </div>
           </motion.div>
@@ -545,19 +545,19 @@ export default function GeneratePage() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       {/* Hero Section */}
       <div>
-        <h1 className="text-3xl font-bold mb-2">
+        <h1 className="text-2xl sm:text-3xl font-bold mb-2">
           Generate Logo
         </h1>
-        <p className="text-muted-foreground">
+        <p className="text-sm sm:text-base text-muted-foreground">
           Create unique, professional logos with AI
         </p>
       </div>
 
       {/* Progress Bar */}
-      <div className="mb-8">
+      <div className="mb-6 sm:mb-8">
         <div className="relative">
           {/* Background Line */}
           <div className="absolute top-5 left-0 right-0 h-1 bg-muted/30 rounded-full" />
@@ -583,26 +583,26 @@ export default function GeneratePage() {
                     scale: currentStep === step.number ? 1.1 : 1,
                   }}
                   transition={{ duration: 0.2 }}
-                  className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold transition-all duration-300 ${
+                  className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center font-semibold transition-all duration-300 ${
                     currentStep >= step.number
                       ? "bg-primary text-primary-foreground shadow-lg shadow-primary/25"
                       : "bg-background border-2 border-muted text-muted-foreground"
                   } ${
                     currentStep === step.number
-                      ? "ring-4 ring-primary/20"
+                      ? "ring-2 sm:ring-4 ring-primary/20"
                       : ""
                   }`}
                 >
                   {currentStep > step.number ? (
-                    <Check className="w-5 h-5" />
+                    <Check className="w-4 h-4 sm:w-5 sm:h-5" />
                   ) : (
-                    <span className="text-sm font-bold">{step.number}</span>
+                    <span className="text-xs sm:text-sm font-bold">{step.number}</span>
                   )}
                 </motion.div>
 
                 {/* Step Label */}
                 <div
-                  className={`mt-3 text-xs font-medium text-center transition-colors duration-300 ${
+                  className={`mt-2 sm:mt-3 text-[10px] sm:text-xs font-medium text-center transition-colors duration-300 max-w-[60px] sm:max-w-none ${
                     currentStep >= step.number
                       ? "text-foreground"
                       : "text-muted-foreground"
@@ -618,52 +618,58 @@ export default function GeneratePage() {
         </div>
       </div>
 
-      <div className={`grid grid-cols-1 relative gap-6 ${
+      <div className={`grid grid-cols-1 relative gap-4 sm:gap-6 ${
         generatedLogo && currentStep === TOTAL_STEPS ? 'lg:grid-cols-2' : ''
       }`}>
         {/* Left Column */}
         <div>
           <Card className="border-2 border-primary/10 h-full shadow-xl">
-            <CardContent className="p-8 min-h-[500px] flex flex-col space-y-4">
+            <CardContent className="p-4 sm:p-6 lg:p-8 min-h-[400px] sm:min-h-[500px] flex flex-col space-y-4">
               <AnimatePresence mode="wait">
                 {renderStepContent()}
               </AnimatePresence>
 
               {/* Navigation Buttons */}
-              <div className="flex justify-between mt-auto pt-8">
+              <div className="flex justify-between mt-auto pt-6 sm:pt-8 gap-2">
                 <Button
                   onClick={prevStep}
                   disabled={currentStep === 1}
                   variant="outline"
-                  className="flex items-center gap-2"
+                  size="sm"
+                  className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm px-3 sm:px-4"
                 >
-                  <ChevronLeft className="w-4 h-4" />
-                  Previous
+                  <ChevronLeft className="w-3 h-3 sm:w-4 sm:h-4" />
+                  <span className="hidden sm:inline">Previous</span>
+                  <span className="sm:hidden">Prev</span>
                 </Button>
                 {currentStep < TOTAL_STEPS ? (
                   <Button
                     onClick={nextStep}
                     disabled={!canProceedToNextStep}
-                    className="flex items-center gap-2"
+                    size="sm"
+                    className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm px-3 sm:px-4"
                   >
                     Next
-                    <ChevronRight className="w-4 h-4" />
+                    <ChevronRight className="w-3 h-3 sm:w-4 sm:h-4" />
                   </Button>
                 ) : (
                   <Button
                     onClick={handleGenerate}
                     disabled={!isFormValid || loading}
-                    className="flex items-center gap-2 bg-primary hover:bg-primary/80"
+                    size="sm"
+                    className="flex items-center gap-1 sm:gap-2 bg-primary hover:bg-primary/80 text-xs sm:text-sm px-3 sm:px-4"
                   >
                     {loading ? (
                       <>
-                        Generating...
-                        <RefreshCw className="w-4 h-4 animate-spin" />
+                        <span className="hidden sm:inline">Generating...</span>
+                        <span className="sm:hidden">...</span>
+                        <RefreshCw className="w-3 h-3 sm:w-4 sm:h-4 animate-spin" />
                       </>
                     ) : (
                       <>
-                        Generate Logo
-                        <IconSparkles className="w-4 h-4" />
+                        <span className="hidden sm:inline">Generate Logo</span>
+                        <span className="sm:hidden">Generate</span>
+                        <IconSparkles className="w-3 h-3 sm:w-4 sm:h-4" />
                       </>
                     )}
                   </Button>
@@ -684,8 +690,8 @@ export default function GeneratePage() {
               <CardContent className="p-6">
                 <div className="space-y-4">
                   <div className="text-center">
-                    <h3 className="text-lg font-semibold mb-2">Your Logo</h3>
-                    <p className="text-sm text-muted-foreground">
+                    <h3 className="text-base sm:text-lg font-semibold mb-2">Your Logo</h3>
+                    <p className="text-xs sm:text-sm text-muted-foreground">
                       Generated with {selectedStyle} style
                     </p>
                   </div>
@@ -697,7 +703,7 @@ export default function GeneratePage() {
                     <img
                       src={generatedLogo}
                       alt="Generated logo"
-                      className="w-full h-full rounded-lg object-contain p-6"
+                      className="w-full h-full rounded-lg object-contain p-4 sm:p-6"
                     />
                   </div>
 
@@ -707,19 +713,20 @@ export default function GeneratePage() {
                         onClick={handleGenerate}
                         size="sm"
                         disabled={loading}
-                        className="flex-1"
+                        className="flex-1 text-xs sm:text-sm"
                       >
-                        <RefreshCw className="mr-2 h-4 w-4" />
-                        {loading ? "Generating..." : "Regenerate"}
+                        <RefreshCw className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />
+                        {loading ? "..." : <span className="hidden sm:inline">Regenerate</span>}
+                        {loading ? "" : <span className="sm:hidden">Regen</span>}
                       </Button>
                       <Button
                         onClick={handleDownload}
                         variant="outline"
                         size="sm"
                         disabled={isDownloading}
-                        className="flex-1"
+                        className="flex-1 text-xs sm:text-sm"
                       >
-                        <Download className="mr-2 h-4 w-4" />
+                        <Download className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />
                         {isDownloading ? "..." : "Download"}
                       </Button>
                     </div>

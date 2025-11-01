@@ -83,69 +83,69 @@ export default function DashboardPage() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       {/* Hero Section */}
       <div>
-        <h1 className="text-3xl font-bold mb-2">
+        <h1 className="text-2xl sm:text-3xl font-bold mb-2">
           Welcome Back 👋
         </h1>
-        <p className="text-muted-foreground">
+        <p className="text-sm sm:text-base text-muted-foreground">
           Manage your logo designs and create new ones
         </p>
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         <Card className="border border-border/50 bg-card hover:shadow-xl transition-all duration-300 hover:border-primary/20">
-          <CardContent className="p-5">
-            <div className="flex items-center justify-between mb-3">
-              <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                <IconPalette className="h-5 w-5 text-primary" />
+          <CardContent className="p-3 sm:p-5">
+            <div className="flex items-center justify-between mb-2 sm:mb-3">
+              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                <IconPalette className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
               </div>
-              <span className="text-2xl font-bold bg-gradient-to-br from-foreground to-foreground/60 bg-clip-text text-transparent">
+              <span className="text-xl sm:text-2xl font-bold bg-gradient-to-br from-foreground to-foreground/60 bg-clip-text text-transparent">
                 {totalDesigns}
               </span>
             </div>
-            <h3 className="font-semibold text-sm">Total Designs</h3>
+            <h3 className="font-semibold text-xs sm:text-sm">Total Designs</h3>
           </CardContent>
         </Card>
 
         <Card className="border border-border/50 bg-card hover:shadow-xl transition-all duration-300 hover:border-green-500/20">
-          <CardContent className="p-5">
-            <div className="flex items-center justify-between mb-3">
-              <div className="w-10 h-10 rounded-lg bg-green-500/10 flex items-center justify-center">
-                <IconClock className="h-5 w-5 text-green-600" />
+          <CardContent className="p-3 sm:p-5">
+            <div className="flex items-center justify-between mb-2 sm:mb-3">
+              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-green-500/10 flex items-center justify-center">
+                <IconClock className="h-4 w-4 sm:h-5 sm:w-5 text-green-600" />
               </div>
-              <span className="text-2xl font-bold bg-gradient-to-br from-green-600 to-green-700 bg-clip-text text-transparent">
+              <span className="text-xl sm:text-2xl font-bold bg-gradient-to-br from-green-600 to-green-700 bg-clip-text text-transparent">
                 {thisWeekDesigns}
               </span>
             </div>
-            <h3 className="font-semibold text-sm">This Week</h3>
+            <h3 className="font-semibold text-xs sm:text-sm">This Week</h3>
           </CardContent>
         </Card>
 
         <Card className="border border-border/50 bg-card hover:shadow-xl transition-all duration-300 hover:border-blue-500/20">
-          <CardContent className="p-5">
-            <div className="flex items-center justify-between mb-3">
-              <div className="w-10 h-10 rounded-lg bg-blue-500/10 flex items-center justify-center">
-                <IconCalendarMonth className="h-5 w-5 text-blue-600" />
+          <CardContent className="p-3 sm:p-5">
+            <div className="flex items-center justify-between mb-2 sm:mb-3">
+              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-blue-500/10 flex items-center justify-center">
+                <IconCalendarMonth className="h-4 w-4 sm:h-5 sm:w-5 text-blue-600" />
               </div>
-              <span className="text-2xl font-bold bg-gradient-to-br from-blue-600 to-blue-700 bg-clip-text text-transparent">
+              <span className="text-xl sm:text-2xl font-bold bg-gradient-to-br from-blue-600 to-blue-700 bg-clip-text text-transparent">
                 {thisMonthDesigns}
               </span>
             </div>
-            <h3 className="font-semibold text-sm">This Month</h3>
+            <h3 className="font-semibold text-xs sm:text-sm">This Month</h3>
           </CardContent>
         </Card>
 
         <Card className="border border-border/50 bg-card hover:shadow-xl transition-all duration-300 hover:border-primary/20 cursor-pointer group">
           <Link href="/dashboard/generate">
-            <CardContent className="p-5">
-              <div className="flex flex-col items-center">
-                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary to-primary/80 p-3 mb-2 shadow-lg group-hover:shadow-xl transition-shadow">
-                  <IconRocket className="h-6 w-6 text-white" />
+            <CardContent className="p-3 sm:p-5">
+              <div className="flex flex-col items-center justify-center h-full">
+                <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-br from-primary to-primary/80 p-2 sm:p-3 mb-1 sm:mb-2 shadow-lg group-hover:shadow-xl transition-shadow">
+                  <IconRocket className="h-full w-full text-white" />
                 </div>
-                <h3 className="font-semibold text-sm">Create New</h3>
+                <h3 className="font-semibold text-xs sm:text-sm">Create New</h3>
               </div>
             </CardContent>
           </Link>
@@ -155,7 +155,7 @@ export default function DashboardPage() {
       {/* Recent Designs */}
       <div>
         <div className="flex items-center justify-between mb-3">
-          <h2 className="text-lg font-bold">Recent Designs</h2>
+          <h2 className="text-base sm:text-lg font-bold">Recent Designs</h2>
           <Link href="/dashboard/my-designs">
             <Button variant="ghost" size="sm" className="text-xs">
               View All
@@ -163,7 +163,7 @@ export default function DashboardPage() {
           </Link>
         </div>
 
-        <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3">
           {isLoading ? (
             [...Array(6)].map((_, index) => <SkeletonCard key={index} />)
           ) : logos.length > 0 ? (
