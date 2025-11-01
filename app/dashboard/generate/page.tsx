@@ -6,7 +6,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import Link from "next/link";
-import { Download, RefreshCw } from "lucide-react";
+import { Download, RefreshCw, ChevronRight, ChevronLeft, Check } from "lucide-react";
 import { generateLogo, downloadImage } from "../../actions/actions";
 import {
   Select,
@@ -15,7 +15,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { useToast } from "@/hooks/use-toast";
 import {
   IconBolt,
@@ -152,7 +152,10 @@ const Footer = () => (
   </div>
 );
 
+const TOTAL_STEPS = 5;
+
 export default function GeneratePage() {
+  const [currentStep, setCurrentStep] = useState(1);
   const [companyName, setCompanyName] = useState("");
   const [selectedStyle, setSelectedStyle] = useState("minimal");
   const [primaryColor, setPrimaryColor] = useState("#2563EB");
@@ -179,6 +182,35 @@ export default function GeneratePage() {
     return companyName.trim().length > 0;
   }, [companyName]);
 
+  const canProceedToNextStep = useMemo(() => {
+    switch (currentStep) {
+      case 1:
+        return companyName.trim().length > 0;
+      case 2:
+        return selectedStyle !== "";
+      case 3:
+        return primaryColor !== "" && backgroundColor !== "" && !!selectedModel;
+      case 4:
+        return !!selectedSize && !!selectedQuality;
+      case 5:
+        return true; // Additional details are optional
+      default:
+        return false;
+    }
+  }, [currentStep, companyName, selectedStyle, primaryColor, backgroundColor, selectedModel, selectedSize, selectedQuality]);
+
+  const nextStep = () => {
+    if (canProceedToNextStep && currentStep < TOTAL_STEPS) {
+      setCurrentStep(currentStep + 1);
+    }
+  };
+
+  const prevStep = () => {
+    if (currentStep > 1) {
+      setCurrentStep(currentStep - 1);
+    }
+  };
+
   const handleGenerate = useCallback(async () => {
     if (!isFormValid) return;
     
@@ -198,6 +230,8 @@ export default function GeneratePage() {
 
       if (result.success && result.url) {
         setGeneratedLogo(result.url);
+        // Dispatch event to refresh credits in topbar
+        window.dispatchEvent(new CustomEvent('refreshCredits'));
         toast({
           title: "Success!",
           description: "Your logo has been generated successfully",
@@ -248,6 +282,258 @@ export default function GeneratePage() {
     }
   }, [generatedLogo, companyName, toast]);
 
+  const steps = [
+    { number: 1, label: "Brand Name", completed: companyName.trim().length > 0 },
+    { number: 2, label: "Style", completed: selectedStyle !== "" },
+    { number: 3, label: "Colors & Model", completed: primaryColor !== "" && backgroundColor !== "" && !!selectedModel },
+    { number: 4, label: "Size & Quality", completed: !!selectedSize && !!selectedQuality },
+    { number: 5, label: "Additional Details", completed: true },
+  ];
+
+  const renderStepContent = () => {
+    switch (currentStep) {
+      case 1:
+        return (
+          <motion.div
+            key="step-1"
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -20 }}
+            transition={{ duration: 0.3 }}
+            className="space-y-6"
+          >
+            <div className="text-center space-y-2 mb-8">
+              <h2 className="text-3xl font-bold">What's your brand name?</h2>
+              <p className="text-muted-foreground">Enter the name you want to appear in your logo</p>
+            </div>
+            <div className="flex flex-col gap-2">
+              <label className="text-sm font-medium ml-2">Brand Name</label>
+              <Input
+                value={companyName}
+                onChange={(e) => setCompanyName(e.target.value)}
+                placeholder="Enter your brand name"
+                className="h-14 text-lg border-2"
+                autoFocus
+              />
+            </div>
+          </motion.div>
+        );
+
+      case 2:
+        return (
+          <motion.div
+            key="step-2"
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -20 }}
+            transition={{ duration: 0.3 }}
+            className="space-y-6"
+          >
+            <div className="text-center space-y-2 mb-8">
+              <h2 className="text-3xl font-bold">Choose a style</h2>
+              <p className="text-muted-foreground">Select the design style that matches your brand</p>
+            </div>
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+              {STYLE_OPTIONS.map((style) => (
+                <motion.button
+                  key={style.id}
+                  onClick={() => setSelectedStyle(style.id)}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  className={`p-6 rounded-xl border-2 flex flex-col items-center gap-3 text-center transition-all ${
+                    selectedStyle === style.id
+                      ? "border-primary bg-primary/10 text-foreground font-semibold ring-2 ring-primary shadow-lg"
+                      : "border-border hover:bg-accent/50 hover:border-primary/50"
+                  }`}
+                >
+                  <style.icon className={`w-8 h-8 ${selectedStyle === style.id ? "text-primary" : ""}`} />
+                  <div className="font-semibold">{style.name}</div>
+                </motion.button>
+              ))}
+            </div>
+          </motion.div>
+        );
+
+      case 3:
+        return (
+          <motion.div
+            key="step-3"
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -20 }}
+            transition={{ duration: 0.3 }}
+            className="space-y-6"
+          >
+            <div className="text-center space-y-2 mb-8">
+              <h2 className="text-3xl font-bold">Colors & AI Model</h2>
+              <p className="text-muted-foreground">Customize colors and choose your AI model</p>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+              <div className="space-y-2">
+                <label className="text-sm font-medium ml-2">Primary Color</label>
+                <Select value={primaryColor} onValueChange={setPrimaryColor}>
+                  <SelectTrigger className="h-14 border-2">
+                    <SelectValue>
+                      <div className="flex items-center gap-3">
+                        <div
+                          className="w-6 h-6 rounded-full border-2 border-border"
+                          style={{ backgroundColor: primaryColor }}
+                        />
+                        {COLOR_OPTIONS.find((c) => c.id === primaryColor)?.name || "Select Color"}
+                      </div>
+                    </SelectValue>
+                  </SelectTrigger>
+                  <SelectContent>
+                    {COLOR_OPTIONS.map((color) => (
+                      <SelectItem key={color.id} value={color.id}>
+                        <div className="flex items-center gap-3">
+                          <div
+                            className="w-5 h-5 rounded-full"
+                            style={{ backgroundColor: color.id }}
+                          />
+                          {color.name}
+                        </div>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium ml-2">Background</label>
+                <Select value={backgroundColor} onValueChange={setBackgroundColor}>
+                  <SelectTrigger className="h-14 border-2">
+                    <SelectValue>
+                      <div className="flex items-center gap-3">
+                        <div
+                          className="w-6 h-6 rounded-full border-2"
+                          style={{ backgroundColor: backgroundColor }}
+                        />
+                        {BACKGROUND_OPTIONS.find((c) => c.id === backgroundColor)?.name || "Select Background"}
+                      </div>
+                    </SelectValue>
+                  </SelectTrigger>
+                  <SelectContent>
+                    {BACKGROUND_OPTIONS.map((color) => (
+                      <SelectItem key={color.id} value={color.id}>
+                        <div className="flex items-center gap-3">
+                          <div
+                            className="w-5 h-5 rounded-full border"
+                            style={{ backgroundColor: color.id }}
+                          />
+                          {color.name}
+                        </div>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium ml-2">AI Model</label>
+                <Select
+                  value={selectedModel}
+                  onValueChange={(value: "dall-e-3" | "black-forest-labs/flux-schnell" | "black-forest-labs/flux-dev") => setSelectedModel(value)}
+                >
+                  <SelectTrigger className="h-14 border-2">
+                    <SelectValue placeholder="Select Model" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {MODEL_OPTIONS.map((model) => (
+                      <SelectItem key={model.id} value={model.id}>
+                        <div>
+                          <div className="font-medium">{model.name}</div>
+                          <div className="text-xs text-muted-foreground">{model.description}</div>
+                        </div>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          </motion.div>
+        );
+
+      case 4:
+        return (
+          <motion.div
+            key="step-4"
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -20 }}
+            transition={{ duration: 0.3 }}
+            className="space-y-6"
+          >
+            <div className="text-center space-y-2 mb-8">
+              <h2 className="text-3xl font-bold">Size & Quality</h2>
+              <p className="text-muted-foreground">Choose the output size and quality</p>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+              <div className="space-y-2">
+                <label className="text-sm font-medium ml-2">Image Size</label>
+                <Select
+                  value={selectedSize}
+                  onValueChange={(value: "256x256" | "512x512" | "1024x1024") => setSelectedSize(value)}
+                >
+                  <SelectTrigger className="h-14 border-2">
+                    <SelectValue placeholder="Select Size" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {SIZE_OPTIONS.map((size) => (
+                      <SelectItem key={size.id} value={size.id}>
+                        {size.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium ml-2">Quality</label>
+                <Select
+                  value={selectedQuality}
+                  onValueChange={(value: "standard" | "hd") => setSelectedQuality(value)}
+                >
+                  <SelectTrigger className="h-14 border-2">
+                    <SelectValue placeholder="Select Quality" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="standard">Standard</SelectItem>
+                    <SelectItem value="hd">HD</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          </motion.div>
+        );
+
+      case 5:
+        return (
+          <motion.div
+            key="step-5"
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -20 }}
+            transition={{ duration: 0.3 }}
+            className="space-y-6"
+          >
+            <div className="text-center space-y-2 mb-8">
+              <h2 className="text-3xl font-bold">Additional Details</h2>
+              <p className="text-muted-foreground">Tell us more about your brand (optional)</p>
+            </div>
+            <div className="space-y-2">
+              <Textarea
+                value={additionalInfo}
+                onChange={(e) => setAdditionalInfo(e.target.value)}
+                placeholder="Describe your brand personality, target audience, or any specific preferences..."
+                className="min-h-[200px] text-base border-2 p-4"
+              />
+            </div>
+          </motion.div>
+        );
+
+      default:
+        return null;
+    }
+  };
+
   return (
     <div className="space-y-6">
       {/* Hero Section */}
@@ -260,234 +546,100 @@ export default function GeneratePage() {
         </p>
       </div>
 
+      {/* Progress Bar */}
+      <div className="mb-8">
+        <div className="flex items-center w-full relative">
+          {steps.map((step, index) => (
+            <div key={step.number} className="flex items-center flex-1 relative">
+              {/* Step Circle */}
+              <div className="flex flex-col items-center relative z-10">
+                <div
+                  className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold transition-all ${
+                    currentStep >= step.number
+                      ? "bg-primary text-white"
+                      : "bg-gray-200 text-gray-500"
+                  }`}
+                >
+                  {currentStep > step.number ? (
+                    <Check className="w-5 h-5 text-white" />
+                  ) : (
+                    <span className="text-sm">{step.number}</span>
+                  )}
+                </div>
+                {/* Step Label */}
+                <div className={`mt-2 text-xs font-medium whitespace-nowrap ${
+                  currentStep >= step.number ? "text-gray-900" : "text-gray-400"
+                }`}>
+                  {step.label}
+                </div>
+              </div>
+              {/* Connecting Line */}
+              {index < steps.length - 1 && (
+                <div className={`flex-1 h-0.5 mx-2 transition-all ${
+                  currentStep > step.number ? "bg-primary" : "bg-gray-200"
+                }`} />
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
+
       <div className="grid grid-cols-1 relative lg:grid-cols-2 gap-6">
         {/* Left Column */}
         <div>
-          <Card className="border-2 border-primary/10 h-full">
-            <CardContent className="p-6 space-y-4">
-              {/* Brand Name */}
-              <div className="flex flex-col gap-2">
-                <label className="text-sm font-medium ml-2">Brand Name</label>
-                <Input
-                  value={companyName}
-                  onChange={(e) => setCompanyName(e.target.value)}
-                  placeholder="Enter your brand name"
-                  className="mt-1 h-12 border-accent"
-                />
-              </div>
+          <Card className="border-2 border-primary/10 h-full shadow-xl">
+            <CardContent className="p-8 min-h-[500px] flex flex-col space-y-4">
+              <AnimatePresence mode="wait">
+                {renderStepContent()}
+              </AnimatePresence>
 
-              {/* Style Selection */}
-              <div className="flex flex-col gap-1">
-                <label className="text-sm font-medium ml-2">Style</label>
-                <div className="grid grid-cols-3 sm:grid-cols-6 gap-3 mt-1">
-                  {STYLE_OPTIONS.map((style) => (
-                    <motion.button
-                      key={style.id}
-                      onClick={() => setSelectedStyle(style.id)}
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                      className={`p-4 rounded-lg border flex items-center gap-1 flex-col text-center transition-all ${
-                        selectedStyle === style.id
-                          ? "border-primary bg-primary/20 text-foreground font-semibold ring-1 ring-primary"
-                          : "border-accent hover:bg-accent/20"
-                      }`}
-                    >
-                      <motion.div
-                        className="text-lg"
-                        transition={{ duration: 0.3 }}
-                      >
-                        {<style.icon className="w-5 h-5" />}
-                      </motion.div>
-                      <div className="text-[10px] font-medium">{style.name}</div>
-                    </motion.button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Colors and Model Selection Row */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <div>
-                  <label className="text-sm font-medium ml-2">
-                    Primary Color
-                  </label>
-                  <Select
-                    value={primaryColor}
-                    onValueChange={setPrimaryColor}
+              {/* Navigation Buttons */}
+              <div className="flex justify-between mt-auto pt-8">
+                <Button
+                  onClick={prevStep}
+                  disabled={currentStep === 1}
+                  variant="outline"
+                  className="flex items-center gap-2"
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                  Previous
+                </Button>
+                {currentStep < TOTAL_STEPS ? (
+                  <Button
+                    onClick={nextStep}
+                    disabled={!canProceedToNextStep}
+                    className="flex items-center gap-2"
                   >
-                    <SelectTrigger className="mt-1 h-12 border-accent">
-                      <SelectValue className="!bg-accent/20">
-                        <div className="flex items-center gap-2">
-                          <div
-                            className="w-4 h-4 rounded-full"
-                            style={{ backgroundColor: primaryColor }}
-                          />
-                          {COLOR_OPTIONS.find((c) => c.id === primaryColor)
-                            ?.name || "Select Color"}
-                        </div>
-                      </SelectValue>
-                    </SelectTrigger>
-                    <SelectContent>
-                      {COLOR_OPTIONS.map((color) => (
-                        <SelectItem key={color.id} value={color.id}>
-                          <div className="flex items-center gap-2">
-                            <div
-                              className="w-4 h-4 rounded-full"
-                              style={{ backgroundColor: color.id }}
-                            />
-                            {color.name}
-                          </div>
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div>
-                  <label className="text-sm font-medium ml-2">
-                    Background
-                  </label>
-                  <Select
-                    value={backgroundColor}
-                    onValueChange={setBackgroundColor}
-                  >
-                    <SelectTrigger className="mt-1 h-12 border-accent">
-                      <SelectValue>
-                        <div className="flex items-center gap-2">
-                          <div
-                            className="w-4 h-4 rounded-full border"
-                            style={{ backgroundColor: backgroundColor }}
-                          />
-                          {BACKGROUND_OPTIONS.find(
-                            (c) => c.id === backgroundColor
-                          )?.name || "Select Background"}
-                        </div>
-                      </SelectValue>
-                    </SelectTrigger>
-                    <SelectContent>
-                      {BACKGROUND_OPTIONS.map((color) => (
-                        <SelectItem key={color.id} value={color.id}>
-                          <div className="flex items-center gap-2">
-                            <div
-                              className="w-4 h-4 rounded-full border"
-                              style={{ backgroundColor: color.id }}
-                            />
-                            {color.name}
-                          </div>
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div>
-                  <label className="text-sm font-medium">AI Model</label>
-                  <Select
-                    value={selectedModel}
-                    onValueChange={(
-                      value:
-                        | "dall-e-3"
-                        | "black-forest-labs/flux-schnell"
-                        | "black-forest-labs/flux-dev"
-                    ) => setSelectedModel(value)}
-                  >
-                    <SelectTrigger className="mt-1 h-12 border-accent">
-                      <SelectValue placeholder="Select Model" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {MODEL_OPTIONS.map((model) => (
-                        <SelectItem key={model.id} value={model.id}>
-                          <div>
-                            <div className="font-medium">{model.name}</div>
-                            <div className="text-xs text-slate-500">
-                              {model.description}
-                            </div>
-                          </div>
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-
-              {/* Size and Quality Row */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="text-sm font-medium ml-2">
-                    Image Size
-                  </label>
-                  <Select
-                    value={selectedSize}
-                    onValueChange={(
-                      value: "256x256" | "512x512" | "1024x1024"
-                    ) => setSelectedSize(value)}
-                  >
-                    <SelectTrigger className="mt-1 h-12 border-accent">
-                      <SelectValue placeholder="Select Size" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {SIZE_OPTIONS.map((size) => (
-                        <SelectItem key={size.id} value={size.id}>
-                          {size.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div>
-                  <label className="text-sm font-medium ml-2">Quality</label>
-                  <Select
-                    value={selectedQuality}
-                    onValueChange={(value: "standard" | "hd") =>
-                      setSelectedQuality(value)
-                    }
-                  >
-                    <SelectTrigger className="mt-1 h-12 border-accent">
-                      <SelectValue placeholder="Select Quality" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="standard">Standard</SelectItem>
-                      <SelectItem value="hd">HD</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-
-              {/* Additional Details */}
-              <div>
-                <label className="text-sm font-medium ml-2">
-                  Additional Details
-                </label>
-                <Textarea
-                  value={additionalInfo}
-                  onChange={(e) => setAdditionalInfo(e.target.value)}
-                  placeholder="Describe your brand personality, target audience, or any specific preferences..."
-                  className="mt-1 h-28 px-4 py-3 border-accent"
-                />
-              </div>
-
-              {/* Generate Button */}
-              <Button
-                onClick={handleGenerate}
-                disabled={!isFormValid || loading}
-                className="w-full h-12 text-lg bg-primary hover:bg-primary/80 disabled:opacity-50"
-              >
-                {loading ? (
-                  <>
-                    Generating...
-                    <RefreshCw className="ml-2 h-5 w-5 animate-spin" />
-                  </>
+                    Next
+                    <ChevronRight className="w-4 h-4" />
+                  </Button>
                 ) : (
-                  <>
-                    Generate Logo
-                    <IconSparkles className="ml-2 h-5 w-5" />
-                  </>
+                  <Button
+                    onClick={handleGenerate}
+                    disabled={!isFormValid || loading}
+                    className="flex items-center gap-2 bg-primary hover:bg-primary/80"
+                  >
+                    {loading ? (
+                      <>
+                        Generating...
+                        <RefreshCw className="w-4 h-4 animate-spin" />
+                      </>
+                    ) : (
+                      <>
+                        Generate Logo
+                        <IconSparkles className="w-4 h-4" />
+                      </>
+                    )}
+                  </Button>
                 )}
-              </Button>
+              </div>
             </CardContent>
           </Card>
         </div>
 
         {/* Right Column */}
         <div className="">
-          <Card className="h-full rounded-3xl">
+          <Card className="h-full rounded-3xl shadow-xl border-2">
             <CardContent className="p-6 h-full">
               {generatedLogo ? (
                 <motion.div
@@ -497,19 +649,20 @@ export default function GeneratePage() {
                   transition={{ duration: 0.4 }}
                 >
                   <div
-                    className="aspect-square rounded-2xl"
+                    className="aspect-square rounded-2xl shadow-lg"
                     style={{ backgroundColor }}
                   >
                     <img
                       src={generatedLogo}
                       alt="Generated logo"
-                      className="w-full h-full rounded-2xl object-contain"
+                      className="w-full h-full rounded-2xl object-contain p-4"
                     />
                   </div>
                   <div className="flex gap-3">
                     <Button
                       onClick={handleGenerate}
                       className="flex-1 bg-primary hover:bg-primary/80"
+                      disabled={loading}
                     >
                       <RefreshCw className="mr-2 h-4 w-4" />
                       Generate New
@@ -518,28 +671,25 @@ export default function GeneratePage() {
                       onClick={handleDownload}
                       variant="outline"
                       className="flex-1"
+                      disabled={isDownloading}
                     >
                       <Download className="mr-2 h-4 w-4" />
-                      Download
+                      {isDownloading ? "Downloading..." : "Download"}
                     </Button>
                   </div>
                 </motion.div>
               ) : (
                 <motion.div
-                  className="h-full rounded-2xl flex items-center border-2 border-dashed justify-center text-center p-8"
+                  className="h-full min-h-[500px] rounded-2xl flex items-center border-2 border-dashed justify-center text-center p-8"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ duration: 0.4 }}
                 >
                   <div className="max-w-md space-y-4">
-                    <IconColorFilter className="h-20 w-20 mx-auto text-primary opacity-50" />
-                    <h3 className="text-xl font-semibold">
-                      Your Logo will appear here
-                    </h3>
-                    <p className="text-neutral-500">
-                      For best results, add additional details and let our AI
-                      generate a unique, professional logo tailored to your
-                      business.
+                    <IconColorFilter className="h-24 w-24 mx-auto text-primary opacity-50" />
+                    <h3 className="text-2xl font-semibold">Your Logo Preview</h3>
+                    <p className="text-muted-foreground">
+                      Complete all steps and generate your logo. It will appear here once generated.
                     </p>
                   </div>
                 </motion.div>

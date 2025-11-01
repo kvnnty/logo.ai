@@ -3,18 +3,37 @@
 import { IconSearch, IconSparkles } from "@tabler/icons-react";
 import { Input } from "@/components/ui/input";
 import { useState, useEffect } from "react";
+import { RefreshCw } from "lucide-react";
 import { getCredits } from "@/app/actions/actions";
 
 export default function DashboardTopbar() {
   const [searchQuery, setSearchQuery] = useState("");
   const [credits, setCredits] = useState({ remaining: 10, limit: 10 });
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
-  useEffect(() => {
-    const fetchCredits = async () => {
+  const fetchCredits = async () => {
+    setIsRefreshing(true);
+    try {
       const result = await getCredits();
       setCredits(result);
-    };
+    } finally {
+      setIsRefreshing(false);
+    }
+  };
+
+  useEffect(() => {
     fetchCredits();
+    
+    // Listen for credit refresh events
+    const handleCreditRefresh = () => {
+      fetchCredits();
+    };
+    
+    window.addEventListener('refreshCredits', handleCreditRefresh);
+    
+    return () => {
+      window.removeEventListener('refreshCredits', handleCreditRefresh);
+    };
   }, []);
 
   return (
@@ -36,11 +55,19 @@ export default function DashboardTopbar() {
           </div>
 
           {/* Credits UI - Right Aligned */}
-          <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-primary/10 border border-primary/20">
+          <div className="flex items-center gap-3 px-4 py-2 rounded-xl bg-primary/10 border border-primary/20">
             <IconSparkles className="h-4 w-4 text-primary" />
             <span className="text-sm font-semibold text-primary">
               {credits.remaining} Credits
             </span>
+            <button
+              onClick={fetchCredits}
+              disabled={isRefreshing}
+              className="p-1 hover:bg-primary/20 rounded transition-colors disabled:opacity-50"
+              title="Refresh credits"
+            >
+              <RefreshCw className={`h-4 w-4 text-primary ${isRefreshing ? 'animate-spin' : ''}`} />
+            </button>
           </div>
         </div>
       </div>
