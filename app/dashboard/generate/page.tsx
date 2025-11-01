@@ -26,6 +26,11 @@ import {
   IconFlame,
   IconMinimize,
   IconSparkles,
+  IconCircle,
+  IconBriefcase,
+  IconPalette,
+  IconGeometry,
+  IconBuildingSkyscraper,
 } from "@tabler/icons-react";
 import {
   IconBrandDribbble,
@@ -37,7 +42,7 @@ const STYLE_OPTIONS = [
   {
     id: "minimal",
     name: "Minimal",
-    icon: IconMinimize,
+    icon: IconCircle,
     details:
       "Flashy, attention grabbing, bold, futuristic, and eye-catching. Use vibrant neon colors with metallic, shiny, and glossy accents.",
   },
@@ -51,28 +56,28 @@ const STYLE_OPTIONS = [
   {
     id: "corporate",
     name: "Corporate",
-    icon: IconComponents,
+    icon: IconBriefcase,
     details:
       "modern, forward-thinking, flat design, geometric shapes, clean lines, natural colors with subtle accents, use strategic negative space to create visual interest.",
   },
   {
     id: "creative",
     name: "Creative",
-    icon: IconBulb,
+    icon: IconPalette,
     details:
       "playful, lighthearted, bright bold colors, rounded shapes, lively.",
   },
   {
     id: "abstract",
     name: "Abstract",
-    icon: IconCube,
+    icon: IconGeometry,
     details:
       "abstract, artistic, creative, unique shapes, patterns, and textures to create a visually interesting and wild logo.",
   },
   {
     id: "flashy",
     name: "Flashy",
-    icon: IconFlame,
+    icon: IconSparkles,
     details:
       "Flashy, attention grabbing, bold, futuristic, and eye-catching. Use vibrant neon colors with metallic, shiny, and glossy accents.",
   },
@@ -165,6 +170,7 @@ export default function GeneratePage() {
   const [generatedLogo, setGeneratedLogo] = useState("");
   const { toast } = useToast();
   const [isDownloading, setIsDownloading] = useState(false);
+  const [imageLoaded, setImageLoaded] = useState(false);
 
   const [selectedModel, setSelectedModel] = useState<
     | "dall-e-3"
@@ -229,6 +235,7 @@ export default function GeneratePage() {
       });
 
       if (result.success && result.url) {
+        setImageLoaded(false);
         setGeneratedLogo(result.url);
         // Dispatch event to refresh credits in topbar
         window.dispatchEvent(new CustomEvent('refreshCredits'));
@@ -346,7 +353,10 @@ export default function GeneratePage() {
                       : "border-border hover:bg-accent/50 hover:border-primary/50"
                   }`}
                 >
-                  <style.icon className={`w-8 h-8 ${selectedStyle === style.id ? "text-primary" : ""}`} />
+                  <style.icon
+                    className={`w-8 h-8 ${selectedStyle === style.id ? "text-primary" : "text-muted-foreground"}`}
+                    strokeWidth={1.5}
+                  />
                   <div className="font-semibold">{style.name}</div>
                 </motion.button>
               ))}
@@ -548,43 +558,69 @@ export default function GeneratePage() {
 
       {/* Progress Bar */}
       <div className="mb-8">
-        <div className="flex items-center w-full relative">
-          {steps.map((step, index) => (
-            <div key={step.number} className="flex items-center flex-1 relative">
-              {/* Step Circle */}
-              <div className="flex flex-col items-center relative z-10">
-                <div
-                  className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold transition-all ${
+        <div className="relative">
+          {/* Background Line */}
+          <div className="absolute top-5 left-0 right-0 h-1 bg-muted/30 rounded-full" />
+          
+          {/* Active Progress Line */}
+          <motion.div
+            className="absolute top-5 left-0 h-1 bg-primary rounded-full"
+            initial={{ width: 0 }}
+            animate={{
+              width: `${((currentStep - 1) / (TOTAL_STEPS - 1)) * 100}%`
+            }}
+            transition={{ duration: 0.4, ease: "easeInOut" }}
+          />
+
+          {/* Steps */}
+          <div className="relative flex justify-between">
+            {steps.map((step, index) => (
+              <div key={step.number} className="flex flex-col items-center">
+                {/* Step Circle */}
+                <motion.div
+                  initial={false}
+                  animate={{
+                    scale: currentStep === step.number ? 1.1 : 1,
+                  }}
+                  transition={{ duration: 0.2 }}
+                  className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold transition-all duration-300 ${
                     currentStep >= step.number
-                      ? "bg-primary text-white"
-                      : "bg-gray-200 text-gray-500"
+                      ? "bg-primary text-primary-foreground shadow-lg shadow-primary/25"
+                      : "bg-background border-2 border-muted text-muted-foreground"
+                  } ${
+                    currentStep === step.number
+                      ? "ring-4 ring-primary/20"
+                      : ""
                   }`}
                 >
                   {currentStep > step.number ? (
-                    <Check className="w-5 h-5 text-white" />
+                    <Check className="w-5 h-5" />
                   ) : (
-                    <span className="text-sm">{step.number}</span>
+                    <span className="text-sm font-bold">{step.number}</span>
                   )}
-                </div>
+                </motion.div>
+
                 {/* Step Label */}
-                <div className={`mt-2 text-xs font-medium whitespace-nowrap ${
-                  currentStep >= step.number ? "text-gray-900" : "text-gray-400"
-                }`}>
+                <div
+                  className={`mt-3 text-xs font-medium text-center transition-colors duration-300 ${
+                    currentStep >= step.number
+                      ? "text-foreground"
+                      : "text-muted-foreground"
+                  } ${
+                    currentStep === step.number ? "font-semibold" : ""
+                  }`}
+                >
                   {step.label}
                 </div>
               </div>
-              {/* Connecting Line */}
-              {index < steps.length - 1 && (
-                <div className={`flex-1 h-0.5 mx-2 transition-all ${
-                  currentStep > step.number ? "bg-primary" : "bg-gray-200"
-                }`} />
-              )}
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 relative lg:grid-cols-2 gap-6">
+      <div className={`grid grid-cols-1 relative gap-6 ${
+        generatedLogo && currentStep === TOTAL_STEPS ? 'lg:grid-cols-2' : ''
+      }`}>
         {/* Left Column */}
         <div>
           <Card className="border-2 border-primary/10 h-full shadow-xl">
@@ -637,66 +673,62 @@ export default function GeneratePage() {
           </Card>
         </div>
 
-        {/* Right Column */}
-        <div className="">
-          <Card className="h-full rounded-3xl shadow-xl border-2">
-            <CardContent className="p-6 h-full">
-              {generatedLogo ? (
-                <motion.div
-                  className="space-y-6"
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.4 }}
-                >
+        {/* Right Column - Only show after step 5 completion */}
+        {generatedLogo && currentStep === TOTAL_STEPS && (
+          <motion.div
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.5 }}
+          >
+            <Card className="rounded-xl border shadow-sm">
+              <CardContent className="p-6">
+                <div className="space-y-4">
+                  <div className="text-center">
+                    <h3 className="text-lg font-semibold mb-2">Your Logo</h3>
+                    <p className="text-sm text-muted-foreground">
+                      Generated with {selectedStyle} style
+                    </p>
+                  </div>
+
                   <div
-                    className="aspect-square rounded-2xl shadow-lg"
+                    className="aspect-square rounded-lg border bg-white"
                     style={{ backgroundColor }}
                   >
                     <img
                       src={generatedLogo}
                       alt="Generated logo"
-                      className="w-full h-full rounded-2xl object-contain p-4"
+                      className="w-full h-full rounded-lg object-contain p-6"
                     />
                   </div>
-                  <div className="flex gap-3">
-                    <Button
-                      onClick={handleGenerate}
-                      className="flex-1 bg-primary hover:bg-primary/80"
-                      disabled={loading}
-                    >
-                      <RefreshCw className="mr-2 h-4 w-4" />
-                      Generate New
-                    </Button>
-                    <Button
-                      onClick={handleDownload}
-                      variant="outline"
-                      className="flex-1"
-                      disabled={isDownloading}
-                    >
-                      <Download className="mr-2 h-4 w-4" />
-                      {isDownloading ? "Downloading..." : "Download"}
-                    </Button>
+
+                  <div className="space-y-3">
+                    <div className="flex gap-2">
+                      <Button
+                        onClick={handleGenerate}
+                        size="sm"
+                        disabled={loading}
+                        className="flex-1"
+                      >
+                        <RefreshCw className="mr-2 h-4 w-4" />
+                        {loading ? "Generating..." : "Regenerate"}
+                      </Button>
+                      <Button
+                        onClick={handleDownload}
+                        variant="outline"
+                        size="sm"
+                        disabled={isDownloading}
+                        className="flex-1"
+                      >
+                        <Download className="mr-2 h-4 w-4" />
+                        {isDownloading ? "..." : "Download"}
+                      </Button>
+                    </div>
                   </div>
-                </motion.div>
-              ) : (
-                <motion.div
-                  className="h-full min-h-[500px] rounded-2xl flex items-center border-2 border-dashed justify-center text-center p-8"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ duration: 0.4 }}
-                >
-                  <div className="max-w-md space-y-4">
-                    <IconColorFilter className="h-24 w-24 mx-auto text-primary opacity-50" />
-                    <h3 className="text-2xl font-semibold">Your Logo Preview</h3>
-                    <p className="text-muted-foreground">
-                      Complete all steps and generate your logo. It will appear here once generated.
-                    </p>
-                  </div>
-                </motion.div>
-              )}
-            </CardContent>
-          </Card>
-        </div>
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
+        )}
       </div>
       <Footer />
     </div>

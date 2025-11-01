@@ -1,12 +1,27 @@
 "use client";
 
-import { useState, useMemo, useCallback } from "react";
+import React, { useState, useMemo, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import Link from "next/link";
-import { Palette, Download, RefreshCw, ChevronRight, ChevronLeft, Check } from "lucide-react";
+import { 
+  Palette, 
+  Download, 
+  RefreshCw, 
+  ChevronRight, 
+  ChevronLeft, 
+  Check,
+  Circle,
+  Monitor,
+  Building2,
+  Paintbrush,
+  Shapes,
+  Sparkles,
+  History,
+  Filter
+} from "lucide-react";
 import { generateLogo, downloadImage } from "../actions/actions";
 import {
   Select,
@@ -21,17 +36,6 @@ import { redirect, useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
 import Navbar from "@/components/landing/navbar";
 import {
-  IconBolt,
-  IconBulb,
-  IconColorFilter,
-  IconComponents,
-  IconCube,
-  IconFlame,
-  IconHistory,
-  IconMinimize,
-  IconSparkles,
-} from "@tabler/icons-react";
-import {
   IconBrandDribbble,
   IconBrandLinkedin,
   IconBrandYoutube,
@@ -41,42 +45,42 @@ const STYLE_OPTIONS = [
   {
     id: "minimal",
     name: "Minimal",
-    icon: IconMinimize,
+    icon: Circle,
     details:
       "Flashy, attention grabbing, bold, futuristic, and eye-catching. Use vibrant neon colors with metallic, shiny, and glossy accents.",
   },
   {
     id: "tech",
     name: "Technology",
-    icon: IconBolt,
+    icon: Monitor,
     details:
       "highly detailed, sharp focus, cinematic, photorealistic, Minimalist, clean, sleek, neutral color pallete with subtle accents, clean lines, shadows, and flat.",
   },
   {
     id: "corporate",
     name: "Corporate",
-    icon: IconComponents,
+    icon: Building2,
     details:
       "modern, forward-thinking, flat design, geometric shapes, clean lines, natural colors with subtle accents, use strategic negative space to create visual interest.",
   },
   {
     id: "creative",
     name: "Creative",
-    icon: IconBulb,
+    icon: Paintbrush,
     details:
       "playful, lighthearted, bright bold colors, rounded shapes, lively.",
   },
   {
     id: "abstract",
     name: "Abstract",
-    icon: IconCube,
+    icon: Shapes,
     details:
       "abstract, artistic, creative, unique shapes, patterns, and textures to create a visually interesting and wild logo.",
   },
   {
     id: "flashy",
     name: "Flashy",
-    icon: IconFlame,
+    icon: Sparkles,
     details:
       "Flashy, attention grabbing, bold, futuristic, and eye-catching. Use vibrant neon colors with metallic, shiny, and glossy accents.",
   },
@@ -360,7 +364,9 @@ export default function Home() {
               <p className="text-muted-foreground">Select the design style that matches your brand</p>
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-              {STYLE_OPTIONS.map((style) => (
+              {STYLE_OPTIONS.map((style) => {
+                const IconComponent = style.icon;
+                return (
                 <motion.button
                   key={style.id}
                   onClick={() => setSelectedStyle(style.id)}
@@ -372,10 +378,11 @@ export default function Home() {
                       : "border-border hover:bg-accent/50 hover:border-primary/50"
                   }`}
                 >
-                  <style.icon className={`w-8 h-8 ${selectedStyle === style.id ? "text-primary" : ""}`} />
+                    <IconComponent className={`w-8 h-8 ${selectedStyle === style.id ? "text-primary" : ""}`} />
                   <div className="font-semibold">{style.name}</div>
                 </motion.button>
-              ))}
+                );
+              })}
             </div>
           </motion.div>
         );
@@ -573,7 +580,7 @@ export default function Home() {
             </span>
           </div>
           <Button onClick={() => router.push("/history")} variant="outline" className="w-fit">
-            <IconHistory className="w-4 scale-y-[-1] h-4 mr-2" />
+            <History className="w-4 scale-y-[-1] h-4 mr-2" />
             History
           </Button>
         </div>
@@ -665,7 +672,7 @@ export default function Home() {
                     ) : (
                       <>
                         Generate Logo
-                        <IconSparkles className="w-4 h-4" />
+                        <Sparkles className="w-4 h-4" />
                       </>
                     )}
                   </Button>
@@ -674,8 +681,9 @@ export default function Home() {
             </CardContent>
           </Card>
 
-          {/* Right Column - Preview */}
-          <Card className="h-full rounded-2xl shadow-xl border-2">
+          {/* Right Column - Preview (Only show after step 4) */}
+          {currentStep >= 4 && (
+            <Card className="h-full rounded-2xl shadow-xl border-2 overflow-hidden">
             <CardContent className="p-6 h-full">
               {generatedLogo ? (
                 <motion.div
@@ -685,7 +693,7 @@ export default function Home() {
                   transition={{ duration: 0.4 }}
                 >
                   <div
-                    className="aspect-square rounded-2xl shadow-lg"
+                      className="aspect-square rounded-2xl shadow-lg overflow-hidden"
                     style={{ backgroundColor }}
                   >
                     <img
@@ -716,22 +724,61 @@ export default function Home() {
                 </motion.div>
               ) : (
                 <motion.div
-                  className="h-full min-h-[500px] rounded-2xl flex items-center border-2 border-dashed justify-center text-center p-8"
+                    className="h-full min-h-[500px] rounded-2xl flex items-center justify-center text-center p-8 relative overflow-hidden"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ duration: 0.4 }}
                 >
-                  <div className="max-w-md space-y-4">
-                    <IconColorFilter className="h-24 w-24 mx-auto text-primary opacity-50" />
-                    <h3 className="text-2xl font-semibold">Your Logo Preview</h3>
-                    <p className="text-muted-foreground">
-                      Complete all steps and generate your logo. It will appear here once generated.
+                    {/* Background Gradient */}
+                    <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-primary/10 to-orange-500/5"></div>
+                    
+                    {/* Animated Border */}
+                    <div className="absolute inset-0 rounded-2xl border-2 border-dashed border-primary/20"></div>
+                    
+                    {/* Content */}
+                    <div className="relative z-10 max-w-md space-y-6">
+                      {/* Icon with animated background */}
+                      <div className="relative mx-auto w-32 h-32 flex items-center justify-center">
+                        <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-orange-500/20 rounded-full blur-2xl animate-pulse"></div>
+                        <div className="relative bg-gradient-to-br from-primary/10 to-orange-500/10 rounded-full p-6 backdrop-blur-sm">
+                          <Sparkles className="h-16 w-16 text-primary" />
+                        </div>
+                      </div>
+                      
+                      {/* Text Content */}
+                      <div className="space-y-3">
+                        <h3 className="text-3xl font-bold bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
+                          Your Logo Preview
+                        </h3>
+                        <p className="text-muted-foreground text-base leading-relaxed">
+                          {currentStep === 4 
+                            ? "Complete the final step and generate your logo. It will appear here once ready."
+                            : currentStep === 5
+                            ? "Ready to generate! Click the button below to create your logo."
+                            : "Your generated logo will appear here."
+                          }
                     </p>
+                      </div>
+                      
+                      {/* Progress Indicator */}
+                      <div className="flex items-center justify-center gap-2 pt-2">
+                        {[1, 2, 3, 4, 5].map((step) => (
+                          <div
+                            key={step}
+                            className={`h-2 w-2 rounded-full transition-all duration-300 ${
+                              step <= currentStep
+                                ? "bg-primary scale-125"
+                                : "bg-muted-foreground/30"
+                            }`}
+                          />
+                        ))}
+                      </div>
                   </div>
                 </motion.div>
               )}
             </CardContent>
           </Card>
+          )}
         </div>
         <Footer />
       </main>

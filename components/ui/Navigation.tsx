@@ -24,10 +24,10 @@ const Navigation = () => {
             Generate
           </Link>
           <Link
-            href="/gallery"
+            href="/example"
             className="text-gray-500 hover:text-primary transition-colors"
           >
-            Gallery
+            Example
           </Link>
           <Link
             href="/pricing"

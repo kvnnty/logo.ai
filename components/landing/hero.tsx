@@ -3,100 +3,122 @@
 import React from "react";
 import Link from "next/link";
 import { Button } from "../ui/button";
-import { IconPointerFilled, IconSparkles } from "@tabler/icons-react";
+import { IconPencil, IconStar, IconEdit, IconWand } from "@tabler/icons-react";
 import { SignedIn, SignedOut, SignInButton } from "@clerk/nextjs";
-import { cn } from "@/lib/utils";
-import { ArrowRightIcon } from "@radix-ui/react-icons";
-import AnimatedShinyText from "../ui/animated-shiny-text";
-import { artworkData } from "@/constants/data";
+import { Star } from "lucide-react";
+import { motion } from "framer-motion";
 
 export default function Hero() {
-  // Get first 6 logos for first row
-  const displayLogos = artworkData.slice(0, 6);
+
+  const features = [
+    { icon: IconPencil, text: "Generate professional logos in seconds with AI" },
+    { icon: IconStar, text: "Multiple style options: Minimal, Tech, Corporate, Creative & more" },
+    { icon: IconEdit, text: "Customize colors, sizes, and quality to match your brand" },
+    { icon: IconWand, text: "Complete ownership - use your logo anywhere, anytime" },
+  ];
+
   return (
-    <>
-      <div className="relative overflow-hidden" style={{ backgroundColor: '#FFEEE3' }}>
-        <section className="flex max-w-full mx-auto relative flex-col items-center justify-center h-full pt-24 px-4 sm:pt-36 pb-24 border-b border-border/40 z-0">
-        <div
-          className={cn(
-            "group relative rounded-full border border-black/5 bg-neutral-100 text-sm sm:text-base max-sm:mb-2 text-white transition-all ease-in hover:cursor-pointer hover:bg-neutral-200",
-          )}
-        >
-          <AnimatedShinyText className="inline-flex items-center justify-center px-3 py-0.5">
-            <span>✨ Create professional logos in seconds</span>
-            <ArrowRightIcon className="ml-1 size-2.5 transition-transform duration-300 ease-in-out group-hover:translate-x-0.5" />
-          </AnimatedShinyText>
+    <section className="relative overflow-hidden bg-transparent">
+      <div className="max-w-6xl mx-auto px-4 pt-32 sm:pt-40 lg:pt-48 pb-12 sm:pb-16">
+        <div className="flex flex-col lg:flex-row gap-8 lg:gap-12 items-center justify-center">
+          {/* Left Side - Text and CTA */}
+          <div className="order-2 lg:order-1 w-full lg:flex-1 lg:max-w-[500px] lg:min-h-[500px] flex-shrink-0 flex flex-col justify-center">
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.5 }}
+              className="space-y-6"
+            >
+              <div className="space-y-4">
+                <h1 className="text-3xl sm:text-4xl lg:text-5xl font-light text-foreground leading-tight tracking-tight">
+                  <span className="block">Create Professional</span>
+                  <span className="block">Logos Instantly</span>
+              </h1>
+                <p className="text-lg sm:text-xl text-muted-foreground leading-relaxed max-w-lg">
+                  Enter your company name, choose your style and preferences, and watch our AI create a unique logo in seconds.
+                </p>
+              </div>
+
+            {/* Features List */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
+              {features.map((feature, index) => {
+                const Icon = feature.icon;
+                return (
+                    <motion.div
+                      key={index}
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: 0.2 + index * 0.1, duration: 0.5 }}
+                      className="flex items-center gap-2.5"
+                    >
+                      <div className="flex-shrink-0 w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center">
+                        <Icon className="size-3.5 text-primary" />
+                     </div>
+                      <span className="text-sm text-foreground font-medium">{feature.text}</span>
+                    </motion.div>
+                );
+              })}
+              </div>
+
+             {/* CTA Button */}
+              <div className="pt-4">
+               <SignedOut>
+                 <SignInButton
+                   signUpForceRedirectUrl="/dashboard"
+                   forceRedirectUrl="/dashboard"
+                   mode="modal"
+                 >
+                    <Button size="lg" className="bg-orange-600 hover:bg-orange-700 text-white px-8 py-6 text-lg font-semibold rounded-lg shadow-lg transition-all duration-200 hover:shadow-xl">
+                      Create Your Logo Now
+                   </Button>
+                 </SignInButton>
+               </SignedOut>
+               <SignedIn>
+                 <Link href="/dashboard/generate">
+                    <Button size="lg" className="bg-orange-600 hover:bg-orange-700 text-white px-8 py-6 text-lg font-semibold rounded-lg shadow-lg transition-all duration-200 hover:shadow-xl">
+                      Create Your Logo Now
+                   </Button>
+                 </Link>
+               </SignedIn>
+              </div>
+
+             {/* Social Proof */}
+              <div className="flex items-center gap-3 pt-2">
+                <div className="flex items-center gap-1">
+                 {[...Array(5)].map((_, i) => (
+                    <Star key={i} className="size-5 fill-green-500 text-green-500" />
+                 ))}
+               </div>
+                <div className="text-sm text-muted-foreground">
+                  <span className="font-semibold text-foreground">4.5</span> out of 5{" "}
+                 <span className="font-semibold text-foreground">126,964</span> reviews
+               </div>
+              </div>
+            </motion.div>
+          </div>
+
+          {/* Right Side - Hero Video */}
+          <div className="relative order-1 lg:order-2 w-full lg:flex-1 lg:max-w-[600px] h-[400px] sm:h-[500px] lg:h-[500px] flex-shrink-0">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.5 }}
+              className="relative w-full h-full rounded-lg overflow-hidden bg-background flex items-center justify-center"
+            >
+              <video
+                src="/hero-video.webm"
+                autoPlay
+                loop
+                muted
+                playsInline
+                className="w-full h-full object-contain"
+              >
+                Your browser does not support the video tag.
+              </video>
+            </motion.div>
+          </div>
         </div>
-          
-          <div className="text-4xl sm:text-5xl md:text-5xl lg:text-7xl font-medium text-center">
-            Design your dream logo in <br />{" "}
-            <span className="font-semibold bg-gradient-to-tr from-white via-primary to-white bg-clip-text text-transparent">
-              seconds, not days
-            </span>
-          </div>
-
-          <div className="text-base md:text-lg mt-8 font-bold w-full lg:w-[50%] text-center text-neutral-500">
-            Transform your brand identity with{" "}
-            <span className="text-neutral-900 font-extrabold">
-              AI-powered logo design
-            </span>
-            . <br className="md:block hidden" />
-            <span className="text-neutral-900 font-extrabold">
-              No design skills needed
-            </span>
-            {" "}— just describe your vision and watch it come to life.
-          </div>
-
-          <div className="mt-10 flex sm:flex-row flex-col w-full md:w-auto items-center gap-4">
-            <SignedIn>
-              <Link href="/dashboard/generate" className="w-full md:w-auto">
-                <Button className="h-8 w-full px-6 py-5 transition-all hover:opacity-90 hover:scale-105">
-                  Try for free! <IconPointerFilled className="w-4 h-4" />
-                </Button>
-              </Link>
-            </SignedIn>
-            <SignedOut>
-              <SignInButton
-              signUpForceRedirectUrl="/dashboard"
-              forceRedirectUrl="/dashboard"
-                mode="modal"
-              >
-                <Button className="h-8 w-full px-6 py-5 transition-all hover:opacity-90 hover:scale-105">
-                  Try for free! <IconPointerFilled className="w-4 h-4" />
-                </Button>
-              </SignInButton>
-            </SignedOut>
-            <Link href="/gallery" className="w-full md:w-auto">
-              <Button
-                variant="outline"
-                className="h-8 w-full px-6 py-5 transition-all hover:shadow-[0_0_20px_2px_hsl(var(--primary))]"
-              >
-                See Examples{" "}
-                <IconSparkles className="fill-[hsl(var(--primary))] text-primary" />
-              </Button>
-            </Link>
-          </div>
-
-          {/* Logo Cards Grid - First Row (6 cards) */}
-          <div className="mt-16 w-full">
-            <div className="grid grid-cols-6 gap-4 w-full max-w-[1920px] mx-auto px-4">
-              {displayLogos.map((logo, index) => (
-                <div
-                  key={index}
-                  className="w-[270px] h-[170px] rounded-xl overflow-hidden group cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-lg justify-self-center"
-                >
-                  <img
-                    src={logo.imageUrl}
-                    alt={`Logo example ${index + 1}`}
-                    className="w-full h-full object-cover transition-transform duration-700 ease-in-out group-hover:scale-110"
-                    loading="eager"
-                  />
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
       </div>
-    </>
+    </section>
   );
 }
