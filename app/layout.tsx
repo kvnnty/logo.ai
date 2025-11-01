@@ -12,33 +12,44 @@ const manrope = Manrope({
 });
 
 export const metadata: Metadata = {
-  title: "LogoAIpro - Create Professional Logos in Minutes",
-  description: "Generate unique, professional logos for your brand using AI. Choose from multiple styles, customize colors, and download high-quality logos instantly.",
+  title: "LogoAIpro - AI Logo Generator | Design Your Dream Logo in Seconds",
+  description: "Transform your brand identity with AI-powered logo design. Create unique, professional logos in seconds using advanced AI models. No design skills needed - just describe your vision and watch it come to life.",
   keywords: [
     "AI logo generator",
-    "logo design",
-    "artificial intelligence",
-    "brand identity",
     "logo maker",
-    "business logo",
-    "professional logo",
-    "custom logo",
-    "logo creation",
-    "LogoAIpro"
+    "professional logo design",
+    "artificial intelligence logo creator",
+    "brand identity",
+    "custom logo maker",
+    "business logo generator",
+    "instant logo design",
+    "free logo creator",
+    "LogoAIpro",
+    "AI design tool",
+    "brand logo creator",
+    "quick logo generator"
   ],
   openGraph: {
     type: "website",
     locale: "en_US",
-    url: "https://www.logoai.in",
-    title: "LogoAIpro - Create Professional Logos in Minutes",
-    description: "Generate unique, professional logos for your brand using AI. Choose from multiple styles, customize colors, and download high-quality logos instantly.",
+    title: "LogoAIpro - Design Your Dream Logo in Seconds with AI",
+    description: "Transform your brand identity with AI-powered logo design. Create professional logos instantly with multiple styles, custom colors, and high-quality downloads.",
     siteName: "LogoAIpro",
+    images: [
+      {
+        url: "/opengraph-image.png",
+        width: 1200,
+        height: 630,
+        alt: "LogoAIpro - AI Logo Generator",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "LogoAIpro - Create Professional Logos in Minutes",
-    description: "Generate unique, professional logos for your brand using AI. Choose from multiple styles, customize colors, and download high-quality logos instantly.",
+    title: "LogoAIpro - Design Your Dream Logo in Seconds",
+    description: "Transform your brand identity with AI-powered logo design. Create professional logos instantly.",
     creator: "@Webbuddy_1729",
+    images: ["/opengraph-image.png"],
   },
   robots: {
     index: true,
