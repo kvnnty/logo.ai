@@ -1,17 +1,11 @@
 import React from "react";
-import { Button } from "../ui/button";
-import { Badge } from "../ui/badge";
 import {
-  IconRocket,
-  IconSparkles,
   IconBrandDribbble,
   IconBrandLinkedin,
   IconBrandYoutube,
 } from "@tabler/icons-react";
+import { Sparkles } from "lucide-react";
 import FooterGradient from "../ui/footer-gradient";
-import { SignedIn } from "@clerk/nextjs";
-import { SignInButton } from "@clerk/nextjs";
-import { SignedOut } from "@clerk/nextjs";
 import Link from "next/link";
 
 export default function Footer() {
@@ -21,61 +15,22 @@ export default function Footer() {
       <div className="absolute inset-0 bg-dot-black/[0.2] z-0"></div>
       <FooterGradient />
 
-      {/* CTA Section */}
-      <div className="relative z-10 py-10 md:py-12 px-4">
-        <div className="max-w-4xl mx-auto text-center">
-          <Badge
-            variant="outline"
-            className="w-fit px-4 py-2 rounded-full flex items-center mx-auto mb-4 gap-2 border-primary/20 hover:border-primary/40 transition-colors"
-          >
-            <IconSparkles className="size-4 text-primary" />
-            Let&apos;s Start now
-            <IconRocket className="size-4 text-primary" />
-          </Badge>
-          <h2 className="text-3xl md:text-5xl font-medium mb-2">
-            Are you ready to explore your
-            <span className="text-muted-foreground/40 text-2xl md:text-4xl">
-              <br /> Creativity with{" "}
-              <span className="mx-2 text-primary">
-                LogoAIpro
-              </span>
-            </span>
-            ?
-          </h2>
-          <div className="mt-6">
-            <SignedOut>
-              <SignInButton
-                signUpForceRedirectUrl="/dashboard"
-                forceRedirectUrl="/dashboard"
-              >
-                <Button className="group text-sm">
-                  Start Generating
-                  <IconSparkles className="size-4 ml-2 group-hover:scale-110 transition-transform" />
-                </Button>
-              </SignInButton>
-            </SignedOut>
-            <SignedIn>
-              <Link href="/dashboard/generate">
-                <Button className="group text-sm">
-                  Start Generating
-                  <IconSparkles className="size-4 ml-2 group-hover:scale-110 transition-transform" />
-                </Button>
-              </Link>
-            </SignedIn>
-          </div>
-        </div>
-      </div>
-
       {/* Navigation & Links Section */}
       <div className="relative z-10 border-t border-border/40 bg-background/30 backdrop-blur-sm">
         <div className="max-w-6xl mx-auto px-4 py-12 md:py-16">
           <div className="flex flex-col md:flex-row items-center justify-between gap-8 mb-12">
             {/* Brand */}
             <div className="flex flex-col items-center md:items-start">
-              <Link href="/" className="inline-block mb-3">
-                <h3 className="text-2xl font-bold text-primary">
-                  LogoAIpro
-                </h3>
+              <Link 
+                href="/" 
+                className="flex items-center gap-2 group mb-3"
+              >
+                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center shadow-lg shadow-primary/20 group-hover:shadow-primary/40 transition-all duration-300">
+                  <Sparkles className="w-5 h-5 text-primary-foreground" />
+                </div>
+                <span className="text-xl font-bold bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
+                  LogoAI<span className="text-primary">pro</span>
+                </span>
               </Link>
               <p className="text-sm text-muted-foreground text-center md:text-left max-w-xs">
                 AI-powered logo design that transforms your ideas into stunning brand identities.

@@ -157,7 +157,7 @@ const Footer = () => (
   </div>
 );
 
-const TOTAL_STEPS = 5;
+const TOTAL_STEPS = 6;
 
 export default function GeneratePage() {
   const [currentStep, setCurrentStep] = useState(1);
@@ -237,6 +237,8 @@ export default function GeneratePage() {
       if (result.success && result.url) {
         setImageLoaded(false);
         setGeneratedLogo(result.url);
+        // Move to step 6 to show the generated logo
+        setCurrentStep(6);
         // Dispatch event to refresh credits in topbar
         window.dispatchEvent(new CustomEvent('refreshCredits'));
         toast({
@@ -295,6 +297,7 @@ export default function GeneratePage() {
     { number: 3, label: "Colors & Model", completed: primaryColor !== "" && backgroundColor !== "" && !!selectedModel },
     { number: 4, label: "Size & Quality", completed: !!selectedSize && !!selectedQuality },
     { number: 5, label: "Additional Details", completed: true },
+    { number: 6, label: "Generated Logo", completed: !!generatedLogo },
   ];
 
   const renderStepContent = () => {
@@ -539,6 +542,75 @@ export default function GeneratePage() {
           </motion.div>
         );
 
+      case 6:
+        return (
+          <motion.div
+            key="step-6"
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -20 }}
+            transition={{ duration: 0.3 }}
+            className="space-y-6"
+          >
+            <div className="text-center space-y-2 mb-6 sm:mb-8">
+              <h2 className="text-2xl sm:text-3xl font-bold">Your Logo is Ready!</h2>
+              <p className="text-sm sm:text-base text-muted-foreground">
+                Generated with {STYLE_OPTIONS.find(s => s.id === selectedStyle)?.name || selectedStyle} style
+              </p>
+            </div>
+
+            {generatedLogo ? (
+              <div className="space-y-6">
+                <div
+                  className="aspect-square rounded-xl border-2 bg-white shadow-lg max-w-lg mx-auto"
+                  style={{ backgroundColor }}
+                >
+                  <img
+                    src={generatedLogo}
+                    alt="Generated logo"
+                    className="w-full h-full rounded-xl object-contain p-6 sm:p-8"
+                  />
+                </div>
+
+                <div className="flex flex-col sm:flex-row gap-3 max-w-lg mx-auto">
+                  <Button
+                    onClick={handleDownload}
+                    size="lg"
+                    disabled={isDownloading}
+                    className="flex-1 text-sm sm:text-base"
+                  >
+                    <Download className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
+                    {isDownloading ? "Downloading..." : "Download Logo"}
+                  </Button>
+                  <Button
+                    onClick={handleGenerate}
+                    variant="outline"
+                    size="lg"
+                    disabled={loading}
+                    className="flex-1 text-sm sm:text-base"
+                  >
+                    <RefreshCw className={`mr-2 h-4 w-4 sm:h-5 sm:w-5 ${loading ? "animate-spin" : ""}`} />
+                    {loading ? "Generating..." : "Regenerate"}
+                  </Button>
+                </div>
+
+                <div className="text-center space-y-2">
+                  <p className="text-xs sm:text-sm text-muted-foreground">
+                    Not satisfied? You can regenerate or go back to adjust settings.
+                  </p>
+                </div>
+              </div>
+            ) : (
+              <div className="flex items-center justify-center min-h-[400px]">
+                <div className="text-center space-y-4">
+                  <RefreshCw className="w-12 h-12 animate-spin mx-auto text-primary" />
+                  <p className="text-muted-foreground">Generating your logo...</p>
+                </div>
+              </div>
+            )}
+          </motion.div>
+        );
+
       default:
         return null;
     }
@@ -618,124 +690,61 @@ export default function GeneratePage() {
         </div>
       </div>
 
-      <div className={`grid grid-cols-1 relative gap-4 sm:gap-6 ${
-        generatedLogo && currentStep === TOTAL_STEPS ? 'lg:grid-cols-2' : ''
-      }`}>
-        {/* Left Column */}
-        <div>
-          <Card className="border-2 border-primary/10 h-full shadow-xl">
-            <CardContent className="p-4 sm:p-6 lg:p-8 min-h-[400px] sm:min-h-[500px] flex flex-col space-y-4">
-              <AnimatePresence mode="wait">
-                {renderStepContent()}
-              </AnimatePresence>
+      <div>
+        <Card className="border-2 border-primary/10 h-full shadow-xl">
+          <CardContent className="p-4 sm:p-6 lg:p-8 min-h-[400px] sm:min-h-[500px] flex flex-col space-y-4">
+            <AnimatePresence mode="wait">
+              {renderStepContent()}
+            </AnimatePresence>
 
-              {/* Navigation Buttons */}
-              <div className="flex justify-between mt-auto pt-6 sm:pt-8 gap-2">
+            {/* Navigation Buttons */}
+            <div className="flex justify-between mt-auto pt-6 sm:pt-8 gap-2">
+              <Button
+                onClick={prevStep}
+                disabled={currentStep === 1 || loading}
+                variant="outline"
+                size="sm"
+                className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm px-3 sm:px-4"
+              >
+                <ChevronLeft className="w-3 h-3 sm:w-4 sm:h-4" />
+                <span className="hidden sm:inline">Previous</span>
+                <span className="sm:hidden">Prev</span>
+              </Button>
+              {currentStep < 5 ? (
                 <Button
-                  onClick={prevStep}
-                  disabled={currentStep === 1}
-                  variant="outline"
+                  onClick={nextStep}
+                  disabled={!canProceedToNextStep}
                   size="sm"
                   className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm px-3 sm:px-4"
                 >
-                  <ChevronLeft className="w-3 h-3 sm:w-4 sm:h-4" />
-                  <span className="hidden sm:inline">Previous</span>
-                  <span className="sm:hidden">Prev</span>
+                  Next
+                  <ChevronRight className="w-3 h-3 sm:w-4 sm:h-4" />
                 </Button>
-                {currentStep < TOTAL_STEPS ? (
-                  <Button
-                    onClick={nextStep}
-                    disabled={!canProceedToNextStep}
-                    size="sm"
-                    className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm px-3 sm:px-4"
-                  >
-                    Next
-                    <ChevronRight className="w-3 h-3 sm:w-4 sm:h-4" />
-                  </Button>
-                ) : (
-                  <Button
-                    onClick={handleGenerate}
-                    disabled={!isFormValid || loading}
-                    size="sm"
-                    className="flex items-center gap-1 sm:gap-2 bg-primary hover:bg-primary/80 text-xs sm:text-sm px-3 sm:px-4"
-                  >
-                    {loading ? (
-                      <>
-                        <span className="hidden sm:inline">Generating...</span>
-                        <span className="sm:hidden">...</span>
-                        <RefreshCw className="w-3 h-3 sm:w-4 sm:h-4 animate-spin" />
-                      </>
-                    ) : (
-                      <>
-                        <span className="hidden sm:inline">Generate Logo</span>
-                        <span className="sm:hidden">Generate</span>
-                        <IconSparkles className="w-3 h-3 sm:w-4 sm:h-4" />
-                      </>
-                    )}
-                  </Button>
-                )}
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Right Column - Only show after step 5 completion */}
-        {generatedLogo && currentStep === TOTAL_STEPS && (
-          <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.5 }}
-          >
-            <Card className="rounded-xl border shadow-sm">
-              <CardContent className="p-6">
-                <div className="space-y-4">
-                  <div className="text-center">
-                    <h3 className="text-base sm:text-lg font-semibold mb-2">Your Logo</h3>
-                    <p className="text-xs sm:text-sm text-muted-foreground">
-                      Generated with {selectedStyle} style
-                    </p>
-                  </div>
-
-                  <div
-                    className="aspect-square rounded-lg border bg-white"
-                    style={{ backgroundColor }}
-                  >
-                    <img
-                      src={generatedLogo}
-                      alt="Generated logo"
-                      className="w-full h-full rounded-lg object-contain p-4 sm:p-6"
-                    />
-                  </div>
-
-                  <div className="space-y-3">
-                    <div className="flex gap-2">
-                      <Button
-                        onClick={handleGenerate}
-                        size="sm"
-                        disabled={loading}
-                        className="flex-1 text-xs sm:text-sm"
-                      >
-                        <RefreshCw className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />
-                        {loading ? "..." : <span className="hidden sm:inline">Regenerate</span>}
-                        {loading ? "" : <span className="sm:hidden">Regen</span>}
-                      </Button>
-                      <Button
-                        onClick={handleDownload}
-                        variant="outline"
-                        size="sm"
-                        disabled={isDownloading}
-                        className="flex-1 text-xs sm:text-sm"
-                      >
-                        <Download className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />
-                        {isDownloading ? "..." : "Download"}
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </motion.div>
-        )}
+              ) : currentStep === 5 ? (
+                <Button
+                  onClick={handleGenerate}
+                  disabled={!isFormValid || loading}
+                  size="sm"
+                  className="flex items-center gap-1 sm:gap-2 bg-primary hover:bg-primary/80 text-xs sm:text-sm px-3 sm:px-4"
+                >
+                  {loading ? (
+                    <>
+                      <span className="hidden sm:inline">Generating...</span>
+                      <span className="sm:hidden">...</span>
+                      <RefreshCw className="w-3 h-3 sm:w-4 sm:h-4 animate-spin" />
+                    </>
+                  ) : (
+                    <>
+                      <span className="hidden sm:inline">Generate Logo</span>
+                      <span className="sm:hidden">Generate</span>
+                      <IconSparkles className="w-3 h-3 sm:w-4 sm:h-4" />
+                    </>
+                  )}
+                </Button>
+              ) : null}
+            </div>
+          </CardContent>
+        </Card>
       </div>
       <Footer />
     </div>
