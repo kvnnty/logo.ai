@@ -1,6 +1,6 @@
 "use client";
 import { SignedIn, UserButton } from "@clerk/nextjs";
-import { SignInButton } from "@clerk/nextjs";
+import { SignInButton, SignUpButton } from "@clerk/nextjs";
 import { SignedOut } from "@clerk/nextjs";
 import React, { useEffect, useState } from "react";
 import { Button } from "../ui/button";
@@ -95,7 +95,7 @@ export default function Navbar() {
                         Sign In
                       </Button>
                     </SignInButton>
-                    <SignInButton
+                    <SignUpButton
                       signUpForceRedirectUrl="/dashboard"
                       forceRedirectUrl="/dashboard"
                       mode="modal"
@@ -106,7 +106,7 @@ export default function Navbar() {
                       >
                         Get Started
                       </Button>
-                    </SignInButton>
+                    </SignUpButton>
                   </SignedOut>
                   <SignedIn>
                     <Link href="/dashboard">
@@ -187,7 +187,7 @@ export default function Navbar() {
                           Sign In
                         </Button>
                       </SignInButton>
-                      <SignInButton
+                      <SignUpButton
                         signUpForceRedirectUrl="/dashboard"
                         forceRedirectUrl="/dashboard"
                         mode="modal"
@@ -198,7 +198,7 @@ export default function Navbar() {
                         >
                           Get Started
                         </Button>
-                      </SignInButton>
+                      </SignUpButton>
                     </SignedOut>
                     <SignedIn>
                       <Link href="/dashboard" onClick={() => setMobileMenuOpen(false)}>
