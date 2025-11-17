@@ -96,7 +96,6 @@ export default function Navbar() {
                       </Button>
                     </SignInButton>
                     <SignUpButton
-                      signUpForceRedirectUrl="/dashboard"
                       forceRedirectUrl="/dashboard"
                       mode="modal"
                     >
@@ -188,7 +187,6 @@ export default function Navbar() {
                         </Button>
                       </SignInButton>
                       <SignUpButton
-                        signUpForceRedirectUrl="/dashboard"
                         forceRedirectUrl="/dashboard"
                         mode="modal"
                       >
