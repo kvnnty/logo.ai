@@ -1,7 +1,6 @@
 "use client";
 
-import { IconSearch, IconSparkles, IconMenu2 } from "@tabler/icons-react";
-import { Input } from "@/components/ui/input";
+import { IconSparkles, IconMenu2 } from "@tabler/icons-react";
 import { useState, useEffect } from "react";
 import { RefreshCw } from "lucide-react";
 import { getCredits } from "@/app/actions/actions";
@@ -11,7 +10,6 @@ interface DashboardTopbarProps {
 }
 
 export default function DashboardTopbar({ onMenuClick }: DashboardTopbarProps) {
-  const [searchQuery, setSearchQuery] = useState("");
   const [credits, setCredits] = useState({ remaining: 10, limit: 10 });
   const [isRefreshing, setIsRefreshing] = useState(false);
 
@@ -53,22 +51,8 @@ export default function DashboardTopbar({ onMenuClick }: DashboardTopbarProps) {
             <IconMenu2 className="h-5 w-5" />
           </button>
 
-          {/* Search Bar - Hidden on mobile, visible on tablet+ */}
-          <div className="relative flex-1 max-w-md hidden sm:block">
-            <div className="absolute left-3 top-1/2 -translate-y-1/2 flex items-center justify-center text-muted-foreground">
-              <IconSearch className="h-4 w-4" />
-            </div>
-            <Input
-              type="search"
-              placeholder="Search designs..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-9 pr-4 h-9 border-border/50 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all"
-            />
-          </div>
-
-          {/* Spacer for mobile */}
-          <div className="flex-1 sm:hidden" />
+          {/* Spacer */}
+          <div className="flex-1" />
 
           {/* Credits UI - Responsive */}
           <div className="flex items-center gap-2 lg:gap-3 px-3 lg:px-4 py-2 rounded-xl bg-primary/10 border border-primary/20">
