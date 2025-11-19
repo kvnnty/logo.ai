@@ -1,0 +1,361 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>MongoDB Setup – LogoAIpro Docs</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="./styles.css" />
+    <script defer src="./script.js"></script>
+  </head>
+  <body>
+    <aside class="sidebar">
+      <div class="brand">
+        <img src="./screenshots/logo.svg" alt="LogoAIpro Logo" />
+        <div>
+          <h1>LogoAIpro</h1>
+          <p>Documentation v1.0</p>
+        </div>
+      </div>
+      <nav>
+        <a href="./index.html">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+          Welcome
+        </a>
+        <a href="./how-to-use.html">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
+          User Guide
+        </a>
+        <a href="./push-to-github.html">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+          How to push to GitHub
+        </a>
+        <a href="./install-vercel.html">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path></svg>
+          How to install on Vercel
+        </a>
+        <a href="./install-aws-ec2.html">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01"></path></svg>
+          How to install on AWS EC2
+        </a>
+        <a href="./clerk-setup.html">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+          Clerk Authentication Setup
+        </a>
+        <a class="active" href="./mongodb-setup.html">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"></path></svg>
+          MongoDB Database Setup
+        </a>
+        <a href="./nebius-setup.html">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path></svg>
+          Nebius AI Setup
+        </a>
+        <a href="./env-setup.html">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+          Environment Variables
+        </a>
+        <a href="./stripe-setup.html">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg>
+          Stripe Payment Setup
+        </a>
+        <a href="./frontend-customization.html">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"></path></svg>
+          Frontend Customization
+        </a>
+        <a href="./pricing-credits.html">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+          Pricing & Credits
+        </a>
+      </nav>
+      <footer>
+        <small>Built with Next.js 15 & MongoDB</small>
+      </footer>
+    </aside>
+
+    <main class="content">
+      <header class="topbar">
+        <h2>MongoDB Database Setup</h2>
+      </header>
+
+      <section class="prose">
+        <div class="callout">
+          <strong><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display: inline-block; width: 18px; height: 18px; vertical-align: middle; margin-right: 0.5rem;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"></path></svg> About MongoDB:</strong> LogoAIpro uses MongoDB to store user data, generated logos, credit balances, transaction history, and user statistics. You can use MongoDB Atlas (cloud) or a self-hosted MongoDB instance.
+        </div>
+
+        <h3>Why MongoDB for LogoAIpro?</h3>
+        <p>MongoDB is the perfect database choice for LogoAIpro because:</p>
+        <ul>
+          <li><strong>Flexible Schema:</strong> Perfect for storing varied logo data, user preferences, and generation history</li>
+          <li><strong>Scalability:</strong> Handles growing user bases and large logo collections</li>
+          <li><strong>JSON-like Documents:</strong> Natural fit for JavaScript/Node.js applications</li>
+          <li><strong>Cloud-Ready:</strong> MongoDB Atlas provides managed hosting</li>
+          <li><strong>Performance:</strong> Fast queries for logo history, credit tracking, and user analytics</li>
+        </ul>
+
+        <h3>Option 1: MongoDB Atlas (Recommended)</h3>
+        <p>MongoDB Atlas is the easiest way to get started with MongoDB. It provides a free tier perfect for development and small applications.</p>
+
+        <h4>Step 1: Create MongoDB Atlas Account</h4>
+        <ol class="steps">
+          <li class="step">Go to <a href="https://www.mongodb.com/atlas" target="_blank" rel="noopener">MongoDB Atlas</a></li>
+          <li class="step">Click "Try Free" to create a new account</li>
+          <li class="step">Fill in your details and verify your email</li>
+          <li class="step">Choose the "Free" tier (M0 Sandbox)</li>
+        </ol>
+
+        <div style="text-align: center; margin: 24px 0;">
+          <img src="./Mongodb/01.png" alt="MongoDB Atlas Homepage" style="max-width: 100%; border-radius: var(--radius); box-shadow: var(--shadow-md);" />
+          <p style="font-size: 14px; color: var(--muted); margin-top: 8px;">MongoDB Atlas homepage - Click "Try Free" to get started</p>
+        </div>
+
+        <div style="text-align: center; margin: 24px 0;">
+          <img src="./Mongodb/02.png" alt="MongoDB Atlas Sign Up" style="max-width: 100%; border-radius: var(--radius); box-shadow: var(--shadow-md);" />
+          <p style="font-size: 14px; color: var(--muted); margin-top: 8px;">Create your MongoDB Atlas account with your details</p>
+        </div>
+
+        <h4>Step 2: Create a Cluster</h4>
+        <ol class="steps">
+          <li class="step">After logging in, click "Build a Database"</li>
+          <li class="step">Select "M0 Sandbox" (Free tier)</li>
+          <li class="step">Choose a cloud provider and region (closest to your users)</li>
+          <li class="step">Give your cluster a name (e.g., "logoai-pro-cluster")</li>
+          <li class="step">Click "Create Cluster"</li>
+        </ol>
+
+        <div style="text-align: center; margin: 24px 0;">
+          <img src="./Mongodb/03.png" alt="MongoDB Atlas Dashboard" style="max-width: 100%; border-radius: var(--radius); box-shadow: var(--shadow-md);" />
+          <p style="font-size: 14px; color: var(--muted); margin-top: 8px;">MongoDB Atlas dashboard - Click "Build a Cluster" to get started</p>
+        </div>
+
+        <div style="text-align: center; margin: 24px 0;">
+          <img src="./Mongodb/04.png" alt="Create Cluster - Choose Free Tier" style="max-width: 100%; border-radius: var(--radius); box-shadow: var(--shadow-md);" />
+          <p style="font-size: 14px; color: var(--muted); margin-top: 8px;">Select the Free tier (M0 Sandbox) for development</p>
+        </div>
+
+        <div style="text-align: center; margin: 24px 0;">
+          <img src="./Mongodb/05.png" alt="Deploy Cluster Configuration" style="max-width: 100%; border-radius: var(--radius); box-shadow: var(--shadow-md);" />
+          <p style="font-size: 14px; color: var(--muted); margin-top: 8px;">Configure your cluster name and settings, then click "Create Deployment"</p>
+        </div>
+
+        <div class="callout">
+          <strong><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display: inline-block; width: 18px; height: 18px; vertical-align: middle; margin-right: 0.5rem;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> Note:</strong> Cluster creation takes 3-5 minutes. You'll receive an email when it's ready.
+        </div>
+
+        <h4>Step 3: Create Database User</h4>
+        <ol class="steps">
+          <li class="step">In the Atlas dashboard, go to "Database Access"</li>
+          <li class="step">Click "Add New Database User"</li>
+          <li class="step">Choose "Password" authentication</li>
+          <li class="step">Create a username and strong password</li>
+          <li class="step">Set privileges to "Read and write to any database"</li>
+          <li class="step">Click "Add User"</li>
+        </ol>
+
+        <div class="callout">
+          <strong><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display: inline-block; width: 18px; height: 18px; vertical-align: middle; margin-right: 0.5rem;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"></path></svg> Important:</strong> Save the username and password securely. You'll need them for the connection string.
+        </div>
+
+        <div style="text-align: center; margin: 24px 0;">
+          <img src="./Mongodb/06.png" alt="Connect - Choose Connection Method" style="max-width: 100%; border-radius: var(--radius); box-shadow: var(--shadow-md);" />
+          <p style="font-size: 14px; color: var(--muted); margin-top: 8px;">Choose your connection method - Select "Compass" for GUI access</p>
+        </div>
+
+        <h4>Step 4: Configure Network Access</h4>
+        <ol class="steps">
+          <li class="step">Go to "Network Access" in the Atlas dashboard</li>
+          <li class="step">Click "Add IP Address"</li>
+          <li class="step">For development: Click "Allow Access from Anywhere" (0.0.0.0/0)</li>
+          <li class="step">For production: Add your server's IP address</li>
+          <li class="step">Click "Confirm"</li>
+        </ol>
+
+        <div style="text-align: center; margin: 24px 0;">
+          <img src="./Mongodb/08.png" alt="Network Access Configuration" style="max-width: 100%; border-radius: var(--radius); box-shadow: var(--shadow-md);" />
+          <p style="font-size: 14px; color: var(--muted); margin-top: 8px;">Configure network access - Click "Allow Access from Anywhere" for development</p>
+        </div>
+
+        <div class="callout">
+          <strong><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display: inline-block; width: 18px; height: 18px; vertical-align: middle; margin-right: 0.5rem;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg> Security Note:</strong> For production, restrict access to specific IP addresses only.
+        </div>
+
+        <h4>Step 5: Get Connection String</h4>
+        <ol class="steps">
+          <li class="step">Go to "Clusters" and click "Connect" on your cluster</li>
+          <li class="step">Choose "Connect your application"</li>
+          <li class="step">Select "Node.js" as the driver</li>
+          <li class="step">Copy the connection string</li>
+          <li class="step">Replace <code>&lt;password&gt;</code> with your database user password</li>
+          <li class="step">Replace <code>&lt;dbname&gt;</code> with your database name (e.g., "logoai-pro")</li>
+        </ol>
+
+        <div style="text-align: center; margin: 24px 0;">
+          <img src="./Mongodb/07.png" alt="MongoDB Compass Connection Setup" style="max-width: 100%; border-radius: var(--radius); box-shadow: var(--shadow-md);" />
+          <p style="font-size: 14px; color: var(--muted); margin-top: 8px;">Download MongoDB Compass and copy the connection string</p>
+        </div>
+
+        <div class="code"><pre><code>mongodb+srv://username:password@cluster0.xxxxx.mongodb.net/logoai-pro?retryWrites=true&w=majority</code></pre></div>
+
+        <h3>Option 2: Using MongoDB Compass (Recommended for Development)</h3>
+        <p>MongoDB Compass is the official GUI for MongoDB, making it easy to visualize and manage your LogoAIpro database.</p>
+
+        <h4>Step 1: Download MongoDB Compass</h4>
+        <ol class="steps">
+          <li class="step">Go to <a href="https://www.mongodb.com/products/compass" target="_blank" rel="noopener">MongoDB Compass</a></li>
+          <li class="step">Download the version for your operating system</li>
+          <li class="step">Install MongoDB Compass following the setup wizard</li>
+          <li class="step">Launch the application</li>
+        </ol>
+
+        <h4>Step 2: Connect to Your MongoDB Atlas Cluster</h4>
+        <ol class="steps">
+          <li class="step">Open MongoDB Compass</li>
+          <li class="step">Click "New Connection"</li>
+          <li class="step">Paste your MongoDB Atlas connection string:
+            <div class="code"><pre><code>mongodb+srv://username:password@cluster0.xxxxx.mongodb.net/</code></pre></div>
+          </li>
+          <li class="step">Click "Connect"</li>
+        </ol>
+
+        <div class="callout">
+          <strong><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display: inline-block; width: 18px; height: 18px; vertical-align: middle; margin-right: 0.5rem;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path></svg> Pro Tip:</strong> You can get your connection string from Atlas by clicking "Connect" → "Connect using MongoDB Compass" in your cluster dashboard.
+        </div>
+
+        <div style="text-align: center; margin: 24px 0;">
+          <img src="./Mongodb/09.png" alt="MongoDB Atlas Cluster Overview" style="max-width: 100%; border-radius: var(--radius); box-shadow: var(--shadow-md);" />
+          <p style="font-size: 14px; color: var(--muted); margin-top: 8px;">Your MongoDB Atlas cluster is ready - Click "Connect" to get connection details</p>
+        </div>
+
+        <h4>Step 3: View Your Data</h4>
+        <p>Once connected, you can browse your LogoAIpro collections:</p>
+        <ul>
+            <li><strong>users</strong> - View user accounts and credit balances</li>
+            <li><strong>logos</strong> - Browse generated logos and their metadata</li>
+            <li><strong>transactions</strong> - Track credit purchases and usage</li>
+        </ul>
+
+        <div class="callout">
+          <strong><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display: inline-block; width: 18px; height: 18px; vertical-align: middle; margin-right: 0.5rem;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path></svg> Tip:</strong> MongoDB Compass provides a visual interface to explore your database without writing queries. Perfect for monitoring logo generation activity, user credits, and troubleshooting issues.
+        </div>
+
+        <h3>Connection String Configuration</h3>
+        <p>Add your MongoDB connection string to your environment variables:</p>
+        
+        <h4>Environment Variable</h4>
+        <p>Add this to your <code>.env.local</code> file:</p>
+        <div class="code"><pre><code># MongoDB Atlas (Cloud)
+MONGO_URI=mongodb+srv://username:password@cluster0.xxxxx.mongodb.net/logoai-pro?retryWrites=true&w=majority
+
+# Self-hosted MongoDB
+MONGO_URI=mongodb://username:password@localhost:27017/logoai-pro</code></pre></div>
+
+        <h3>Database Schema</h3>
+        <p>LogoAIpro automatically creates the following collections:</p>
+
+        <div class="callout info">
+          <h4><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg> Database Collections</h4>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; margin-top: 1rem;">
+            <div style="background: var(--panel-2); padding: 1.5rem; border-radius: var(--radius); border: 2px solid var(--border);">
+              <h5 style="margin: 0 0 0.5rem 0; color: var(--text);">👥 users</h5>
+              <p style="margin: 0 0 1rem 0; color: var(--text-secondary);">Stores user account information, credit balances, and preferences.</p>
+              <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                <code style="background: var(--panel); padding: 0.25rem 0.5rem; border-radius: 4px; border: 1px solid var(--border);">_id</code>
+                <code style="background: var(--panel); padding: 0.25rem 0.5rem; border-radius: 4px; border: 1px solid var(--border);">email</code>
+                <code style="background: var(--panel); padding: 0.25rem 0.5rem; border-radius: 4px; border: 1px solid var(--border);">credits</code>
+                <code style="background: var(--panel); padding: 0.25rem 0.5rem; border-radius: 4px; border: 1px solid var(--border);">createdAt</code>
+              </div>
+            </div>
+            
+            <div style="background: var(--panel-2); padding: 1.5rem; border-radius: var(--radius); border: 2px solid var(--border);">
+              <h5 style="margin: 0 0 0.5rem 0; color: var(--text);"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"></path></svg> logos</h5>
+              <p style="margin: 0 0 1rem 0; color: var(--text-secondary);">Stores generated logos with metadata, styles, and settings.</p>
+              <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                <code style="background: var(--panel); padding: 0.25rem 0.5rem; border-radius: 4px; border: 1px solid var(--border);">userId</code>
+                <code style="background: var(--panel); padding: 0.25rem 0.5rem; border-radius: 4px; border: 1px solid var(--border);">logoUrl</code>
+                <code style="background: var(--panel); padding: 0.25rem 0.5rem; border-radius: 4px; border: 1px solid var(--border);">style</code>
+                <code style="background: var(--panel); padding: 0.25rem 0.5rem; border-radius: 4px; border: 1px solid var(--border);">createdAt</code>
+              </div>
+            </div>
+
+            <div style="background: var(--panel-2); padding: 1.5rem; border-radius: var(--radius); border: 2px solid var(--border);">
+              <h5 style="margin: 0 0 0.5rem 0; color: var(--text);">�� transactions</h5>
+              <p style="margin: 0 0 1rem 0; color: var(--text-secondary);">Tracks credit purchases, usage, and payment history.</p>
+              <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                <code style="background: var(--panel); padding: 0.25rem 0.5rem; border-radius: 4px; border: 1px solid var(--border);">userId</code>
+                <code style="background: var(--panel); padding: 0.25rem 0.5rem; border-radius: 4px; border: 1px solid var(--border);">type</code>
+                <code style="background: var(--panel); padding: 0.25rem 0.5rem; border-radius: 4px; border: 1px solid var(--border);">amount</code>
+                <code style="background: var(--panel); padding: 0.25rem 0.5rem; border-radius: 4px; border: 1px solid var(--border);">createdAt</code>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div style="text-align: center; margin: 24px 0;">
+          <img src="./Mongodb/10.png" alt="MongoDB Atlas Database Access Management" style="max-width: 100%; border-radius: var(--radius); box-shadow: var(--shadow-md);" />
+          <p style="font-size: 14px; color: var(--muted); margin-top: 8px;">Database Access management - Add and manage database users</p>
+        </div>
+
+        <h3>Test Database Connection</h3>
+        <p>Verify your MongoDB connection is working:</p>
+
+        <h4>Test Connection</h4>
+        <p>Start your development server and check the console for connection messages:</p>
+        <div class="code"><pre><code>npm run dev
+# or
+pnpm dev</code></pre></div>
+        
+        <p>Look for messages like:</p>
+        <div class="code"><pre><code><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display: inline-block; width: 18px; height: 18px; vertical-align: middle; margin-right: 0.5rem;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> Connected to MongoDB
+<svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display: inline-block; width: 18px; height: 18px; vertical-align: middle; margin-right: 0.5rem;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> Database connection established</code></pre></div>
+
+        <h3>Troubleshooting</h3>
+        <div class="callout warning">
+          <h4><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg> Common Issues</h4>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; margin-top: 1rem;">
+            <div>
+              <h5 style="margin: 0 0 0.5rem 0; color: var(--text);"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display: inline-block; width: 18px; height: 18px; vertical-align: middle; margin-right: 0.5rem;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> Connection Timeout</h5>
+              <p style="margin: 0; color: var(--text-secondary);">Check your network access settings in MongoDB Atlas and ensure your IP is whitelisted.</p>
+            </div>
+            
+            <div>
+              <h5 style="margin: 0 0 0.5rem 0; color: var(--text);"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display: inline-block; width: 18px; height: 18px; vertical-align: middle; margin-right: 0.5rem;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"></path></svg> Authentication Failed</h5>
+              <p style="margin: 0; color: var(--text-secondary);">Verify your username and password are correct in the connection string.</p>
+            </div>
+            
+            <div>
+              <h5 style="margin: 0 0 0.5rem 0; color: var(--text);"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display: inline-block; width: 18px; height: 18px; vertical-align: middle; margin-right: 0.5rem;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"></path></svg> Database Not Found</h5>
+              <p style="margin: 0; color: var(--text-secondary);">Ensure the database name in your connection string matches your intended database.</p>
+            </div>
+            
+            <div>
+              <h5 style="margin: 0 0 0.5rem 0; color: var(--text);">🚫 Permission Denied</h5>
+              <p style="margin: 0; color: var(--text-secondary);">Check that your database user has read/write permissions for the database.</p>
+            </div>
+          </div>
+        </div>
+
+        <h3>Next Steps</h3>
+        <p>After setting up MongoDB:</p>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; margin: 2rem 0;">
+          <div style="background: var(--panel-2); padding: 1.5rem; border-radius: var(--radius); border: 2px solid var(--border);">
+            <h5 style="margin: 0 0 0.5rem 0; color: var(--text);"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display: inline-block; width: 18px; height: 18px; vertical-align: middle; margin-right: 0.5rem;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path></svg> Nebius AI Setup</h5>
+            <p style="margin: 0 0 1rem 0; color: var(--text-secondary);">Configure Nebius AI for logo generation.</p>
+            <a href="nebius-setup.html" class="btn" style="display: inline-block; margin-top: 0.5rem; padding: 0.75rem 1.5rem; background: var(--brand); color: white; text-decoration: none; border-radius: var(--radius-sm); font-weight: 500; border: 2px solid var(--border); border-right: 4px solid var(--border); border-bottom: 4px solid var(--border);">Setup Guide →</a>
+          </div>
+          
+          <div style="background: var(--panel-2); padding: 1.5rem; border-radius: var(--radius); border: 2px solid var(--border);">
+            <h5 style="margin: 0 0 0.5rem 0; color: var(--text);"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display: inline-block; width: 18px; height: 18px; vertical-align: middle; margin-right: 0.5rem;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg> Configure Stripe</h5>
+            <p style="margin: 0 0 1rem 0; color: var(--text-secondary);">Set up Stripe for credit purchases.</p>
+            <a href="stripe-setup.html" class="btn" style="display: inline-block; margin-top: 0.5rem; padding: 0.75rem 1.5rem; background: var(--brand); color: white; text-decoration: none; border-radius: var(--radius-sm); font-weight: 500; border: 2px solid var(--border); border-right: 4px solid var(--border); border-bottom: 4px solid var(--border);">Setup Guide →</a>
+          </div>
+        </div>
+
+        <div class="callout success">
+          <strong><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display: inline-block; width: 18px; height: 18px; vertical-align: middle; margin-right: 0.5rem;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"></path></svg> Success!</strong> Your MongoDB database is now configured and ready for LogoAIpro. The application will automatically create the necessary collections and indexes when it starts.
+        </div>
+      </section>
+    </main>
+  </body>
+</html>

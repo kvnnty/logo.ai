@@ -1,0 +1,249 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Push to GitHub – LogoAIpro Docs</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="./styles.css" />
+    <script defer src="./script.js"></script>
+  </head>
+  <body>
+    <aside class="sidebar">
+      <div class="brand">
+        <img src="./screenshots/logo.svg" alt="LogoAIpro Logo" />
+        <div>
+          <h1>LogoAIpro</h1>
+          <p>Documentation v1.0</p>
+        </div>
+      </div>
+      <nav>
+        <a href="./index.html">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+          Welcome
+        </a>
+        <a href="./how-to-use.html">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
+          User Guide
+        </a>
+        <a class="active" href="./push-to-github.html">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+          How to push to GitHub
+        </a>
+        <a href="./install-vercel.html">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path></svg>
+          How to install on Vercel
+        </a>
+        <a href="./install-aws-ec2.html">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01"></path></svg>
+          How to install on AWS EC2
+        </a>
+        <a href="./clerk-setup.html">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+          Clerk Authentication Setup
+        </a>
+        <a href="./mongodb-setup.html">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"></path></svg>
+          MongoDB Database Setup
+        </a>
+        <a href="./nebius-setup.html">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path></svg>
+          Nebius AI Setup
+        </a>
+        <a href="./env-setup.html">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+          Environment Variables
+        </a>
+        <a href="./stripe-setup.html">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg>
+          Stripe Payment Setup
+        </a>
+        <a href="./frontend-customization.html">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"></path></svg>
+          Frontend Customization
+        </a>
+        <a href="./pricing-credits.html">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+          Pricing & Credits
+        </a>
+      </nav>
+      <footer>
+        <small>Built with Next.js 15 & MongoDB</small>
+      </footer>
+    </aside>
+
+    <main class="content">
+      <header class="topbar">
+        <h2>Push Code to GitHub</h2>
+      </header>
+
+      <section class="prose">
+        <div class="callout info">
+          <strong>📦 GitHub Setup:</strong> This guide will walk you through setting up a GitHub repository and pushing your LogoAIpro code to GitHub. This is a prerequisite step before deploying to Vercel or AWS EC2.
+        </div>
+
+        <h2>Requirements</h2>
+        <ul>
+          <li>GitHub account (free)</li>
+          <li>Git installed on your computer</li>
+          <li>Code editor (VS Code recommended)</li>
+          <li>LogoAIpro source code</li>
+        </ul>
+
+        <h2>Step 1: Install Git</h2>
+        <ol class="steps">
+          <li class="step">Download Git from <a href="https://git-scm.com/downloads" target="_blank" rel="noopener">git-scm.com</a></li>
+          <li class="step">Install Git following the installation wizard</li>
+          <li class="step">Configure Git (first time only):
+            <div class="code"><pre><code>git config --global user.name "Your Name"
+git config --global user.email "your.email@example.com"</code></pre></div>
+          </li>
+        </ol>
+
+        <h2>Step 2: Create GitHub Repository</h2>
+        <ol class="steps">
+          <li class="step">Go to <a href="https://github.com" target="_blank" rel="noopener">github.com</a> and sign in</li>
+          <li class="step">Click "+" → "New repository"</li>
+          <li class="step">Repository name: <strong>logo-ai-pro</strong> (or your preferred name)</li>
+          <li class="step">Set visibility: <strong>Private</strong> (recommended) or Public</li>
+          <li class="step">Do NOT initialize with README (we'll push existing code)</li>
+          <li class="step">Click "Create repository"</li>
+          <li class="step">Copy the repository URL (e.g., <code>https://github.com/yourusername/logo-ai-pro.git</code>)</li>
+        </ol>
+
+        <h2>Step 3: Initialize Git and Push to GitHub (Command Line)</h2>
+        
+        <div class="code"><pre><code># Navigate to your LogoAIpro project folder
+cd /path/to/logo-ai-envato
+
+# Initialize Git repository
+git init
+
+# Add all files
+git add .
+
+# Create initial commit
+git commit -m "Initial commit: LogoAIpro v1.0"
+
+# Rename branch to main (if needed)
+git branch -M main
+
+# Add remote repository
+git remote add origin https://github.com/yourusername/logo-ai-pro.git
+
+# Push to GitHub
+git push -u origin main</code></pre></div>
+
+        <div class="callout warning">
+          <strong><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display: inline-block; width: 18px; height: 18px; vertical-align: middle; margin-right: 0.5rem;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg> Security Note:</strong> Before pushing, ensure your <code>.gitignore</code> file excludes:
+          <ul>
+            <li><code>.env.local</code> - Contains API keys and secrets</li>
+            <li><code>node_modules/</code> - Dependencies (reinstall with npm install)</li>
+            <li><code>.next/</code> - Build files (regenerated on build)</li>
+            <li><code>.DS_Store</code> - macOS system files</li>
+          </ul>
+        </div>
+
+        <h2>Step 4: Alternative - GitHub Desktop (Optional)</h2>
+        <p>For users who prefer a GUI interface:</p>
+        <ol class="steps">
+          <li class="step">Download and install <a href="https://desktop.github.com/" target="_blank" rel="noopener">GitHub Desktop</a></li>
+          <li class="step">Sign in to your GitHub account</li>
+          <li class="step">Click "File" → "Add Local Repository"</li>
+          <li class="step">Select your LogoAIpro project folder</li>
+          <li class="step">Click "Publish repository"</li>
+          <li class="step">Name: <strong>logo-ai-pro</strong>, keep it private, click "Publish Repository"</li>
+          <li class="step">Commit message: "Initial commit: LogoAIpro v1.0"</li>
+          <li class="step">Click "Commit to main" then "Push origin"</li>
+        </ol>
+
+        <h2>Step 5: Verify Upload</h2>
+        <ol class="steps">
+          <li class="step">Go to your GitHub repository page</li>
+          <li class="step">Verify all files are uploaded:
+            <ul>
+              <li><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display: inline-block; width: 18px; height: 18px; vertical-align: middle; margin-right: 0.5rem;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> <code>package.json</code></li>
+              <li><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display: inline-block; width: 18px; height: 18px; vertical-align: middle; margin-right: 0.5rem;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> <code>app/</code> directory</li>
+              <li><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display: inline-block; width: 18px; height: 18px; vertical-align: middle; margin-right: 0.5rem;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> <code>components/</code> directory</li>
+              <li><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display: inline-block; width: 18px; height: 18px; vertical-align: middle; margin-right: 0.5rem;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> <code>public/</code> directory</li>
+              <li><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display: inline-block; width: 18px; height: 18px; vertical-align: middle; margin-right: 0.5rem;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> <code>.gitignore</code></li>
+              <li><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display: inline-block; width: 18px; height: 18px; vertical-align: middle; margin-right: 0.5rem;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> <code>README.md</code></li>
+            </ul>
+          </li>
+          <li class="step">Verify sensitive files are NOT uploaded:
+            <ul>
+              <li>❌ <code>.env.local</code> (should be in .gitignore)</li>
+              <li>❌ <code>node_modules/</code> (should be in .gitignore)</li>
+            </ul>
+          </li>
+        </ol>
+
+        <h2>Step 6: Update .gitignore (If Needed)</h2>
+        <p>Ensure your <code>.gitignore</code> includes:</p>
+        
+        <div class="code"><pre><code># Environment variables
+.env.local
+.env
+.env*.local
+
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Build outputs
+.next/
+out/
+dist/
+build/
+
+# Testing
+coverage/
+.nyc_output/
+
+# Misc
+.DS_Store
+*.log
+*.pem
+
+# Debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Temporary files
+*.tmp
+.cache/</code></pre></div>
+
+        <h2>Next Steps</h2>
+        <p>Now that your code is on GitHub, you can proceed with deployment:</p>
+        <div class="callout success">
+          <ul>
+            <li><a href="./install-vercel.html">Deploy to Vercel</a> (Recommended for beginners, easy setup)</li>
+            <li><a href="./install-aws-ec2.html">Deploy to AWS EC2</a> (Recommended for production, better performance)</li>
+          </ul>
+        </div>
+
+        <div class="callout warning">
+          <strong><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg> Security Reminders:</strong>
+          <ul>
+            <li><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display: inline-block; width: 18px; height: 18px; vertical-align: middle; margin-right: 0.5rem;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> Never commit API keys or secrets to GitHub</li>
+            <li><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display: inline-block; width: 18px; height: 18px; vertical-align: middle; margin-right: 0.5rem;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> Keep your repository private if it contains sensitive information</li>
+            <li><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display: inline-block; width: 18px; height: 18px; vertical-align: middle; margin-right: 0.5rem;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> Use environment variables for all secrets</li>
+            <li><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display: inline-block; width: 18px; height: 18px; vertical-align: middle; margin-right: 0.5rem;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> Review your commits before pushing to ensure no secrets are included</li>
+          </ul>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>
+

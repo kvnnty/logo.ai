@@ -1,0 +1,434 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Environment Variables Setup – LogoAIpro Docs</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="./styles.css" />
+    <script defer src="./script.js"></script>
+  </head>
+  <body>
+    <aside class="sidebar">
+      <div class="brand">
+        <img src="./screenshots/logo.svg" alt="LogoAIpro Logo" />
+        <div>
+          <h1>LogoAIpro</h1>
+          <p>Documentation v1.0</p>
+        </div>
+      </div>
+      <nav>
+        <a href="./index.html">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+          Welcome
+        </a>
+        <a href="./how-to-use.html">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
+          User Guide
+        </a>
+        <a href="./push-to-github.html">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+          How to push to GitHub
+        </a>
+        <a href="./install-vercel.html">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path></svg>
+          How to install on Vercel
+        </a>
+        <a href="./install-aws-ec2.html">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01"></path></svg>
+          How to install on AWS EC2
+        </a>
+        <a href="./clerk-setup.html">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+          Clerk Authentication Setup
+        </a>
+        <a href="./mongodb-setup.html">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"></path></svg>
+          MongoDB Database Setup
+        </a>
+        <a href="./nebius-setup.html">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path></svg>
+          Nebius AI Setup
+        </a>
+        <a class="active" href="./env-setup.html">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+          Environment Variables
+        </a>
+        <a href="./stripe-setup.html">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg>
+          Stripe Payment Setup
+        </a>
+        <a href="./frontend-customization.html">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"></path></svg>
+          Frontend Customization
+        </a>
+        <a href="./pricing-credits.html">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+          Pricing & Credits
+        </a>
+      </nav>
+      <footer>
+        <small>Built with Next.js 15 & MongoDB</small>
+      </footer>
+    </aside>
+
+    <main class="content">
+      <header class="topbar">
+        <h2>Environment Variables Setup</h2>
+      </header>
+
+      <section class="prose">
+        <div class="callout info">
+          <strong><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg> Environment Configuration:</strong> Set up all required environment variables for LogoAIpro v1.0. This includes database connections, API keys, and service configurations.
+        </div>
+
+        <h2><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg> Complete .env.local Template</h2>
+
+        <div class="callout warning">
+          <strong><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display: inline-block; width: 18px; height: 18px; vertical-align: middle; margin-right: 0.5rem;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg> Security Note:</strong> Never commit your <code>.env.local</code> file to version control. Add it to your <code>.gitignore</code> file to keep your secrets safe.
+        </div>
+
+        <pre><code># ===========================================
+# LogoAIpro v1.0 - Environment Variables
+# ===========================================
+# Create .env.local in project root (Next.js automatically loads it)
+
+# ===========================================
+# FRONTEND CONFIGURATION (Public Variables)
+# ===========================================
+
+# Clerk Authentication (Public Key)
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_xxxxxxxxxxxxx
+
+# Stripe Payment (Public Key)
+NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_xxxxxxxxxxxxx
+
+# Application URL
+NEXT_PUBLIC_APP_URL=http://localhost:3000
+# Production: NEXT_PUBLIC_APP_URL=https://yourdomain.com
+
+# Development URL (for local development)
+NEXT_PUBLIC_DEVELOPMENT_URL=http://localhost:3000
+
+# ===========================================
+# DATABASE CONFIGURATION
+# ===========================================
+
+# MongoDB Connection (Required)
+DATABASE_URL=mongodb+srv://username:password@cluster.mongodb.net/logoai-pro?retryWrites=true&w=majority
+# Alternative variable name:
+# MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/logoai-pro?retryWrites=true&w=majority
+
+# ===========================================
+# AUTHENTICATION (CLERK)
+# ===========================================
+
+# Clerk Secret Key (Required)
+CLERK_SECRET_KEY=sk_test_xxxxxxxxxxxxx
+
+# Clerk Webhook Secret (Required for webhooks)
+CLERK_WEBHOOK_SECRET=whsec_xxxxxxxxxxxxx
+
+# Clerk Redirect URLs
+NEXT_PUBLIC_CLERK_SIGN_IN_FORCE_REDIRECT_URL=/dashboard
+NEXT_PUBLIC_CLERK_SIGN_UP_FORCE_REDIRECT_URL=/dashboard
+
+# ===========================================
+# AI PROVIDERS (Nebius AI)
+# ===========================================
+
+# Nebius AI API Key (Required)
+NEBIUS_API_KEY=your-nebius-api-key
+
+# Helicone API Key (Optional - for observability)
+HELICONE_API_KEY=your-helicone-api-key
+
+# ===========================================
+# PAYMENT PROCESSING (STRIPE)
+# ===========================================
+
+# Stripe Secret Key (Required)
+STRIPE_SECRET_KEY=sk_test_xxxxxxxxxxxxx
+
+# Stripe Webhook Secret (Required for webhooks)
+STRIPE_WEBHOOK_SECRET=whsec_xxxxxxxxxxxxx
+
+# Stripe Price IDs for Credit Packages
+STRIPE_PRICE_ID_BASIC=price_xxxxxxxxxxxxx
+STRIPE_PRICE_ID_PRO=price_xxxxxxxxxxxxx
+STRIPE_PRICE_ID_ENTERPRISE=price_xxxxxxxxxxxxx
+
+# ===========================================
+# RATE LIMITING (Upstash Redis)
+# ===========================================
+
+# Upstash Redis REST URL (Required)
+UPSTASH_REDIS_REST_URL=https://your-redis-instance.upstash.io
+
+# Upstash Redis REST Token (Required)
+UPSTASH_REDIS_REST_TOKEN=your-upstash-redis-token
+
+# ===========================================
+# ANALYTICS & MONITORING (Optional)
+# ===========================================
+
+# Umami Analytics (Optional)
+# NEXT_PUBLIC_UMAMI_WEBSITE_ID=your-umami-website-id
+# NEXT_PUBLIC_UMAMI_SCRIPT_URL=https://analytics.yourdomain.com/script.js
+
+# ===========================================
+# VERCEL DEPLOYMENT (Automatic)
+# ===========================================
+# Vercel Analytics and other features are automatic if deployed on Vercel
+# No configuration needed</code></pre>
+
+        <h2><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg> Environment Variable Details</h2>
+
+        <h3><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg> Authentication (Clerk)</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>Variable</th>
+              <th>Description</th>
+              <th>Required</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY</code></td>
+              <td>Public key from Clerk Dashboard → API Keys</td>
+              <td><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display: inline-block; width: 18px; height: 18px; vertical-align: middle; margin-right: 0.5rem;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> Yes</td>
+            </tr>
+            <tr>
+              <td><code>CLERK_SECRET_KEY</code></td>
+              <td>Secret key from Clerk Dashboard → API Keys</td>
+              <td><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display: inline-block; width: 18px; height: 18px; vertical-align: middle; margin-right: 0.5rem;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> Yes</td>
+            </tr>
+            <tr>
+              <td><code>CLERK_WEBHOOK_SECRET</code></td>
+              <td>Webhook secret from Clerk Dashboard → Webhooks</td>
+              <td><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display: inline-block; width: 18px; height: 18px; vertical-align: middle; margin-right: 0.5rem;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> Yes</td>
+            </tr>
+            <tr>
+              <td><code>NEXT_PUBLIC_CLERK_SIGN_IN_FORCE_REDIRECT_URL</code></td>
+              <td>Redirect URL after sign in (default: /dashboard)</td>
+              <td><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display: inline-block; width: 18px; height: 18px; vertical-align: middle; margin-right: 0.5rem;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg> Optional</td>
+            </tr>
+            <tr>
+              <td><code>NEXT_PUBLIC_CLERK_SIGN_UP_FORCE_REDIRECT_URL</code></td>
+              <td>Redirect URL after sign up (default: /dashboard)</td>
+              <td><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display: inline-block; width: 18px; height: 18px; vertical-align: middle; margin-right: 0.5rem;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg> Optional</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h3><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display: inline-block; width: 18px; height: 18px; vertical-align: middle; margin-right: 0.5rem;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path></svg> AI Processing (Nebius AI)</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>Variable</th>
+              <th>Description</th>
+              <th>Required</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>NEBIUS_API_KEY</code></td>
+              <td>API key from Nebius AI Studio</td>
+              <td><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display: inline-block; width: 18px; height: 18px; vertical-align: middle; margin-right: 0.5rem;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> Yes</td>
+            </tr>
+            <tr>
+              <td><code>HELICONE_API_KEY</code></td>
+              <td>Helicone API key for AI request monitoring (optional)</td>
+              <td><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display: inline-block; width: 18px; height: 18px; vertical-align: middle; margin-right: 0.5rem;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg> Optional</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h3><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display: inline-block; width: 18px; height: 18px; vertical-align: middle; margin-right: 0.5rem;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg> Payments (Stripe)</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>Variable</th>
+              <th>Description</th>
+              <th>Required</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY</code></td>
+              <td>Publishable key from Stripe Dashboard → Developers → API keys</td>
+              <td><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display: inline-block; width: 18px; height: 18px; vertical-align: middle; margin-right: 0.5rem;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> Yes</td>
+            </tr>
+            <tr>
+              <td><code>STRIPE_SECRET_KEY</code></td>
+              <td>Secret key from Stripe Dashboard → Developers → API keys</td>
+              <td><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display: inline-block; width: 18px; height: 18px; vertical-align: middle; margin-right: 0.5rem;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> Yes</td>
+            </tr>
+            <tr>
+              <td><code>STRIPE_WEBHOOK_SECRET</code></td>
+              <td>Webhook secret from Stripe Dashboard → Developers → Webhooks</td>
+              <td><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display: inline-block; width: 18px; height: 18px; vertical-align: middle; margin-right: 0.5rem;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> Yes</td>
+            </tr>
+            <tr>
+              <td><code>STRIPE_PRICE_ID_BASIC</code></td>
+              <td>Stripe Price ID for Basic plan (50 credits)</td>
+              <td><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display: inline-block; width: 18px; height: 18px; vertical-align: middle; margin-right: 0.5rem;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> Yes</td>
+            </tr>
+            <tr>
+              <td><code>STRIPE_PRICE_ID_PRO</code></td>
+              <td>Stripe Price ID for Pro plan (150 credits)</td>
+              <td><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display: inline-block; width: 18px; height: 18px; vertical-align: middle; margin-right: 0.5rem;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> Yes</td>
+            </tr>
+            <tr>
+              <td><code>STRIPE_PRICE_ID_ENTERPRISE</code></td>
+              <td>Stripe Price ID for Enterprise plan (500 credits)</td>
+              <td><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display: inline-block; width: 18px; height: 18px; vertical-align: middle; margin-right: 0.5rem;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> Yes</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h3><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display: inline-block; width: 18px; height: 18px; vertical-align: middle; margin-right: 0.5rem;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"></path></svg> Database (MongoDB)</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>Variable</th>
+              <th>Description</th>
+              <th>Required</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>DATABASE_URL</code></td>
+              <td>MongoDB connection string from Atlas or local instance</td>
+              <td><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display: inline-block; width: 18px; height: 18px; vertical-align: middle; margin-right: 0.5rem;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> Yes</td>
+            </tr>
+            <tr>
+              <td><code>MONGODB_URI</code></td>
+              <td>Alternative variable name (same as DATABASE_URL)</td>
+              <td><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display: inline-block; width: 18px; height: 18px; vertical-align: middle; margin-right: 0.5rem;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg> If DATABASE_URL not set</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h3><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg> Rate Limiting (Upstash Redis)</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>Variable</th>
+              <th>Description</th>
+              <th>Required</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>UPSTASH_REDIS_REST_URL</code></td>
+              <td>Upstash Redis REST API URL</td>
+              <td><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display: inline-block; width: 18px; height: 18px; vertical-align: middle; margin-right: 0.5rem;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> Yes</td>
+            </tr>
+            <tr>
+              <td><code>UPSTASH_REDIS_REST_TOKEN</code></td>
+              <td>Upstash Redis REST API token</td>
+              <td><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display: inline-block; width: 18px; height: 18px; vertical-align: middle; margin-right: 0.5rem;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> Yes</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h2><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg> Setup Instructions</h2>
+
+        <h3>Step 1: Create .env.local File</h3>
+        <ol class="steps">
+          <li class="step">In your project root, create a new file named <code>.env.local</code></li>
+          <li class="step">Copy the template above into the file</li>
+          <li class="step">Replace all placeholder values with your actual keys</li>
+        </ol>
+
+        <h3>Step 2: Get Required API Keys</h3>
+        <div class="callout info">
+          <strong><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg> Follow these guides to get your API keys:</strong>
+          <ul>
+            <li><a href="./clerk-setup.html">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+          Clerk Authentication Setup
+        </a> - For authentication keys</li>
+            <li><a href="./nebius-setup.html">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path></svg>
+          Nebius AI Setup
+        </a> - For AI logo generation API key</li>
+            <li><a href="./stripe-setup.html">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg>
+          Stripe Payment Setup
+        </a> - For payment processing keys</li>
+            <li><a href="./mongodb-setup.html">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"></path></svg>
+          MongoDB Database Setup
+        </a> - For database connection string</li>
+          </ul>
+        </div>
+
+        <h3>Step 3: Configure Upstash Redis</h3>
+        <ol class="steps">
+          <li class="step">Create an Upstash account at <a href="https://upstash.com" target="_blank">upstash.com</a></li>
+          <li class="step">Create a new Redis database</li>
+          <li class="step">Copy the REST URL and REST Token</li>
+          <li class="step">Add credentials to <code>.env.local</code></li>
+        </ol>
+
+        <h3>Step 4: Verify Configuration</h3>
+        <ol class="steps">
+          <li class="step">Start the development server: <code>npm run dev</code></li>
+          <li class="step">Check console for any missing environment variable warnings</li>
+          <li class="step">Test authentication by trying to sign up/login</li>
+          <li class="step">Test logo generation to ensure Nebius AI is working</li>
+        </ol>
+
+        <div class="callout warning">
+          <strong><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display: inline-block; width: 18px; height: 18px; vertical-align: middle; margin-right: 0.5rem;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg> Important Notes:</strong>
+          <ul>
+            <li><strong>Development vs Production:</strong> Use test keys for development and production keys for deployment</li>
+            <li><strong>Variable Names:</strong> Variables prefixed with <code>NEXT_PUBLIC_</code> are exposed to the browser</li>
+            <li><strong>Security:</strong> Never commit <code>.env.local</code> to version control</li>
+            <li><strong>Restart Server:</strong> Always restart your dev server after changing environment variables</li>
+          </ul>
+        </div>
+
+        <h2><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display: inline-block; width: 18px; height: 18px; vertical-align: middle; margin-right: 0.5rem;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg> Production Deployment</h2>
+
+        <p>For production deployments, set these variables in your hosting platform:</p>
+
+        <h3>Vercel</h3>
+        <ol class="steps">
+          <li class="step">Go to Project Settings → Environment Variables</li>
+          <li class="step">Add each variable individually</li>
+          <li class="step">Select appropriate environment (Production, Preview, Development)</li>
+          <li class="step">Update <code>NEXT_PUBLIC_APP_URL</code> to your production domain</li>
+          <li class="step">Use production API keys (not test keys)</li>
+          <li class="step">Redeploy your application</li>
+        </ol>
+
+        <h3>AWS EC2</h3>
+        <ol class="steps">
+          <li class="step">Create a <code>.env</code> file on your server</li>
+          <li class="step">Copy all variables from <code>.env.local</code></li>
+          <li class="step">Update <code>NEXT_PUBLIC_APP_URL</code> to your production domain</li>
+          <li class="step">Use production API keys (not test keys)</li>
+        </ol>
+
+        <div class="callout success">
+          <strong><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display: inline-block; width: 18px; height: 18px; vertical-align: middle; margin-right: 0.5rem;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> Next Steps:</strong> Once your environment variables are configured, proceed to:
+          <ul>
+            <li><a href="./clerk-setup.html">Set up Clerk Authentication</a></li>
+            <li><a href="./mongodb-setup.html">Configure MongoDB Database</a></li>
+            <li><a href="./nebius-setup.html">Configure Nebius AI</a></li>
+            <li><a href="./stripe-setup.html">Set up Stripe Payments</a></li>
+          </ul>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>
+
+

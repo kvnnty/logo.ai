@@ -1,0 +1,384 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Pricing & Credits Configuration – LogoAIpro Docs</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="./styles.css" />
+    <script defer src="./script.js"></script>
+  </head>
+  <body>
+    <aside class="sidebar">
+      <div class="brand">
+        <img src="./screenshots/logo.svg" alt="LogoAIpro Logo" />
+        <div>
+          <h1>LogoAIpro</h1>
+          <p>Documentation v1.0</p>
+        </div>
+      </div>
+      <nav>
+        <a href="./index.html">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+          Welcome
+        </a>
+        <a href="./how-to-use.html">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
+          User Guide
+        </a>
+        <a href="./push-to-github.html">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+          How to push to GitHub
+        </a>
+        <a href="./install-vercel.html">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path></svg>
+          How to install on Vercel
+        </a>
+        <a href="./install-aws-ec2.html">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01"></path></svg>
+          How to install on AWS EC2
+        </a>
+        <a href="./clerk-setup.html">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+          Clerk Authentication Setup
+        </a>
+        <a href="./mongodb-setup.html">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"></path></svg>
+          MongoDB Database Setup
+        </a>
+        <a href="./nebius-setup.html">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path></svg>
+          Nebius AI Setup
+        </a>
+        <a href="./env-setup.html">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+          Environment Variables
+        </a>
+        <a href="./stripe-setup.html">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg>
+          Stripe Payment Setup
+        </a>
+        <a href="./frontend-customization.html">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"></path></svg>
+          Frontend Customization
+        </a>
+        <a class="active" href="./pricing-credits.html">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+          Pricing & Credits
+        </a>
+      </nav>
+      <footer>
+        <small>Built with Next.js 15 & MongoDB</small>
+      </footer>
+    </aside>
+
+    <main class="content">
+      <header class="topbar">
+        <h2>Pricing & Credits Configuration</h2>
+      </header>
+
+      <section class="prose">
+        <div class="callout info">
+          <strong><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> Credit-Based System:</strong> LogoAIpro uses a credit-based pricing model with three credit packages. Each logo generation costs credits, which are deducted from user accounts when they create logos.
+        </div>
+
+        <h2><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg> Credit Packages Overview</h2>
+        
+        <p>LogoAIpro offers three credit packages with different quantities of credits. Each package provides credits for logo generation operations.</p>
+
+        <h3>Package Structure</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>Package</th>
+              <th>Credits</th>
+              <th>Price</th>
+              <th>Price/Credit</th>
+              <th>Value</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Basic Pack</strong></td>
+              <td>50</td>
+              <td>$9.99</td>
+              <td>$0.20</td>
+              <td>Entry Level</td>
+            </tr>
+            <tr>
+              <td><strong>Pro Pack</strong> ⭐</td>
+              <td>150</td>
+              <td>$24.99</td>
+              <td>$0.17</td>
+              <td>Best Value</td>
+            </tr>
+            <tr>
+              <td><strong>Enterprise Pack</strong></td>
+              <td>500</td>
+              <td>$79.99</td>
+              <td>$0.16</td>
+              <td>Professional</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="callout success">
+          <strong><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display: inline-block; width: 18px; height: 18px; vertical-align: middle; margin-right: 0.5rem;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path></svg> Best Value:</strong> The Pro Pack offers the best value with the lowest cost per credit ($0.17), making it perfect for regular users.
+        </div>
+
+        <div class="callout info">
+          <strong><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display: inline-block; width: 18px; height: 18px; vertical-align: middle; margin-right: 0.5rem;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"></path></svg> Free Tier:</strong> All new users receive <strong>10 free credits</strong> to test the platform. No credit card required!
+        </div>
+
+        <h2><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"></path></svg> Credit Costs per Operation</h2>
+
+        <p>Each logo generation typically costs <strong>1 credit</strong> per logo. This applies to all logo generation operations regardless of style, size, or quality settings.</p>
+
+        <h3>Credit Costs</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>Operation</th>
+              <th>Credits per Operation</th>
+              <th>Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Logo Generation</strong></td>
+              <td>1 credit</td>
+              <td>Generate a single logo with any style, size, or quality</td>
+            </tr>
+            <tr>
+              <td><strong>Logo Regeneration</strong></td>
+              <td>1 credit</td>
+              <td>Regenerate a logo with different parameters</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h2><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg> Configuration Files</h2>
+
+        <h3>1. Frontend Pricing Display</h3>
+        <p>Credit packages are configured in your pricing configuration file for display on the frontend:</p>
+
+        <div class="code"><pre><code>export const creditPackages = [
+  {
+    name: "Basic Pack",
+    credits: 50,
+    price: "$9.99",
+    pricePerCredit: "$0.20 per credit",
+    description: "Perfect for testing and small projects.",
+    ctaLabel: "Buy Basic Pack",
+    ctaHref: "/api/checkout/credits?plan=basic",
+  },
+  {
+    name: "Pro Pack",
+    credits: 150,
+    price: "$24.99",
+    pricePerCredit: "$0.17 per credit",
+    description: "Best value for regular users and creators.",
+    highlight: true, // This makes it the "Best Value" package
+    ctaLabel: "Buy Pro Pack",
+    ctaHref: "/api/checkout/credits?plan=pro",
+  },
+  {
+    name: "Enterprise Pack",
+    credits: 500,
+    price: "$79.99",
+    pricePerCredit: "$0.16 per credit",
+    description: "For businesses and heavy users.",
+    ctaLabel: "Buy Enterprise Pack",
+    ctaHref: "/api/checkout/credits?plan=enterprise",
+  },
+];</code></pre></div>
+
+        <h3>2. Backend Credit Configuration</h3>
+        <p>Credit pricing and checkout is handled in <code>app/api/checkout/credits/route.ts</code>:</p>
+
+        <div class="code"><pre><code>// Credit pricing plans (prices in cents for Stripe)
+const CREDIT_PLANS = {
+  basic: { price: 999, credits: 50 }, // $9.99
+  pro: { price: 2499, credits: 150 }, // $24.99
+  enterprise: { price: 7999, credits: 500 }, // $79.99
+} as const;</code></pre></div>
+
+        <div class="callout warning">
+          <strong><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display: inline-block; width: 18px; height: 18px; vertical-align: middle; margin-right: 0.5rem;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg> Important:</strong> Prices in the backend are in <strong>cents</strong> (e.g., 999 = $9.99) for Stripe integration. Always convert dollar amounts to cents when updating prices.
+        </div>
+
+        <h2><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg> Customizing Credit Packages</h2>
+
+        <h3>Step 1: Modify Credit Amounts</h3>
+        <p>To change credit amounts, update both files:</p>
+        <ol class="steps">
+          <li class="step"><strong>Frontend:</strong> Update your pricing configuration file with new credit amounts</li>
+          <li class="step"><strong>Backend:</strong> Update <code>app/api/checkout/credits/route.ts</code> with matching credit amounts and prices (in cents)</li>
+          <li class="step"><strong>Stripe:</strong> No changes needed in Stripe Dashboard since we use dynamic pricing</li>
+        </ol>
+
+        <h3>Step 2: Modify Package Prices</h3>
+        <ol class="steps">
+          <li class="step">Update prices in your frontend configuration (display price as string, e.g., "$9.99")</li>
+          <li class="step">Update prices in <code>app/api/checkout/credits/route.ts</code> (in cents, e.g., 999 for $9.99)</li>
+          <li class="step">Recalculate <code>pricePerCredit</code> in frontend configuration</li>
+        </ol>
+
+        <h3>Step 3: Add a New Package</h3>
+        <ol class="steps">
+          <li class="step">Add new package to your pricing configuration array</li>
+          <li class="step">Add corresponding entry to <code>CREDIT_PLANS</code> object in <code>app/api/checkout/credits/route.ts</code></li>
+          <li class="step">Update the <code>ctaHref</code> to match the new plan key (e.g., <code>plan=premium</code>)</li>
+          <li class="step">Test the checkout flow to ensure it works correctly</li>
+        </ol>
+
+        <h2><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display: inline-block; width: 18px; height: 18px; vertical-align: middle; margin-right: 0.5rem;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg> Stripe Integration</h2>
+
+        <h3>Checkout Process Flow</h3>
+        <p>The checkout API route creates Stripe checkout sessions with dynamic pricing. Here's how it works:</p>
+
+        <ol class="steps">
+          <li class="step">User clicks "Buy Credits" button on pricing page</li>
+          <li class="step">Frontend redirects to <code>/api/checkout/credits?plan=basic</code></li>
+          <li class="step">Backend validates the plan and creates a Stripe checkout session</li>
+          <li class="step">User completes payment on Stripe checkout page</li>
+          <li class="step">Stripe webhook triggers and adds credits to user account</li>
+          <li class="step">User is redirected back to credits page with success message</li>
+        </ol>
+
+        <h3>Stripe Checkout Session Configuration</h3>
+        <div class="code"><pre><code>const session = await stripe.checkout.sessions.create({
+  allow_promotion_codes: true, // Allows coupon codes
+  metadata: {
+    userId, // User ID from Clerk
+    credits: plan.credits.toString(),
+    type: "user_credits", // Identifies this as a credit purchase
+  },
+  line_items: [
+    {
+      price_data: {
+        currency: "usd",
+        unit_amount: plan.price, // Price in cents
+        product_data: {
+          name: `${plan.credits.toLocaleString()} Credit Pack`,
+          description: `${plan.credits.toLocaleString()} credits for logo generation`,
+        },
+      },
+      quantity: 1,
+    },
+  ],
+  mode: "payment", // One-time payment
+  success_url: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard/credits?session_id={CHECKOUT_SESSION_ID}&success=true`,
+  cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard/credits?canceled=true`,
+});</code></pre></div>
+
+        <div class="callout info">
+          <strong><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display: inline-block; width: 18px; height: 18px; vertical-align: middle; margin-right: 0.5rem;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path></svg> Dynamic Pricing:</strong> LogoAIpro uses dynamic Stripe pricing (<code>price_data</code>) instead of predefined Stripe Price IDs. This allows easy price changes without updating Stripe Dashboard.
+        </div>
+
+        <h3>Modify Credit Costs per Operation</h3>
+        <p>To change credit costs for logo generation, update the credit check in your API route:</p>
+
+        <div class="code"><pre><code>// In API route (e.g., app/api/generate/route.ts)
+import { checkAndDeductCredits } from "@/lib/utils/credits";
+
+// Check and deduct credits (change 1 to your desired credit cost)
+const creditCheck = await checkAndDeductCredits(1);
+if (!creditCheck.success) {
+  return NextResponse.json(
+    { error: creditCheck.error || "Insufficient credits" },
+    { status: 400 }
+  );
+}</code></pre></div>
+
+        <h2><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg> Credit Validation System</h2>
+
+        <h3>Credit Check Function</h3>
+        <p>Credits are checked and deducted using your credit utility function:</p>
+
+        <div class="code"><pre><code>export async function checkAndDeductCredits(
+  amount: number,
+  userId?: string
+): Promise&lt;{ success: boolean; error?: string }&gt; {
+  // Implementation:
+  // 1. Checks user credit balance from database
+  // 2. Deducts credits if sufficient balance exists
+  // 3. Updates user credit balance in database
+  // 4. Returns success or error message
+}</code></pre></div>
+
+        <h3>Credit Balance Check</h3>
+        <ul>
+          <li><strong>Before Operation:</strong> System checks if user has enough credits</li>
+          <li><strong>During Operation:</strong> Credits are deducted immediately when operation starts</li>
+          <li><strong>After Operation:</strong> If operation fails, credits are not refunded (prevent abuse)</li>
+        </ul>
+
+        <h2><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg> Webhook Integration</h2>
+
+        <h3>Stripe Webhook Handler</h3>
+        <p>Credits are automatically added to user accounts via Stripe webhook when payment is completed:</p>
+
+        <div class="code"><pre><code>// app/api/stripe-webhook/route.ts
+if (event.type === 'checkout.session.completed') {
+  const session = event.data.object;
+  const userId = session.metadata.userId;
+  const credits = parseInt(session.metadata.credits);
+  
+  // Validate this is a credit purchase
+  if (session.metadata.type === 'user_credits') {
+    // Add credits to user account in database
+    await addCreditsToUser(userId, credits);
+  }
+}</code></pre></div>
+
+        <div class="callout warning">
+          <strong><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display: inline-block; width: 18px; height: 18px; vertical-align: middle; margin-right: 0.5rem;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg> Webhook Security:</strong> Always verify webhook signatures using <code>STRIPE_WEBHOOK_SECRET</code> to ensure requests are from Stripe.
+        </div>
+
+        <h2><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg> Pricing Strategy Recommendations</h2>
+
+        <h3>Current Pricing Tiers</h3>
+        <ul>
+          <li><strong>Basic Pack ($9.99):</strong> Perfect for testing the platform or occasional use</li>
+          <li><strong>Pro Pack ($24.99):</strong> Ideal for regular users and content creators</li>
+          <li><strong>Enterprise Pack ($79.99):</strong> Best for heavy users and businesses</li>
+        </ul>
+
+        <h3>Pricing Tips</h3>
+        <ul>
+          <li><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display: inline-block; width: 18px; height: 18px; vertical-align: middle; margin-right: 0.5rem;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> Lower cost per credit with larger packs incentivizes bulk purchases</li>
+          <li><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display: inline-block; width: 18px; height: 18px; vertical-align: middle; margin-right: 0.5rem;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> The Pro pack being highlighted as "Best Value" drives conversions</li>
+          <li><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display: inline-block; width: 18px; height: 18px; vertical-align: middle; margin-right: 0.5rem;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> Clear pricing per credit helps users understand value</li>
+          <li><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display: inline-block; width: 18px; height: 18px; vertical-align: middle; margin-right: 0.5rem;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> Free tier (10 credits) allows users to test before purchasing</li>
+        </ul>
+
+        <h2><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg> Testing Credit System</h2>
+
+        <h3>Test Checklist</h3>
+        <ol class="steps">
+          <li class="step">Test credit purchase flow with Stripe test mode</li>
+          <li class="step">Verify credits are added correctly after payment</li>
+          <li class="step">Test credit deduction when generating logos</li>
+          <li class="step">Verify insufficient credits error message</li>
+          <li class="step">Test webhook handling for successful payments</li>
+          <li class="step">Verify credit balance displays correctly in dashboard</li>
+        </ol>
+
+        <div class="callout success">
+          <strong><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display: inline-block; width: 18px; height: 18px; vertical-align: middle; margin-right: 0.5rem;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> Next Steps:</strong>
+          <ul>
+            <li><a href="./stripe-setup.html">Configure Stripe Payment Setup</a></li>
+            <li><a href="./env-setup.html">Complete Environment Variables Setup</a></li>
+            <li><a href="./how-to-use.html">Learn how users purchase credits</a></li>
+            <li><a href="./frontend-customization.html">Customize Pricing Display</a></li>
+          </ul>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>
+

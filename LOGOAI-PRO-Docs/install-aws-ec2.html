@@ -1,0 +1,460 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Install on AWS EC2 – LogoAIpro Docs</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="./styles.css" />
+    <script defer src="./script.js"></script>
+  </head>
+  <body>
+    <aside class="sidebar">
+      <div class="brand">
+        <img src="./screenshots/logo.svg" alt="LogoAIpro Logo" />
+        <div>
+          <h1>LogoAIpro</h1>
+          <p>Documentation v1.0</p>
+        </div>
+      </div>
+      <nav>
+        <a href="./index.html">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+          Welcome
+        </a>
+        <a href="./how-to-use.html">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
+          User Guide
+        </a>
+        <a href="./push-to-github.html">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+          How to push to GitHub
+        </a>
+        <a href="./install-vercel.html">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path></svg>
+          How to install on Vercel
+        </a>
+        <a class="active" href="./install-aws-ec2.html">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01"></path></svg>
+          How to install on AWS EC2
+        </a>
+        <a href="./clerk-setup.html">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+          Clerk Authentication Setup
+        </a>
+        <a href="./mongodb-setup.html">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"></path></svg>
+          MongoDB Database Setup
+        </a>
+        <a href="./nebius-setup.html">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path></svg>
+          Nebius AI Setup
+        </a>
+        <a href="./env-setup.html">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+          Environment Variables
+        </a>
+        <a href="./stripe-setup.html">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg>
+          Stripe Payment Setup
+        </a>
+        <a href="./frontend-customization.html">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"></path></svg>
+          Frontend Customization
+        </a>
+        <a href="./pricing-credits.html">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+          Pricing & Credits
+        </a>
+      </nav>
+      <footer>
+        <small>Built with Next.js 15 & MongoDB</small>
+      </footer>
+    </aside>
+
+    <main class="content">
+      <header class="topbar">
+        <h2>Install on AWS EC2 Ubuntu Server</h2>
+      </header>
+
+      <section class="prose">
+        <div class="callout">
+          <strong>Prerequisite:</strong> Make sure you've completed the <a href="./push-to-github.html">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+          How to push to GitHub
+        </a> before proceeding with How to install on AWS EC2.
+        </div>
+
+        <h2>📹 Video Tutorial</h2>
+        <p>Watch this comprehensive video guide for step-by-step AWS EC2 setup instructions:</p>
+        
+        <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%; background: #000; border-radius: 16px; border: 4px solid #000; margin: 2rem 0;">
+          <iframe 
+            width="100%" 
+            height="100%" 
+            src="https://www.youtube.com/embed/CK-6zarD2Hc" 
+            style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0;" 
+            title="AWS EC2 Installation Tutorial"
+            frameborder="0" 
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+            allowfullscreen>
+          </iframe>
+        </div>
+        
+        <p style="margin-top: 1rem; text-align: center;">
+          <a href="https://www.youtube.com/watch?v=CK-6zarD2Hc" target="_blank" rel="noopener noreferrer" style="color: var(--brand, #6366f1); text-decoration: underline;">
+            Watch on YouTube if the video doesn't load above
+          </a>
+        </p>
+        
+        <div class="callout info">
+          <strong>🎥 Video Guide:</strong> This tutorial covers the complete AWS EC2 setup process including server configuration, environment setup, and deployment steps. Follow along for the easiest installation experience!
+        </div>
+
+        <div class="callout warning">
+          <strong><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display: inline-block; width: 18px; height: 18px; vertical-align: middle; margin-right: 0.5rem;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg> Important Note:</strong> This video demonstrates the standard AWS EC2 installation process for any Node.js project. It does not show the specific installation steps for this LogoAIpro project. Please follow the written instructions below for project-specific setup requirements and configurations.
+        </div>
+
+        <h3>Requirements</h3>
+        <ul>
+          <li>AWS Account (free tier eligible)</li>
+          <li>Domain name (optional, can use EC2 public IP)</li>
+          <li>Basic knowledge of Linux commands</li>
+          <li>Web browser (for AWS EC2 Instance Connect - recommended)</li>
+          <li>SSH client (Terminal, PuTTY, or VS Code - optional, for traditional SSH)</li>
+        </ul>
+
+        <div class="callout">
+          <strong>Estimated Cost:</strong> t2.micro instance (free tier) can run this application. For production, consider t3.small or larger.
+        </div>
+
+        <h3>Step 1: Create AWS Account and EC2 Instance</h3>
+        
+        <h4>1.1 Sign up for AWS</h4>
+        <ol class="steps">
+          <li class="step">Go to <a href="https://aws.amazon.com/" target="_blank" rel="noopener">aws.amazon.com</a> and click "Create an AWS Account"</li>
+          <li class="step">Fill in your account details and verify your email/phone</li>
+          <li class="step">Add a payment method (required even for free tier)</li>
+          <li class="step">Choose "Basic Support" (free tier includes this)</li>
+        </ol>
+
+        <h4>1.2 Launch EC2 Instance</h4>
+        <ol class="steps">
+          <li class="step">Sign in to AWS Console and navigate to EC2 service</li>
+          <li class="step">Click "Launch Instance"</li>
+          <li class="step">Choose "Ubuntu Server 24.04 LTS" (free tier eligible)</li>
+          <li class="step">Select "t2.micro" instance type (free tier)</li>
+          <li class="step">Create or select a key pair for SSH access</li>
+          <li class="step">Configure security group with these rules:
+            <div class="code"><pre><code>Type: SSH, Protocol: TCP, Port: 22, Source: My IP
+Type: HTTP, Protocol: TCP, Port: 80, Source: 0.0.0.0/0
+Type: HTTPS, Protocol: TCP, Port: 443, Source: 0.0.0.0/0
+Type: Custom TCP, Protocol: TCP, Port: 3000, Source: 0.0.0.0/0</code></pre></div>
+            <p><strong>Note:</strong> If using AWS EC2 Instance Connect, you don't need to open SSH port 22 to your IP. EC2 Instance Connect handles authentication automatically.</p>
+          </li>
+          <li class="step">Launch the instance and wait for it to be "running"</li>
+        </ol>
+
+        <h3>Step 2: Connect to Your EC2 Instance</h3>
+        
+        <h4>2.1 Using AWS EC2 Instance Connect (Recommended)</h4>
+        <ol class="steps">
+          <li class="step">In EC2 Console, select your running instance</li>
+          <li class="step">Click the "Connect" button at the top</li>
+          <li class="step">Select "EC2 Instance Connect" tab</li>
+          <li class="step">Click "Connect" - this will open a browser-based terminal</li>
+          <li class="step">You're now connected to your instance!</li>
+        </ol>
+
+        <div class="callout">
+          <strong>AWS EC2 Instance Connect:</strong> This method doesn't require downloading key files or configuring SSH clients. It works directly in your browser and is more secure.
+        </div>
+
+        <h4>2.2 Alternative: AWS Systems Manager Session Manager</h4>
+        <ol class="steps">
+          <li class="step">In EC2 Console, select your instance</li>
+          <li class="step">Click the "Connect" button</li>
+          <li class="step">Select "Session Manager" tab</li>
+          <li class="step">Click "Connect" to open a browser-based terminal</li>
+        </ol>
+
+        <div class="callout">
+          <strong>Note:</strong> Session Manager requires the SSM agent to be installed and running on your instance. This is pre-installed on Amazon Linux 2 and Ubuntu 18.04+ AMIs.
+        </div>
+
+        <h4>2.3 Traditional SSH (If needed)</h4>
+        <p>If you prefer traditional SSH or need it for specific use cases:</p>
+        <div class="code"><pre><code># Make your key file secure
+chmod 400 /path/to/your-key.pem
+
+# Connect to your instance
+ssh -i /path/to/your-key.pem ubuntu@YOUR_PUBLIC_IP
+
+# Example:
+ssh -i ~/Downloads/my-key.pem ubuntu@3.15.123.45</code></pre></div>
+
+        <h3>Step 3: Install Required Software</h3>
+        
+        <h4>3.1 Update System</h4>
+        <div class="code"><pre><code># Update package list and upgrade system
+sudo apt update && sudo apt upgrade -y
+
+# Install essential packages
+sudo apt install -y curl wget git unzip software-properties-common</code></pre></div>
+
+        <h4>3.2 Install Node.js 18+</h4>
+        <div class="code"><pre><code># Install Node.js using NodeSource repository
+curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+sudo apt-get install -y nodejs
+
+# Verify installation
+node --version  # Should show v18.x.x or higher
+npm --version</code></pre></div>
+
+        <h4>3.3 Install PM2 (Process Manager)</h4>
+        <div class="code"><pre><code># Install PM2 globally
+sudo npm install -g pm2
+
+# Configure PM2 to start on boot
+pm2 startup
+# Follow the instructions shown by the command</code></pre></div>
+
+        <h4>3.4 Install Nginx (Reverse Proxy)</h4>
+        <div class="code"><pre><code># Install Nginx
+sudo apt install -y nginx
+
+# Start and enable Nginx
+sudo systemctl start nginx
+sudo systemctl enable nginx
+
+# Check status
+sudo systemctl status nginx</code></pre></div>
+
+        <h3>Step 4: Deploy the Application</h3>
+        
+        <h4>4.1 Clone Your Repository</h4>
+        <div class="code"><pre><code># Create application directory
+sudo mkdir -p /var/www
+cd /var/www
+
+# Clone your repository (replace with your actual repo URL)
+sudo git clone https://github.com/yourusername/logo-ai-pro.git logo-ai-pro
+sudo chown -R ubuntu:ubuntu logo-ai-pro
+cd logo-ai-pro</code></pre></div>
+
+        <h4>4.2 Install Dependencies</h4>
+        <div class="code"><pre><code># Install project dependencies
+npm install
+
+# Build the application
+npm run build</code></pre></div>
+
+        <h4>4.3 Configure Environment Variables</h4>
+        <div class="code"><pre><code># Create environment file
+nano .env.local
+
+# Add all required environment variables (see env-setup.html)
+# MongoDB Connection (required)
+DATABASE_URL=mongodb+srv://username:password@cluster.mongodb.net/logo-ai-pro
+
+# Clerk Authentication (required)
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_...
+CLERK_SECRET_KEY=sk_test_...
+CLERK_WEBHOOK_SECRET=whsec_...
+
+# Nebius AI (required)
+NEBIUS_API_KEY=your-nebius-api-key
+
+# Stripe Configuration (required)
+NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_...
+STRIPE_SECRET_KEY=sk_test_...
+STRIPE_WEBHOOK_SECRET=whsec_...
+
+# Upstash Redis (required)
+UPSTASH_REDIS_REST_URL=https://...
+UPSTASH_REDIS_REST_TOKEN=...
+
+# App URL
+NEXT_PUBLIC_APP_URL=http://YOUR_PUBLIC_IP:3000
+
+# Optional: Helicone (for observability)
+HELICONE_API_KEY=your-helicone-key
+
+# Optional: Umami (for analytics)
+UMAMI_WEBSITE_ID=your-umami-id</code></pre></div>
+
+        <h3>Step 5: Configure Nginx</h3>
+        
+        <h4>5.1 Create Nginx Configuration</h4>
+        <div class="code"><pre><code># Create Nginx configuration
+sudo nano /etc/nginx/sites-available/default
+
+# Add the following configuration:
+server {
+    listen 80;
+    server_name YOUR_PUBLIC_IP;  # Replace with your domain if you have one
+
+    location / {
+        proxy_pass http://localhost:3000;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_cache_bypass $http_upgrade;
+    }
+}</code></pre></div>
+
+        <h4>5.2 Enable the Site</h4>
+        <div class="code"><pre><code># Enable the site
+sudo ln -s /etc/nginx/sites-available/default /etc/nginx/sites-enabled/
+
+# Remove default site
+sudo rm /etc/nginx/sites-enabled/default
+
+# Test Nginx configuration
+sudo nginx -t
+
+# Restart Nginx
+sudo systemctl restart nginx</code></pre></div>
+
+        <h3>Step 6: Start the Application</h3>
+        
+        <h4>6.1 Start with PM2</h4>
+        <div class="code"><pre><code># Start the application with PM2
+pm2 start npm --name "logo-ai-pro" -- start
+
+# Save PM2 configuration
+pm2 save
+
+# Check status
+pm2 status
+pm2 logs logo-ai-pro</code></pre></div>
+
+        <h3>Step 7: Configure SSL (Optional but Recommended)</h3>
+        
+        <h4>7.1 Install Certbot</h4>
+        <div class="code"><pre><code># Install Certbot
+sudo apt install -y certbot python3-certbot-nginx
+
+# Get SSL certificate (replace with your domain)
+sudo certbot --nginx -d yourdomain.com
+
+# Test auto-renewal
+sudo certbot renew --dry-run</code></pre></div>
+
+        <h3>Step 8: Configure Firewall</h3>
+        
+        <div class="code"><pre><code># Configure UFW firewall
+sudo ufw allow ssh
+sudo ufw allow 'Nginx Full'
+sudo ufw --force enable
+
+# Check status
+sudo ufw status</code></pre></div>
+
+        <h3>Step 9: Update Webhook URLs</h3>
+        
+        <ol class="steps">
+          <li class="step">Go to Stripe Dashboard → Webhooks</li>
+          <li class="step">Update your webhook endpoint URL to: <code>https://YOUR_DOMAIN/api/webhooks/stripe</code></li>
+          <li class="step">Go to Clerk Dashboard → Webhooks</li>
+          <li class="step">Update your webhook endpoint URL to: <code>https://YOUR_DOMAIN/api/webhooks/clerk</code></li>
+          <li class="step">Test the webhooks using the test endpoints</li>
+        </ol>
+
+        <h3>Step 10: Verify Installation</h3>
+        
+        <div class="code"><pre><code># Check if the application is running
+curl http://localhost:3000/api/db-health
+
+# Check Nginx status
+sudo systemctl status nginx
+
+# Check PM2 status
+pm2 status
+
+# View application logs
+pm2 logs logo-ai-pro</code></pre></div>
+
+        <h3>Useful Commands</h3>
+        
+        <h4>Application Management</h4>
+        <div class="code"><pre><code># Restart application
+pm2 restart logo-ai-pro
+
+# Stop application
+pm2 stop logo-ai-pro
+
+# View logs
+pm2 logs logo-ai-pro
+
+# Monitor resources
+pm2 monit</code></pre></div>
+
+        <h4>Nginx Management</h4>
+        <div class="code"><pre><code># Restart Nginx
+sudo systemctl restart nginx
+
+# Reload Nginx configuration
+sudo systemctl reload nginx
+
+# Check Nginx status
+sudo systemctl status nginx</code></pre></div>
+
+        <h4>System Updates</h4>
+        <div class="code"><pre><code># Update system packages
+sudo apt update && sudo apt upgrade -y
+
+# Update application
+cd /var/www/logo-ai-pro
+git pull origin main
+npm install
+npm run build
+pm2 restart logo-ai-pro</code></pre></div>
+
+        <h3>Troubleshooting</h3>
+        
+        <h4>Common Issues</h4>
+        <ul>
+          <li><strong>EC2 Instance Connect not working:</strong> Ensure your instance has the EC2 Instance Connect agent installed (pre-installed on Ubuntu 18.04+)</li>
+          <li><strong>Port 3000 not accessible:</strong> Check security group rules and firewall settings</li>
+          <li><strong>Application not starting:</strong> Check PM2 logs with <code>pm2 logs logo-ai-pro</code></li>
+          <li><strong>Nginx 502 error:</strong> Ensure the application is running on port 3000</li>
+          <li><strong>Environment variables not working:</strong> Verify .env.local file exists and has correct values</li>
+          <li><strong>Session Manager not available:</strong> Ensure SSM agent is running with <code>sudo systemctl status snap.amazon-ssm-agent.amazon-ssm-agent</code></li>
+        </ul>
+
+        <h4>Log Locations</h4>
+        <div class="code"><pre><code># Application logs
+pm2 logs logo-ai-pro
+
+# Nginx logs
+sudo tail -f /var/log/nginx/access.log
+sudo tail -f /var/log/nginx/error.log
+
+# System logs
+sudo journalctl -u nginx
+sudo journalctl -u pm2-ubuntu</code></pre></div>
+
+        <div class="callout">
+          <strong>Security Note:</strong> For production use, consider setting up a proper domain name, configuring a WAF, and implementing additional security measures like fail2ban.
+        </div>
+
+        <h3>Cost Optimization</h3>
+        <ul>
+          <li>Use t2.micro for development (free tier)</li>
+          <li>Consider Reserved Instances for production</li>
+          <li>Set up CloudWatch alarms for monitoring</li>
+          <li>Consider using Application Load Balancer for high traffic</li>
+        </ul>
+      </section>
+    </main>
+  </body>
+</html>
+

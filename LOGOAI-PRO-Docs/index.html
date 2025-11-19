@@ -1,0 +1,365 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>LogoAIpro – Documentation</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="./styles.css" />
+    <script defer src="./script.js"></script>
+  </head>
+  <body>
+    <aside class="sidebar">
+      <div class="brand">
+        <img src="./screenshots/logo.svg" alt="LogoAIpro Logo" />
+        <div>
+          <h1>LogoAIpro</h1>
+          <p>Documentation v1.0</p>
+        </div>
+      </div>
+      <nav>
+        <a class="active" href="./index.html">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+          Welcome
+        </a>
+        <a href="./how-to-use.html">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
+          User Guide
+        </a>
+        <a href="./push-to-github.html">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+          How to push to GitHub
+        </a>
+        <a href="./install-vercel.html">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path></svg>
+          How to install on Vercel
+        </a>
+        <a href="./install-aws-ec2.html">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01"></path></svg>
+          How to install on AWS EC2
+        </a>
+        <a href="./clerk-setup.html">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+          Clerk Authentication Setup
+        </a>
+        <a href="./mongodb-setup.html">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"></path></svg>
+          MongoDB Database Setup
+        </a>
+        <a href="./nebius-setup.html">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path></svg>
+          Nebius AI Setup
+        </a>
+        <a href="./env-setup.html">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+          Environment Variables
+        </a>
+        <a href="./stripe-setup.html">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg>
+          Stripe Payment Setup
+        </a>
+        <a href="./frontend-customization.html">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"></path></svg>
+          Frontend Customization
+        </a>
+        <a href="./pricing-credits.html">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+          Pricing & Credits
+        </a>
+      </nav>
+      <footer>
+        <small>Built with Next.js 15 & MongoDB</small>
+      </footer>
+    </aside>
+
+    <main class="content">
+      <header class="topbar">
+        <h2>Welcome to LogoAIpro</h2>
+      </header>
+
+      <section class="prose">
+        <div class="version-info">
+          <div class="version">Version 1.0</div>
+          <div class="date">Updated January 2025</div>
+        </div>
+
+        <div class="callout info">
+          <strong>
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display: inline-block; width: 18px; height: 18px; vertical-align: middle; margin-right: 0.5rem;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+            Welcome to LogoAIpro v1.0!
+          </strong> This comprehensive documentation will guide you through setting up and deploying your AI-powered logo generation platform. Create professional, unique brand identities in seconds with cutting-edge AI technology.
+        </div>
+
+        <h2>
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"></path></svg>
+          Overview
+        </h2>
+        
+        <p><strong>LogoAIpro</strong> is an intelligent, AI-driven platform that enables businesses, entrepreneurs, and creators to design professional, unique brand identities in seconds. Built with state-of-the-art AI models (Flux Schnell and Flux Dev via Nebius AI), it serves startups, small businesses, freelancers, agencies, and anyone needing a professional logo without the traditional design costs or time investment.</p>
+        
+        <div class="feature-grid">
+          <div class="feature-card">
+            <h3>
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"></path></svg>
+              AI Logo Generation
+            </h3>
+            <p>Create unique logos using advanced AI models (Flux Schnell and Flux Dev) powered by Nebius AI infrastructure.</p>
+          </div>
+          
+          <div class="feature-card">
+            <h3>
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"></path></svg>
+              6 Design Styles
+            </h3>
+            <p>Choose from Minimal, Technology, Corporate, Creative, Abstract, and Flashy design styles to match your brand.</p>
+          </div>
+          
+          <div class="feature-card">
+            <h3>
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path></svg>
+              Full Customization
+            </h3>
+            <p>Customize colors, sizes (256x256, 512x512, 1024x1024), and quality settings (Standard, HD) for your logos.</p>
+          </div>
+          
+          <div class="feature-card">
+            <h3>
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg>
+              Credit System
+            </h3>
+            <p>Flexible credit-based pricing with packages: Basic (50 credits), Pro (150 credits), and Enterprise (500 credits).</p>
+          </div>
+          
+          <div class="feature-card">
+            <h3>
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
+              Fully Responsive
+            </h3>
+            <p>Mobile-first design with beautiful UI, optimized for all devices including iPhone SE and desktop.</p>
+          </div>
+          
+          <div class="feature-card">
+            <h3>
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+              User History
+            </h3>
+            <p>Track and manage previously generated logos with a comprehensive history and gallery system.</p>
+          </div>
+        </div>
+
+        <h2>
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+          System Architecture
+        </h2>
+        
+        <div class="callout success">
+          <strong>
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display: inline-block; width: 18px; height: 18px; vertical-align: middle; margin-right: 0.5rem;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            Tech Stack:
+          </strong>
+          <ul>
+            <li><strong>Framework:</strong> Next.js 15 (App Router) - Monolithic Architecture</li>
+            <li><strong>Language:</strong> TypeScript</li>
+            <li><strong>UI Library:</strong> Tailwind CSS & Shadcn UI</li>
+            <li><strong>Database:</strong> MongoDB with Mongoose ODM</li>
+            <li><strong>Authentication:</strong> Clerk (Complete authentication solution)</li>
+            <li><strong>Payments:</strong> Stripe (Credit packages and one-time purchases)</li>
+            <li><strong>AI Integration:</strong> Nebius AI (Flux Schnell & Flux Dev models)</li>
+            <li><strong>Rate Limiting:</strong> Upstash Redis (10 requests per 30 days)</li>
+            <li><strong>Observability:</strong> Helicone (AI request monitoring)</li>
+            <li><strong>Analytics:</strong> Umami (Optional analytics)</li>
+            <li><strong>Deployment:</strong> Vercel (recommended) or AWS EC2</li>
+          </ul>
+        </div>
+
+        <h2>
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path></svg>
+          Key Features
+        </h2>
+
+        <h3>6-Step Logo Creation Wizard</h3>
+        <ul>
+          <li><strong>Step 1 - Brand Name:</strong> Enter your company or brand name to be included in the logo</li>
+          <li><strong>Step 2 - Style Selection:</strong> Choose from 6 professional design styles</li>
+          <li><strong>Step 3 - Colors & Model:</strong> Customize primary color, background color, and select AI model</li>
+          <li><strong>Step 4 - Size & Quality:</strong> Select output dimensions and quality level</li>
+          <li><strong>Step 5 - Additional Details:</strong> Provide optional brand personality and preferences</li>
+          <li><strong>Step 6 - Generated Logo:</strong> View, download, or regenerate your logo</li>
+        </ul>
+
+        <h3>Design Styles</h3>
+        <ul>
+          <li><strong>Minimal:</strong> Simple, timeless, single-color with negative space and flat design</li>
+          <li><strong>Technology:</strong> Detailed, sharp, cinematic, minimalist with clean lines</li>
+          <li><strong>Corporate:</strong> Modern, forward-thinking, geometric shapes with professional appeal</li>
+          <li><strong>Creative:</strong> Playful, bright bold colors, rounded shapes, lively designs</li>
+          <li><strong>Abstract:</strong> Artistic, unique shapes, patterns, and visually interesting textures</li>
+          <li><strong>Flashy:</strong> Attention-grabbing, bold, futuristic with vibrant neon colors</li>
+        </ul>
+
+        <h3>AI Models</h3>
+        <ul>
+          <li><strong>Flux Schnell:</strong> Optimized for realistic and detailed logos with fast generation</li>
+          <li><strong>Flux Dev:</strong> Advanced model for enhanced realism and complex designs</li>
+        </ul>
+
+        <h2>
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>
+          Prerequisites
+        </h2>
+        
+        <div class="callout warning">
+          <strong>
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display: inline-block; width: 18px; height: 18px; vertical-align: middle; margin-right: 0.5rem;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+            Before you begin, ensure you have:
+          </strong>
+          <ul>
+            <li>Node.js 18+ installed</li>
+            <li>MongoDB database (Atlas recommended)</li>
+            <li>Clerk account (for authentication)</li>
+            <li>Nebius AI API key (for AI logo generation)</li>
+            <li>Stripe account (for payment processing)</li>
+            <li>Upstash Redis account (for rate limiting)</li>
+            <li>Helicone account (optional, for observability)</li>
+            <li>Umami account (optional, for analytics)</li>
+          </ul>
+        </div>
+
+        <h2>
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+          Quick Start
+        </h2>
+        
+        <ol>
+          <li><strong>Clone:</strong> Get the repository from GitHub</li>
+          <li><strong>Install:</strong> Run <code>npm install</code> to install dependencies</li>
+          <li><strong>Environment Setup:</strong> Configure all required API keys in <code>.env.local</code></li>
+          <li><strong>Database:</strong> Set up MongoDB connection</li>
+          <li><strong>Authentication:</strong> Configure Clerk authentication</li>
+          <li><strong>AI Service:</strong> Set up Nebius AI API key</li>
+          <li><strong>Start:</strong> Run <code>npm run dev</code> to start development server</li>
+          <li><strong>Deploy:</strong> Follow deployment guides for Vercel or AWS EC2</li>
+        </ol>
+
+        <div class="callout info">
+          <strong>
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display: inline-block; width: 18px; height: 18px; vertical-align: middle; margin-right: 0.5rem;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path></svg>
+            Pro Tip:
+          </strong> For production use, Vercel is recommended for easy deployment and automatic scaling. AWS EC2 is also supported for more control over the infrastructure.
+        </div>
+
+        <h2>
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+          Pricing & Credits
+        </h2>
+
+        <h3>Credit Packages</h3>
+        <div class="callout">
+          <table>
+            <thead>
+              <tr>
+                <th>Package</th>
+                <th>Credits</th>
+                <th>Price</th>
+                <th>Price/Credit</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Basic</td>
+                <td>50</td>
+                <td>$9.99</td>
+                <td>$0.20</td>
+              </tr>
+              <tr>
+                <td>Pro</td>
+                <td>150</td>
+                <td>$24.99</td>
+                <td>$0.17</td>
+              </tr>
+              <tr>
+                <td>Enterprise</td>
+                <td>500</td>
+                <td>$79.99</td>
+                <td>$0.16</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="callout success">
+          <strong>
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display: inline-block; width: 18px; height: 18px; vertical-align: middle; margin-right: 0.5rem;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"></path></svg>
+            Free Tier:
+          </strong> All new users receive <strong>10 free credits</strong> to test the platform. No credit card required!
+        </div>
+
+        <h2>
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
+          Documentation Sections
+        </h2>
+        
+        <div class="feature-grid">
+          <div class="feature-card">
+            <h3>
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+              User Guide
+            </h3>
+            <p>Complete end-user documentation for creating logos, managing history, and navigating the dashboard.</p>
+          </div>
+          
+          <div class="feature-card">
+            <h3>
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path></svg>
+              Deployment
+            </h3>
+            <p>Step-by-step guides for deploying to Vercel (recommended) or AWS EC2.</p>
+          </div>
+          
+          <div class="feature-card">
+            <h3>
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+              Configuration
+            </h3>
+            <p>Environment setup, API integrations (Clerk, Nebius AI, Stripe), and system configuration.</p>
+          </div>
+          
+          <div class="feature-card">
+            <h3>
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"></path></svg>
+              Customization
+            </h3>
+            <p>Frontend modifications, theming, pricing configuration, and feature customization guides.</p>
+          </div>
+        </div>
+
+        <h2>
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+          Support & Resources
+        </h2>
+        
+        <div class="callout">
+          <strong>Need Help?</strong>
+          <ul>
+            <li><strong>Documentation:</strong> Comprehensive guides for all features</li>
+            <li><strong>README:</strong> Check the main README.md for detailed information</li>
+            <li><strong>Issues:</strong> Report issues on GitHub</li>
+            <li><strong>Community:</strong> Join our developer community</li>
+          </ul>
+        </div>
+
+        <p><strong>Ready to get started?</strong> Follow our step-by-step deployment guides. Each section includes detailed instructions, code examples, and troubleshooting tips.</p>
+
+        <div style="text-align: center; margin: 2rem 0;">
+          <a href="./how-to-use.html" class="btn">Start with User Guide →</a>
+          <a href="./install-vercel.html" class="btn secondary">Deploy to Vercel →</a>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>
+
+

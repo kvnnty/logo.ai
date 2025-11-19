@@ -1,0 +1,335 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Stripe Payment Setup – LogoAIpro Docs</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="./styles.css" />
+    <script defer src="./script.js"></script>
+  </head>
+  <body>
+    <aside class="sidebar">
+      <div class="brand">
+        <img src="./screenshots/logo.svg" alt="LogoAIpro Logo" />
+        <div>
+          <h1>LogoAIpro</h1>
+          <p>Documentation v1.0</p>
+        </div>
+      </div>
+      <nav>
+        <a href="./index.html">Welcome</a>
+        <a href="./how-to-use.html">User Guide</a>
+        <a href="./push-to-github.html">How to push to GitHub</a>
+        <a href="./install-vercel.html">How to install on Vercel</a>
+        <a href="./install-aws-ec2.html">How to install on AWS EC2</a>
+        <a href="./clerk-setup.html">Clerk Authentication Setup</a>
+        <a href="./mongodb-setup.html">MongoDB Database Setup</a>
+        <a href="./nebius-setup.html">Nebius AI Setup</a>
+        <a href="./env-setup.html">Environment Variables</a>
+        <a class="active" href="./stripe-setup.html">Stripe Payment Setup</a>
+        <a href="./frontend-customization.html">Frontend Customization</a>
+        <a href="./pricing-credits.html">Pricing & Credits</a>
+      </nav>
+      <footer>
+        <small>Built with Next.js 15 & MongoDB</small>
+      </footer>
+    </aside>
+
+    <main class="content">
+      <header class="topbar">
+        <h2>Stripe Payment Setup</h2>
+      </header>
+
+      <section class="prose">
+        <div class="callout info">
+          <strong>
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display: inline-block; width: 18px; height: 18px; vertical-align: middle; margin-right: 0.5rem;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg>
+            Payment System:
+          </strong> LogoAIpro uses Stripe for secure credit purchases. Stripe handles payment processing, checkout sessions, and webhooks for credit allocation.
+        </div>
+
+        <h2>Why Stripe?</h2>
+
+        <p>Stripe is a complete payment solution that provides:</p>
+        <ul>
+          <li><strong>Secure Payments:</strong> PCI-compliant payment processing</li>
+          <li><strong>Checkout Sessions:</strong> Easy-to-use checkout flow</li>
+          <li><strong>Webhooks:</strong> Real-time payment event notifications</li>
+          <li><strong>Multi-Currency:</strong> Support for multiple currencies</li>
+          <li><strong>Easy Integration:</strong> Simple Next.js integration</li>
+        </ul>
+
+        <h2>
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+          Step-by-Step Setup
+        </h2>
+
+        <h3>Step 1: Create Stripe Account</h3>
+        <ol class="steps">
+          <li class="step">Go to <a href="https://stripe.com" target="_blank" rel="noopener">stripe.com</a></li>
+          <li class="step">Click "Sign Up" or "Start Now"</li>
+          <li class="step">Sign up with your email address</li>
+          <li class="step">Verify your email address</li>
+          <li class="step">Complete the onboarding process</li>
+        </ol>
+
+        <h3>Step 2: Get API Keys</h3>
+        <ol class="steps">
+          <li class="step">After signing in, navigate to <strong>Developers → API Keys</strong></li>
+          <li class="step">You'll see two keys:
+            <ul>
+              <li><strong>Publishable Key:</strong> Starts with <code>pk_test_</code> (for test) or <code>pk_live_</code> (for production)</li>
+              <li><strong>Secret Key:</strong> Starts with <code>sk_test_</code> (for test) or <code>sk_live_</code> (for production)</li>
+            </ul>
+          </li>
+          <li class="step">Copy both keys</li>
+          <li class="step">Add them to your <code>.env.local</code> file:
+            <div class="code"><pre><code>NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_xxxxxxxxxxxxx
+STRIPE_SECRET_KEY=sk_test_xxxxxxxxxxxxx</code></pre></div>
+          </li>
+        </ol>
+
+        <div class="callout warning">
+          <strong>
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display: inline-block; width: 18px; height: 18px; vertical-align: middle; margin-right: 0.5rem;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+            Security Note:
+          </strong> Never share your secret key or commit it to version control. The secret key should only be used server-side.
+        </div>
+
+        <h3>Step 3: Create Credit Products</h3>
+        <p>LogoAIpro uses one-time payments for credit packages. Create products in Stripe:</p>
+        
+        <ol class="steps">
+          <li class="step">Navigate to <strong>Products</strong> in the sidebar</li>
+          <li class="step">Click "Add Product"</li>
+          <li class="step">Create three products for your credit packages:
+            <ul>
+              <li><strong>Basic Pack:</strong> One-time payment, $9.99 (50 credits)</li>
+              <li><strong>Pro Pack:</strong> One-time payment, $24.99 (150 credits)</li>
+              <li><strong>Enterprise Pack:</strong> One-time payment, $79.99 (500 credits)</li>
+            </ul>
+          </li>
+          <li class="step">For each product:
+            <ul>
+              <li>Enter product name (e.g., "Basic Pack")</li>
+              <li>Enter description</li>
+              <li>Set price (one-time payment)</li>
+              <li>Save the product</li>
+            </ul>
+          </li>
+          <li class="step">Copy the Price ID for each product (starts with <code>price_</code>)</li>
+        </ol>
+
+        <h3>Step 4: Configure Credit Packages in Code</h3>
+        <p>Update credit packages in your pricing configuration file:</p>
+        
+        <div class="code"><pre><code>export const creditPackages = [
+  {
+    name: "Basic Pack",
+    credits: 50,
+    price: "$9.99",
+    pricePerCredit: "$0.20 per credit",
+    description: "Perfect for testing and small projects.",
+    ctaLabel: "Buy Basic Pack",
+    ctaHref: "/api/checkout/credits?plan=basic",
+  },
+  {
+    name: "Pro Pack",
+    credits: 150,
+    price: "$24.99",
+    pricePerCredit: "$0.17 per credit",
+    description: "Best value for regular users and creators.",
+    highlight: true,
+    ctaLabel: "Buy Pro Pack",
+    ctaHref: "/api/checkout/credits?plan=pro",
+  },
+  {
+    name: "Enterprise Pack",
+    credits: 500,
+    price: "$79.99",
+    pricePerCredit: "$0.16 per credit",
+    description: "For businesses and heavy users.",
+    ctaLabel: "Buy Enterprise Pack",
+    ctaHref: "/api/checkout/credits?plan=enterprise",
+  },
+];</code></pre></div>
+
+        <h3>Step 5: Configure Checkout API</h3>
+        <p>Update checkout route in <code>app/api/checkout/credits/route.ts</code> to map plans to Stripe Price IDs:</p>
+        
+        <div class="code"><pre><code>const PLAN_PRICE_MAP: Record<string, string> = {
+  'basic': process.env.STRIPE_PRICE_BASIC || 'price_xxxxxxxxxxxxx',
+  'pro': process.env.STRIPE_PRICE_PRO || 'price_xxxxxxxxxxxxx',
+  'enterprise': process.env.STRIPE_PRICE_ENTERPRISE || 'price_xxxxxxxxxxxxx',
+};</code></pre></div>
+
+        <p>Add these Price IDs to your <code>.env.local</code>:</p>
+        
+        <div class="code"><pre><code>STRIPE_PRICE_BASIC=price_xxxxxxxxxxxxx
+STRIPE_PRICE_PRO=price_xxxxxxxxxxxxx
+STRIPE_PRICE_ENTERPRISE=price_xxxxxxxxxxxxx</code></pre></div>
+
+        <h3>Step 6: Set Up Webhooks</h3>
+        <p>Webhooks are essential for automatically adding credits to user accounts after payment.</p>
+        
+        <ol class="steps">
+          <li class="step">Navigate to <strong>Developers → Webhooks</strong> in Stripe Dashboard</li>
+          <li class="step">Click "Add Endpoint"</li>
+          <li class="step">Configure the webhook:
+            <ul>
+              <li><strong>Endpoint URL:</strong>
+                <div class="code"><pre><code># Development (use ngrok for local testing)
+https://your-ngrok-url.ngrok.io/api/webhooks/stripe
+
+# Production
+https://yourdomain.com/api/webhooks/stripe</code></pre></div>
+              </li>
+              <li><strong>Events to Listen For:</strong> Select these events:
+                <ul>
+                  <li><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display: inline-block; width: 16px; height: 16px; vertical-align: middle; margin-right: 0.5rem;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> <code>checkout.session.completed</code> - Payment successful</li>
+                  <li><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display: inline-block; width: 16px; height: 16px; vertical-align: middle; margin-right: 0.5rem;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> <code>payment_intent.succeeded</code> - Payment completed</li>
+                  <li><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display: inline-block; width: 16px; height: 16px; vertical-align: middle; margin-right: 0.5rem;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> <code>payment_intent.payment_failed</code> - Payment failed</li>
+                </ul>
+              </li>
+            </ul>
+          </li>
+          <li class="step">Click "Add Endpoint"</li>
+          <li class="step">Copy the <strong>Signing Secret</strong> (starts with <code>whsec_</code>)</li>
+          <li class="step">Add it to your <code>.env.local</code>:
+            <div class="code"><pre><code>STRIPE_WEBHOOK_SECRET=whsec_xxxxxxxxxxxxx</code></pre></div>
+          </li>
+        </ol>
+
+        <div class="callout warning">
+          <strong>
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display: inline-block; width: 18px; height: 18px; vertical-align: middle; margin-right: 0.5rem;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+            Webhook Testing (Local Development):
+          </strong>
+          <ul>
+            <li>Use <a href="https://ngrok.com" target="_blank" rel="noopener">ngrok</a> to expose your local server</li>
+            <li>Run: <code>ngrok http 3000</code></li>
+            <li>Use the ngrok URL as your webhook endpoint</li>
+            <li>Update the webhook URL in Stripe dashboard</li>
+          </ul>
+        </div>
+
+        <h3>Step 7: Configure Application URLs</h3>
+        <ol class="steps">
+          <li class="step">Navigate to <strong>Settings → Branding</strong> in Stripe Dashboard</li>
+          <li class="step">Configure your application details:
+            <ul>
+              <li>Business name: <strong>LogoAIpro</strong></li>
+              <li>Support email: Your support email</li>
+              <li>Support phone: Your support phone (optional)</li>
+            </ul>
+          </li>
+          <li class="step">Configure redirect URLs in your checkout API route:
+            <div class="code"><pre><code>success_url: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard/credits?session_id={CHECKOUT_SESSION_ID}&success=true`,
+cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard/credits?canceled=true`,</code></pre></div>
+          </li>
+        </ol>
+
+        <h3>Step 8: Test Payment Flow</h3>
+        <ol class="steps">
+          <li class="step">Ensure all environment variables are set in <code>.env.local</code></li>
+          <li class="step">Start your development server: <code>npm run dev</code></li>
+          <li class="step">Navigate to Dashboard → Credits</li>
+          <li class="step">Click "Buy Credits" on any package</li>
+          <li class="step">Use Stripe test card: <code>4242 4242 4242 4242</code></li>
+          <li class="step">Use any future expiry date and any 3-digit CVC</li>
+          <li class="step">Complete the payment</li>
+          <li class="step">Verify credits are added to your account</li>
+        </ol>
+
+        <h2>
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"></path></svg>
+          Production Setup
+        </h2>
+
+        <h3>Switching to Production Keys</h3>
+        <ol class="steps">
+          <li class="step">In Stripe Dashboard, toggle from "Test" to "Live" mode</li>
+          <li class="step">Get your production API keys</li>
+          <li class="step">Create production products and prices</li>
+          <li class="step">Update environment variables on your production server:
+            <div class="code"><pre><code>NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_live_xxxxxxxxxxxxx
+STRIPE_SECRET_KEY=sk_live_xxxxxxxxxxxxx
+STRIPE_WEBHOOK_SECRET=whsec_xxxxxxxxxxxxx
+STRIPE_PRICE_BASIC=price_xxxxxxxxxxxxx
+STRIPE_PRICE_PRO=price_xxxxxxxxxxxxx
+STRIPE_PRICE_ENTERPRISE=price_xxxxxxxxxxxxx</code></pre></div>
+          </li>
+          <li class="step">Update webhook URL to your production domain</li>
+          <li class="step">Test payment in production with a real card</li>
+        </ol>
+
+        <h2>
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg>
+          Testing with Stripe Test Cards
+        </h2>
+
+        <p>Stripe provides test cards for testing different scenarios:</p>
+        <table>
+          <thead>
+            <tr>
+              <th>Card Number</th>
+              <th>Scenario</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>4242 4242 4242 4242</code></td>
+              <td>Successful payment</td>
+            </tr>
+            <tr>
+              <td><code>4000 0000 0000 0002</code></td>
+              <td>Card declined</td>
+            </tr>
+            <tr>
+              <td><code>4000 0000 0000 9995</code></td>
+              <td>Insufficient funds</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <p>Use any future expiry date (e.g., 12/25) and any 3-digit CVC (e.g., 123).</p>
+
+        <h2>
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+          Verification Checklist
+        </h2>
+        
+        <div class="callout">
+          <strong>Ensure you have:</strong>
+          <ul>
+            <li><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display: inline-block; width: 16px; height: 16px; vertical-align: middle; margin-right: 0.5rem;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> Stripe account created</li>
+            <li><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display: inline-block; width: 16px; height: 16px; vertical-align: middle; margin-right: 0.5rem;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> API keys added to <code>.env.local</code></li>
+            <li><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display: inline-block; width: 16px; height: 16px; vertical-align: middle; margin-right: 0.5rem;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> Credit products created in Stripe</li>
+            <li><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display: inline-block; width: 16px; height: 16px; vertical-align: middle; margin-right: 0.5rem;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> Price IDs configured in code</li>
+            <li><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display: inline-block; width: 16px; height: 16px; vertical-align: middle; margin-right: 0.5rem;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> Webhook configured and secret added</li>
+            <li><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display: inline-block; width: 16px; height: 16px; vertical-align: middle; margin-right: 0.5rem;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> Checkout API route configured</li>
+            <li><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display: inline-block; width: 16px; height: 16px; vertical-align: middle; margin-right: 0.5rem;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> Test payment completed successfully</li>
+            <li><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display: inline-block; width: 16px; height: 16px; vertical-align: middle; margin-right: 0.5rem;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> Credits added to test account</li>
+          </ul>
+        </div>
+
+        <div class="callout success">
+          <strong>
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display: inline-block; width: 18px; height: 18px; vertical-align: middle; margin-right: 0.5rem;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            Next Steps:
+          </strong> After Stripe is configured:
+          <ul>
+            <li><a href="./env-setup.html">Complete Environment Variables Setup</a></li>
+            <li><a href="./pricing-credits.html">Configure Pricing & Credits</a></li>
+            <li><a href="./how-to-use.html">Learn how to use LogoAIpro</a></li>
+          </ul>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>
+

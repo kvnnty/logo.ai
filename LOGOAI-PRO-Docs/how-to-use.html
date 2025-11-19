@@ -1,0 +1,304 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>User Guide – LogoAIpro Docs</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="./styles.css" />
+    <script defer src="./script.js"></script>
+  </head>
+  <body>
+    <aside class="sidebar">
+      <div class="brand">
+        <img src="./screenshots/logo.svg" alt="LogoAIpro Logo" />
+        <div>
+          <h1>LogoAIpro</h1>
+          <p>Documentation v1.0</p>
+        </div>
+      </div>
+      <nav>
+        <a href="./index.html">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+          Welcome
+        </a>
+        <a class="active" href="./how-to-use.html">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
+          User Guide
+        </a>
+        <a href="./push-to-github.html">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+          How to push to GitHub
+        </a>
+        <a href="./install-vercel.html">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path></svg>
+          How to install on Vercel
+        </a>
+        <a href="./install-aws-ec2.html">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01"></path></svg>
+          How to install on AWS EC2
+        </a>
+        <a href="./clerk-setup.html">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+          Clerk Authentication Setup
+        </a>
+        <a href="./mongodb-setup.html">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"></path></svg>
+          MongoDB Database Setup
+        </a>
+        <a href="./nebius-setup.html">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path></svg>
+          Nebius AI Setup
+        </a>
+        <a href="./env-setup.html">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+          Environment Variables
+        </a>
+        <a href="./stripe-setup.html">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg>
+          Stripe Payment Setup
+        </a>
+        <a href="./frontend-customization.html">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"></path></svg>
+          Frontend Customization
+        </a>
+        <a href="./pricing-credits.html">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+          Pricing & Credits
+        </a>
+      </nav>
+      <footer>
+        <small>Built with Next.js 15 & MongoDB</small>
+      </footer>
+    </aside>
+
+    <main class="content">
+      <header class="topbar">
+        <h2>User Guide</h2>
+      </header>
+
+      <section class="prose">
+        <div class="callout info">
+          <strong><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"></path></svg> Complete User Guide:</strong> Learn how to use LogoAIpro v1.0, from creating your first AI-generated logo to managing your logo history and understanding the credit system.
+        </div>
+
+        <h2><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display: inline-block; width: 18px; height: 18px; vertical-align: middle; margin-right: 0.5rem;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg> Getting Started</h2>
+
+        <h3>1. Account Creation</h3>
+        <ol>
+          <li><strong>Sign Up:</strong> Click "Get Started" or "Sign Up" on the homepage</li>
+          <li><strong>Choose Method:</strong> Sign up with email/password or Google OAuth</li>
+          <li><strong>Verify Email:</strong> Check your email and verify your account (if required)</li>
+          <li><strong>Dashboard Access:</strong> Automatically redirected to your dashboard after registration</li>
+          <li><strong>Free Credits:</strong> Receive 10 free credits to test the platform</li>
+        </ol>
+
+        <h3>2. Understanding Credits</h3>
+        <div class="callout success">
+          <strong><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> Credit System:</strong>
+          <ul>
+            <li><strong>Free Credits:</strong> All new users receive 10 free credits</li>
+            <li><strong>Credit Packages:</strong> Purchase credits in packages (Basic: 50, Pro: 150, Enterprise: 500 credits)</li>
+            <li><strong>Logo Cost:</strong> Each logo generation costs 1 credit</li>
+            <li><strong>Buy More:</strong> Purchase credits from Dashboard → Credits</li>
+            <li><strong>No Expiration:</strong> Credits never expire</li>
+          </ul>
+        </div>
+
+        <h2><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"></path></svg> Creating Your Logo</h2>
+
+        <p>LogoAIpro uses a simple 6-step wizard to create professional logos. Follow these steps:</p>
+
+        <h3>Step 1: Brand Name</h3>
+        <ol>
+          <li><strong>Navigate:</strong> Go to <code>/generate</code> or click "Generate Logo" from the dashboard</li>
+          <li><strong>Enter Name:</strong> Type your company or brand name in the input field</li>
+          <li><strong>Continue:</strong> Click "Next" to proceed to style selection</li>
+        </ol>
+
+        <div class="callout">
+          <strong><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display: inline-block; width: 18px; height: 18px; vertical-align: middle; margin-right: 0.5rem;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path></svg> Tip:</strong> Use your actual brand name as it will appear in the generated logo. Keep it concise for best results.
+        </div>
+
+        <h3>Step 2: Style Selection</h3>
+        <p>Choose from 6 professional design styles:</p>
+        <ul>
+          <li><strong>Minimal:</strong> Simple, timeless, single-color with negative space and flat design</li>
+          <li><strong>Technology:</strong> Detailed, sharp, cinematic, minimalist with clean lines</li>
+          <li><strong>Corporate:</strong> Modern, forward-thinking, geometric shapes with professional appeal</li>
+          <li><strong>Creative:</strong> Playful, bright bold colors, rounded shapes, lively designs</li>
+          <li><strong>Abstract:</strong> Artistic, unique shapes, patterns, and visually interesting textures</li>
+          <li><strong>Flashy:</strong> Attention-grabbing, bold, futuristic with vibrant neon colors</li>
+        </ul>
+        <ol>
+          <li><strong>Browse Styles:</strong> Review all 6 style options</li>
+          <li><strong>Select Style:</strong> Click on your preferred style</li>
+          <li><strong>Continue:</strong> Click "Next" to proceed</li>
+        </ol>
+
+        <h3>Step 3: Colors & AI Model</h3>
+        <p>Customize your logo's appearance and choose the AI model:</p>
+        <ol>
+          <li><strong>Primary Color:</strong> Select the main color for your logo (Blue, Red, Orange, Green, Purple, Black)</li>
+          <li><strong>Background Color:</strong> Choose the background color (White, Light Gray, Light Red, Black, Light Blue, Light Green)</li>
+          <li><strong>AI Model:</strong> Choose between:
+            <ul>
+              <li><strong>Flux Schnell:</strong> Fast generation, optimized for realistic logos</li>
+              <li><strong>Flux Dev:</strong> Advanced model for enhanced realism and complex designs</li>
+            </ul>
+          </li>
+          <li><strong>Continue:</strong> Click "Next" to proceed</li>
+        </ol>
+
+        <h3>Step 4: Size & Quality</h3>
+        <p>Select the output dimensions and quality:</p>
+        <ol>
+          <li><strong>Image Size:</strong> Choose from:
+            <ul>
+              <li><strong>Small (256x256):</strong> For web icons and small applications</li>
+              <li><strong>Medium (512x512):</strong> Standard size for most use cases</li>
+              <li><strong>Large (1024x1024):</strong> High resolution for print and large displays</li>
+            </ul>
+          </li>
+          <li><strong>Quality:</strong> Select quality level:
+            <ul>
+              <li><strong>Standard:</strong> Good quality, faster generation</li>
+              <li><strong>HD:</strong> Higher quality, slightly longer generation time</li>
+            </ul>
+          </li>
+          <li><strong>Continue:</strong> Click "Next" to proceed</li>
+        </ol>
+
+        <h3>Step 5: Additional Details</h3>
+        <p>Provide optional information about your brand:</p>
+        <ol>
+          <li><strong>Brand Personality:</strong> Describe your brand's personality, target audience, or specific preferences</li>
+          <li><strong>Examples:</strong> "Modern tech startup targeting millennials" or "Eco-friendly brand with natural themes"</li>
+          <li><strong>Optional:</strong> This step is optional - you can skip it if you don't have specific requirements</li>
+          <li><strong>Generate:</strong> Click "Generate Logo" to create your logo</li>
+        </ol>
+
+        <h3>Step 6: Generated Logo</h3>
+        <p>Once generation is complete, you can:</p>
+        <ol>
+          <li><strong>View Logo:</strong> See your generated logo in the preview area</li>
+          <li><strong>Download:</strong> Click "Download" to save your logo as a WebP file</li>
+          <li><strong>Generate New:</strong> Click "Generate New" to create another variation</li>
+          <li><strong>View History:</strong> Your logo is automatically saved to your history</li>
+        </ol>
+
+        <div class="callout success">
+          <strong><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display: inline-block; width: 18px; height: 18px; vertical-align: middle; margin-right: 0.5rem;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> Success!</strong> Your logo is now saved to your account and can be accessed from the History page.
+        </div>
+
+        <h2><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg> Dashboard Navigation</h2>
+
+        <h3>Main Pages</h3>
+        <ul>
+          <li><strong>Dashboard:</strong> Overview with recent logos and quick access to generation</li>
+          <li><strong>Generate:</strong> Logo creation wizard (6-step process)</li>
+          <li><strong>My Designs:</strong> View all your generated logos</li>
+          <li><strong>History:</strong> Browse your logo generation history</li>
+          <li><strong>Credits:</strong> View current credits and purchase more</li>
+        </ul>
+
+        <h2>💾 Managing Your Logos</h2>
+
+        <h3>Viewing Logo History</h3>
+        <ol>
+          <li><strong>Navigate:</strong> Go to Dashboard → History or My Designs</li>
+          <li><strong>Browse:</strong> View all your previously generated logos</li>
+          <li><strong>Filter:</strong> Use search or filters to find specific logos</li>
+          <li><strong>Download:</strong> Click on any logo to view and download</li>
+        </ol>
+
+        <h2><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display: inline-block; width: 18px; height: 18px; vertical-align: middle; margin-right: 0.5rem;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg> Purchasing Credits</h2>
+
+        <h3>Credit Packages</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>Package</th>
+              <th>Credits</th>
+              <th>Price</th>
+              <th>Best For</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Basic</td>
+              <td>50</td>
+              <td>$9.99</td>
+              <td>Small projects, testing</td>
+            </tr>
+            <tr>
+              <td>Pro ⭐</td>
+              <td>150</td>
+              <td>$24.99</td>
+              <td>Regular users, best value</td>
+            </tr>
+            <tr>
+              <td>Enterprise</td>
+              <td>500</td>
+              <td>$79.99</td>
+              <td>Large projects, agencies</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h3>How to Purchase</h3>
+        <ol>
+          <li><strong>Navigate:</strong> Go to Dashboard → Credits</li>
+          <li><strong>Select Package:</strong> Choose a credit package</li>
+          <li><strong>Checkout:</strong> Click "Get Started" on your chosen plan</li>
+          <li><strong>Payment:</strong> Complete payment with Stripe</li>
+          <li><strong>Credits Added:</strong> Credits are automatically added to your account</li>
+        </ol>
+
+        <h2><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"></path></svg> Tips & Best Practices</h2>
+
+        <h3>Getting Better Results</h3>
+        <ul>
+          <li><strong>Clear Brand Name:</strong> Use your actual brand name for best results</li>
+          <li><strong>Style Selection:</strong> Choose a style that matches your brand identity</li>
+          <li><strong>Color Choice:</strong> Select colors that represent your brand</li>
+          <li><strong>Additional Details:</strong> Provide specific information about your brand for more tailored results</li>
+          <li><strong>Try Variations:</strong> Generate multiple logos with different styles or colors</li>
+        </ul>
+
+        <h3>Saving Credits</h3>
+        <ul>
+          <li><strong>Preview First:</strong> Review all options before generating</li>
+          <li><strong>Save Results:</strong> Download logos you like immediately</li>
+          <li><strong>Buy Larger Packs:</strong> Larger packs offer better value per credit</li>
+          <li><strong>Use Free Credits:</strong> Test the platform with your 10 free credits first</li>
+        </ul>
+
+        <h2><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg> Rate Limiting</h2>
+
+        <div class="callout warning">
+          <strong><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display: inline-block; width: 18px; height: 18px; vertical-align: middle; margin-right: 0.5rem;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg> Rate Limit:</strong> LogoAIpro has a rate limit of 10 logo generations per 30 days per user. This helps prevent abuse and ensures fair usage for all users.
+        </div>
+
+        <h2><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z"></path></svg> Troubleshooting</h2>
+
+        <h3>Common Issues</h3>
+        <ul>
+          <li><strong>No Credits:</strong> Purchase credits from the Credits page</li>
+          <li><strong>Generation Failed:</strong> Check your internet connection and try again</li>
+          <li><strong>Rate Limited:</strong> Wait for the rate limit period to reset (30 days)</li>
+          <li><strong>Download Issues:</strong> Try a different browser or check browser permissions</li>
+        </ul>
+
+        <div class="callout success">
+          <strong><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display: inline-block; width: 18px; height: 18px; vertical-align: middle; margin-right: 0.5rem;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> Ready to create?</strong> Start using LogoAIpro's AI logo generation today! Each logo is unique and professionally designed.
+        </div>
+      </section>
+    </main>
+  </body>
+</html>
+
+

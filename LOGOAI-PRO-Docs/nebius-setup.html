@@ -1,0 +1,302 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Nebius AI Setup – LogoAIpro Docs</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="./styles.css" />
+    <script defer src="./script.js"></script>
+  </head>
+  <body>
+    <aside class="sidebar">
+      <div class="brand">
+        <img src="./screenshots/logo.svg" alt="LogoAIpro Logo" />
+        <div>
+          <h1>LogoAIpro</h1>
+          <p>Documentation v1.0</p>
+        </div>
+      </div>
+      <nav>
+        <a href="./index.html">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+          Welcome
+        </a>
+        <a href="./how-to-use.html">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
+          User Guide
+        </a>
+        <a href="./push-to-github.html">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+          How to push to GitHub
+        </a>
+        <a href="./install-vercel.html">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path></svg>
+          How to install on Vercel
+        </a>
+        <a href="./install-aws-ec2.html">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01"></path></svg>
+          How to install on AWS EC2
+        </a>
+        <a href="./clerk-setup.html">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+          Clerk Authentication Setup
+        </a>
+        <a href="./mongodb-setup.html">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"></path></svg>
+          MongoDB Database Setup
+        </a>
+        <a class="active" href="./nebius-setup.html">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path></svg>
+          Nebius AI Setup
+        </a>
+        <a href="./env-setup.html">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+          Environment Variables
+        </a>
+        <a href="./stripe-setup.html">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg>
+          Stripe Payment Setup
+        </a>
+        <a href="./frontend-customization.html">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"></path></svg>
+          Frontend Customization
+        </a>
+        <a href="./pricing-credits.html">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+          Pricing & Credits
+        </a>
+      </nav>
+      <footer>
+        <small>Built with Next.js 15 & MongoDB</small>
+      </footer>
+    </aside>
+
+    <main class="content">
+      <header class="topbar">
+        <h2>Nebius AI Setup</h2>
+      </header>
+
+      <section class="prose">
+        <div class="callout info">
+          <strong><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display: inline-block; width: 18px; height: 18px; vertical-align: middle; margin-right: 0.5rem;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path></svg> AI Processing:</strong> LogoAIpro uses Nebius AI to power logo generation. Nebius AI provides access to state-of-the-art AI models (Flux Schnell and Flux Dev) for creating professional, unique brand identities.
+        </div>
+
+        <h2>What is Nebius AI?</h2>
+
+        <p>Nebius AI is a platform that provides access to advanced AI models for image generation. LogoAIpro uses Nebius AI to:</p>
+        <ul>
+          <li><strong>Generate Logos:</strong> Create professional, unique brand identities from text prompts</li>
+          <li><strong>Multiple Styles:</strong> Support for 6 design styles (Minimal, Technology, Corporate, Creative, Abstract, Flashy)</li>
+          <li><strong>Customization:</strong> Control colors, sizes, and quality settings</li>
+          <li><strong>Fast Generation:</strong> Optimized models for quick logo creation</li>
+        </ul>
+
+        <h2><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg> Step-by-Step Setup</h2>
+
+        <h3>Step 1: Create Nebius AI Account</h3>
+        <ol class="steps">
+          <li class="step">Go to <a href="https://nebius.ai" target="_blank" rel="noopener">nebius.ai</a></li>
+          <li class="step">Click "Sign Up" or "Get Started"</li>
+          <li class="step">Sign up with your email address or preferred method</li>
+          <li class="step">Verify your email address (if required)</li>
+          <li class="step">Complete the onboarding process</li>
+        </ol>
+
+        <h3>Step 2: Get Your API Key</h3>
+        <ol class="steps">
+          <li class="step">After signing in, navigate to <strong>API Keys</strong> or <strong>Settings</strong></li>
+          <li class="step">Click on <strong>Create API Key</strong> or <strong>Generate New Key</strong></li>
+          <li class="step">Give your API key a name (e.g., "LogoAIpro Production")</li>
+          <li class="step">Copy the API key immediately (you won't be able to see it again)</li>
+          <li class="step">Add it to your <code>.env.local</code> file:
+            <div class="code"><pre><code>NEBIUS_API_KEY=your-api-key-here</code></pre></div>
+          </li>
+        </ol>
+
+        <div class="callout warning">
+          <strong><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display: inline-block; width: 18px; height: 18px; vertical-align: middle; margin-right: 0.5rem;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg> Security Note:</strong> Never share your API key or commit it to version control. Keep it secure in your <code>.env.local</code> file. Store it safely as you won't be able to view it again after creation.
+        </div>
+
+        <h3>Step 3: Configure Project/Organization (if required)</h3>
+        <p>Some Nebius AI setups require a project ID or organization ID:</p>
+        <ol class="steps">
+          <li class="step">Navigate to your Nebius AI dashboard</li>
+          <li class="step">Find your Project ID or Organization ID in the settings</li>
+          <li class="step">Add it to your <code>.env.local</code> file if required:
+            <div class="code"><pre><code>NEBIUS_PROJECT_ID=your-project-id
+NEBIUS_ORGANIZATION_ID=your-org-id</code></pre></div>
+          </li>
+        </ol>
+
+        <h2><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg> Models Used by LogoAIpro</h2>
+
+        <h3>Primary Models: Flux Schnell & Flux Dev</h3>
+        <p>LogoAIpro uses two AI models for logo generation:</p>
+        <ul>
+          <li><strong>Flux Schnell:</strong> Optimized for realistic and detailed logos with fast generation times</li>
+          <li><strong>Flux Dev:</strong> Advanced model for enhanced realism and complex designs</li>
+        </ul>
+
+        <div class="code"><pre><code>Model Options:
+- Flux Schnell: Fast generation, optimized for logos
+- Flux Dev: Enhanced quality, more detailed results
+
+Primary Use: Logo generation with 6 design styles
+Output Format: PNG/JPG
+Sizes: 256x256, 512x512, 1024x1024
+Quality: Standard, HD</code></pre></div>
+
+        <h3>Model Configuration</h3>
+        <p>LogoAIpro is configured with:</p>
+        <ul>
+          <li><strong>Output Format:</strong> PNG (for transparency support) or JPG</li>
+          <li><strong>Size Options:</strong> 256x256, 512x512, 1024x1024 pixels</li>
+          <li><strong>Quality Settings:</strong> Standard and HD options</li>
+          <li><strong>Design Styles:</strong> 6 professional styles (Minimal, Technology, Corporate, Creative, Abstract, Flashy)</li>
+          <li><strong>Color Customization:</strong> Primary and background color options</li>
+        </ul>
+
+        <h2><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display: inline-block; width: 18px; height: 18px; vertical-align: middle; margin-right: 0.5rem;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> Pricing & Credits</h2>
+
+        <div class="callout info">
+          <strong><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display: inline-block; width: 18px; height: 18px; vertical-align: middle; margin-right: 0.5rem;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg> Nebius AI Pricing:</strong>
+          <ul>
+            <li>Nebius AI charges per API call or based on compute usage</li>
+            <li>Costs vary by model (Flux Schnell vs Flux Dev) and generation time</li>
+            <li>LogoAIpro deducts credits from user accounts based on logo generation</li>
+            <li>Each logo generation typically costs 1 credit per operation</li>
+          </ul>
+        </div>
+
+        <h3>Credit Costs</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>Operation</th>
+              <th>Credits per Operation</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Logo Generation (Flux Schnell)</td>
+              <td>1 credit</td>
+            </tr>
+            <tr>
+              <td>Logo Generation (Flux Dev)</td>
+              <td>1 credit</td>
+            </tr>
+            <tr>
+              <td>Logo Regeneration</td>
+              <td>1 credit</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h2><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg> Testing Nebius AI API</h2>
+
+        <h3>Test API Connection</h3>
+        <ol class="steps">
+          <li class="step">Ensure your <code>NEBIUS_API_KEY</code> is set in <code>.env.local</code></li>
+          <li class="step">Start your development server: <code>npm run dev</code></li>
+          <li class="step">Navigate to the logo generation page (<code>/dashboard/generate</code> or <code>/generate</code>)</li>
+          <li class="step">Try generating a logo with different styles and settings</li>
+          <li class="step">Check the browser console and server logs for any errors</li>
+        </ol>
+
+        <h3>Common Issues</h3>
+
+        <h4>Issue: "Nebius API key is not configured"</h4>
+        <p><strong>Solution:</strong></p>
+        <ul>
+          <li>Verify <code>NEBIUS_API_KEY</code> is set in <code>.env.local</code></li>
+          <li>Restart your development server after adding the key</li>
+          <li>Check that the key is correctly formatted (no extra spaces or quotes)</li>
+          <li>Ensure the key hasn't expired or been revoked</li>
+        </ul>
+
+        <h4>Issue: "Failed to generate logo"</h4>
+        <p><strong>Solution:</strong></p>
+        <ul>
+          <li>Check your Nebius AI account has sufficient credits/balance</li>
+          <li>Verify your API key is valid and active</li>
+          <li>Check Nebius AI status page for service issues</li>
+          <li>Review server logs for detailed error messages</li>
+          <li>Verify your project/organization ID is correct (if required)</li>
+        </ul>
+
+        <h4>Issue: "Rate limit exceeded"</h4>
+        <p><strong>Solution:</strong></p>
+        <ul>
+          <li>Upgrade your Nebius AI account for higher rate limits</li>
+          <li>Implement request throttling in your application</li>
+          <li>Wait before making additional requests</li>
+          <li>Check your current usage in the Nebius AI dashboard</li>
+        </ul>
+
+        <h4>Issue: "Invalid model or endpoint"</h4>
+        <p><strong>Solution:</strong></p>
+        <ul>
+          <li>Verify the model names (Flux Schnell, Flux Dev) are correct</li>
+          <li>Check that the API endpoint URLs are up to date</li>
+          <li>Review Nebius AI documentation for any API changes</li>
+          <li>Ensure you're using the correct API version</li>
+        </ul>
+
+        <h2><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg> Security Best Practices</h2>
+
+        <div class="callout warning">
+          <strong><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg> Security Recommendations:</strong>
+          <ul>
+            <li><strong>Never Expose Key:</strong> Keep your API key server-side only</li>
+            <li><strong>Use Environment Variables:</strong> Never hardcode keys in your code</li>
+            <li><strong>Separate Test/Prod:</strong> Use different keys for development and production</li>
+            <li><strong>Monitor Usage:</strong> Regularly check Nebius AI dashboard for unusual activity</li>
+            <li><strong>Rotate Keys:</strong> Periodically rotate your API keys for security</li>
+            <li><strong>Set Usage Limits:</strong> Configure spending limits in Nebius AI dashboard</li>
+          </ul>
+        </div>
+
+        <h2><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg> Monitoring & Analytics</h2>
+
+        <h3>Nebius AI Dashboard</h3>
+        <p>Monitor your API usage in the Nebius AI Dashboard:</p>
+        <ul>
+          <li><strong>Usage:</strong> Track API calls and compute usage</li>
+          <li><strong>Billing:</strong> Monitor costs and set spending limits</li>
+          <li><strong>API Keys:</strong> Manage and rotate your API keys</li>
+          <li><strong>Projects:</strong> Organize and manage your projects</li>
+          <li><strong>Logs:</strong> View API request logs and errors</li>
+        </ul>
+
+        <h2><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display: inline-block; width: 18px; height: 18px; vertical-align: middle; margin-right: 0.5rem;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> Verification Checklist</h2>
+        
+        <div class="callout">
+          <strong>Ensure you have:</strong>
+          <ul>
+            <li><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display: inline-block; width: 18px; height: 18px; vertical-align: middle; margin-right: 0.5rem;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> Nebius AI account created</li>
+            <li><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display: inline-block; width: 18px; height: 18px; vertical-align: middle; margin-right: 0.5rem;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> API key generated and added to <code>.env.local</code></li>
+            <li><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display: inline-block; width: 18px; height: 18px; vertical-align: middle; margin-right: 0.5rem;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> Project/Organization ID configured (if required)</li>
+            <li><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display: inline-block; width: 18px; height: 18px; vertical-align: middle; margin-right: 0.5rem;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> Tested API connection with a simple logo generation</li>
+            <li><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display: inline-block; width: 18px; height: 18px; vertical-align: middle; margin-right: 0.5rem;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> Verified credits are being deducted correctly</li>
+            <li><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display: inline-block; width: 18px; height: 18px; vertical-align: middle; margin-right: 0.5rem;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> Checked Nebius AI dashboard for successful API calls</li>
+          </ul>
+        </div>
+
+        <div class="callout success">
+          <strong><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display: inline-block; width: 18px; height: 18px; vertical-align: middle; margin-right: 0.5rem;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> Next Steps:</strong> After Nebius AI is configured:
+          <ul>
+            <li><a href="./env-setup.html">Complete Environment Variables Setup</a></li>
+            <li><a href="./how-to-use.html">Learn how to use logo generation</a></li>
+            <li><a href="./pricing-credits.html">Configure pricing and credits</a></li>
+            <li><a href="./mongodb-setup.html">Set up MongoDB for storing generated logos</a></li>
+          </ul>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>
+
