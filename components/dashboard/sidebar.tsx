@@ -3,6 +3,7 @@
 import { SignedIn, UserButton, useUser } from "@clerk/nextjs";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useState } from "react";
 import {
   IconLayoutDashboard,
   IconSparkles,
@@ -10,25 +11,28 @@ import {
   IconHome,
   IconCreditCard,
   IconX,
+  IconChevronDown,
+  IconBrandAsana,
+  IconMessageCircle,
+  IconTarget,
+  IconFileText,
+  IconBook,
+  IconHome2,
 } from "@tabler/icons-react";
 import { cn } from "@/lib/utils";
 
 interface NavItem {
   title: string;
-  href: string;
+  href?: string;
   icon: React.ComponentType<{ className?: string }>;
+  items?: { title: string; href: string }[];
 }
 
 const navItems: NavItem[] = [
   {
-    title: "Dashboard",
+    title: "Home",
     href: "/dashboard",
-    icon: IconLayoutDashboard,
-  },
-  {
-    title: "Generate",
-    href: "/dashboard/generate",
-    icon: IconSparkles,
+    icon: IconHome2,
   },
   {
     title: "My Designs",
@@ -36,9 +40,47 @@ const navItems: NavItem[] = [
     icon: IconPalette,
   },
   {
-    title: "Add Credits",
-    href: "/dashboard/credits",
-    icon: IconCreditCard,
+    title: "Branding",
+    icon: IconBrandAsana,
+    items: [
+      { title: "Business Cards", href: "/dashboard/branding/business-cards" },
+      { title: "Letterheads", href: "/dashboard/branding/letterheads" },
+      { title: "Email Signature", href: "/dashboard/branding/email-signature" },
+      { title: "Favicon Pack", href: "/dashboard/branding/favicon-pack" },
+      { title: "Brand Book", href: "/dashboard/branding/brand-book" },
+      { title: "License", href: "/dashboard/branding/license" },
+    ],
+  },
+  {
+    title: "Social",
+    icon: IconMessageCircle,
+    items: [
+      { title: "Social Stories", href: "/dashboard/social/social-stories" },
+      { title: "Social Posts", href: "/dashboard/social/social-posts" },
+      { title: "Social covers & profiles", href: "/dashboard/social/social-covers-profiles" },
+      { title: "Youtube Thumbnails", href: "/dashboard/social/youtube-thumbnails" },
+    ],
+  },
+  {
+    title: "Marketing",
+    icon: IconTarget,
+    items: [
+      { title: "Ads", href: "/dashboard/marketing/ads" },
+      { title: "Flyers", href: "/dashboard/marketing/flyers" },
+      { title: "Posters", href: "/dashboard/marketing/posters" },
+      { title: "Cards", href: "/dashboard/marketing/cards" },
+      { title: "ID Cards", href: "/dashboard/marketing/id-cards" },
+    ],
+  },
+  {
+    title: "My Designs",
+    href: "/dashboard/my-designs",
+    icon: IconFileText,
+  },
+  {
+    title: "About Your Brand",
+    href: "/dashboard/about-your-brand",
+    icon: IconBook,
   },
 ];
 
@@ -50,6 +92,15 @@ interface DashboardSidebarProps {
 export default function DashboardSidebar({ isOpen = false, onClose }: DashboardSidebarProps) {
   const pathname = usePathname();
   const { user } = useUser();
+  const [expandedSections, setExpandedSections] = useState<string[]>(["Branding", "Social", "Marketing"]);
+
+  const toggleSection = (title: string) => {
+    setExpandedSections((prev) =>
+      prev.includes(title)
+        ? prev.filter((t) => t !== title)
+        : [...prev, title]
+    );
+  };
 
   const handleNavClick = () => {
     if (onClose) {
@@ -72,7 +123,7 @@ export default function DashboardSidebar({ isOpen = false, onClose }: DashboardS
         "fixed left-0 top-0 z-50 h-screen w-72 p-4 transition-transform duration-300 lg:translate-x-0",
         isOpen ? "translate-x-0" : "-translate-x-full"
       )}>
-        <div className="h-full border border-border/50 rounded-2xl bg-card shadow-xl hover:shadow-2xl transition-all duration-300 flex flex-col p-4">
+        <div className="h-full bg-card transition-all duration-300 flex flex-col overflow-hidden">
           {/* Close button for mobile */}
           <button
             onClick={onClose}
@@ -83,7 +134,7 @@ export default function DashboardSidebar({ isOpen = false, onClose }: DashboardS
           </button>
 
           {/* Logo Section */}
-          <div className="mb-6">
+          <div className="mb-6 flex-shrink-0">
             <Link href="/" className="flex items-center gap-3 px-3 py-2.5 group" onClick={handleNavClick}>
               <div className="relative">
                 <div className="absolute inset-0 bg-primary/20 blur-xl group-hover:bg-primary/30 transition-colors rounded-xl" />
@@ -96,17 +147,66 @@ export default function DashboardSidebar({ isOpen = false, onClose }: DashboardS
           </div>
 
           {/* Navigation Items */}
-          <nav className="flex-1 space-y-1.5">
+          <nav className="flex-1 space-y-1 overflow-y-auto pr-2 custom-scrollbar">
             {navItems.map((item) => {
               const Icon = item.icon;
-              const isActive = pathname === item.href;
+              const isActive = item.href ? pathname === item.href : false;
+              const isExpanded = expandedSections.includes(item.title);
+              const hasChildren = item.items && item.items.length > 0;
+
+              if (hasChildren) {
+                return (
+                  <div key={item.title} className="mb-2">
+                    <button
+                      onClick={() => toggleSection(item.title)}
+                      className={cn(
+                        "w-full group flex items-center justify-between rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-200 text-muted-foreground hover:bg-accent/50 hover:text-accent-foreground"
+                      )}
+                    >
+                      <div className="flex items-center gap-3">
+                        <Icon className="h-5 w-5" />
+                        <span>{item.title}</span>
+                      </div>
+                      <IconChevronDown
+                        className={cn(
+                          "h-4 w-4 transition-transform duration-200",
+                          isExpanded ? "rotate-180" : ""
+                        )}
+                      />
+                    </button>
+                    {isExpanded && (
+                      <div className="mt-1 ml-4 space-y-1 border-l border-border/50 pl-3">
+                        {item.items!.map((subItem) => {
+                          const isSubActive = pathname === subItem.href;
+                          return (
+                            <Link
+                              key={subItem.href}
+                              href={subItem.href}
+                              onClick={handleNavClick}
+                              className={cn(
+                                "block rounded-lg px-4 py-2 text-sm transition-colors",
+                                isSubActive
+                                  ? "bg-primary/10 text-primary font-medium"
+                                  : "text-muted-foreground hover:text-foreground hover:bg-accent/30"
+                              )}
+                            >
+                              {subItem.title}
+                            </Link>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
+                );
+              }
+
               return (
                 <Link
                   key={item.href}
-                  href={item.href}
+                  href={item.href!}
                   onClick={handleNavClick}
                   className={cn(
-                    "group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-200",
+                    "group flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm font-medium transition-all duration-200 mb-1",
                     isActive
                       ? "bg-primary text-primary-foreground shadow-md"
                       : "text-muted-foreground hover:bg-accent/50 hover:text-accent-foreground"
@@ -123,7 +223,23 @@ export default function DashboardSidebar({ isOpen = false, onClose }: DashboardS
           </nav>
 
           {/* Bottom Section */}
-          <div className="space-y-1.5">
+          <div className="space-y-1.5 mt-auto pt-4 border-t border-border/50 flex-shrink-0">
+            <Link
+              href="/dashboard/credits"
+              onClick={handleNavClick}
+              className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-muted-foreground hover:bg-accent/50 hover:text-accent-foreground transition-colors"
+            >
+              <IconCreditCard className="h-5 w-5" />
+              <span>Add Credits</span>
+            </Link>
+            <Link
+              href="/dashboard/generate"
+              onClick={handleNavClick}
+              className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-muted-foreground hover:bg-accent/50 hover:text-accent-foreground transition-colors"
+            >
+              <IconSparkles className="h-5 w-5" />
+              <span>Generate</span>
+            </Link>
             <Link
               href="/"
               onClick={handleNavClick}

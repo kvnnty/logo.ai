@@ -52,15 +52,17 @@ export default function DashboardLayout({
   return (
     <div className="flex min-h-screen bg-background">
       <DashboardSidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
-      <div className="flex-1 lg:ml-72 flex flex-col h-screen overflow-hidden">
-        <DashboardTopbar onMenuClick={() => setSidebarOpen(true)} />
-        <main className="flex-1 overflow-y-auto p-2 sm:p-4">
-          <div className="border border-border/50 rounded-xl sm:rounded-2xl bg-card shadow-xl overflow-hidden">
-            <div className="p-3 sm:p-4">
-              {children}
+      <div className="flex-1 lg:ml-72 flex flex-col p-4 overflow-hidden">
+        <div className="flex-1 border border-border/50 rounded-xl sm:rounded-2xl bg-card overflow-hidden">
+          <DashboardTopbar onMenuClick={() => setSidebarOpen(true)} />
+          <main className="flex-1 overflow-y-auto p-2 sm:p-4">
+            <div className="">
+              <div className="p-3 sm:p-4">
+                {children}
+              </div>
             </div>
-          </div>
-        </main>
+          </main>
+        </div>
       </div>
     </div>
   );
