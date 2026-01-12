@@ -15,7 +15,7 @@ const LogoCard = ({ logo, onDownload }: LogoCardProps) => {
   const [imageLoaded, setImageLoaded] = useState(false);
 
   return (
-    <Card className="group">
+    <Card className="group border-border/50 hover:bg-accent/30 transition-all duration-300 hover:border-primary/50">
       <CardContent className="w-full p-0">
         <div className="w-full rounded-t-md overflow-hidden aspect-square relative bg-muted/30">
           {!imageLoaded && (
@@ -30,9 +30,8 @@ const LogoCard = ({ logo, onDownload }: LogoCardProps) => {
           />
         </div>
         <div
-          className={`border-t p-2 transition-opacity duration-300 ${
-            imageLoaded ? "opacity-100" : "opacity-40"
-          }`}
+          className={`border-t p-2 transition-opacity duration-300 ${imageLoaded ? "opacity-100" : "opacity-40"
+            }`}
         >
           <div className="flex justify-between items-center mb-1.5">
             <h3 className="text-xs font-medium truncate">{logo.username}</h3>

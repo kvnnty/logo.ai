@@ -1,9 +1,11 @@
 "use client";
 
 import { IconSparkles, IconMenu2 } from "@tabler/icons-react";
+import Link from "next/link";
 import { useState, useEffect } from "react";
 import { RefreshCw } from "lucide-react";
 import { getCredits } from "@/app/actions/actions";
+import { Button } from "../ui/button";
 
 interface DashboardTopbarProps {
   onMenuClick?: () => void;
@@ -53,21 +55,30 @@ export default function DashboardTopbar({ onMenuClick }: DashboardTopbarProps) {
         {/* Spacer */}
         <div className="flex-1" />
 
-        {/* Credits UI - Responsive */}
-        <div className="flex items-center gap-2 lg:gap-3 px-3 lg:px-4 py-2 rounded-xl bg-primary/10 border border-primary/20">
-          <IconSparkles className="h-4 w-4 text-primary" />
-          <span className="text-xs lg:text-sm font-semibold text-primary whitespace-nowrap">
-            {credits.remaining}
-            <span className="hidden sm:inline"> Credits</span>
-          </span>
-          <button
-            onClick={fetchCredits}
-            disabled={isRefreshing}
-            className="p-1 hover:bg-primary/20 rounded transition-colors disabled:opacity-50"
-            title="Refresh credits"
-          >
-            <RefreshCw className={`h-3 w-3 lg:h-4 lg:w-4 text-primary ${isRefreshing ? 'animate-spin' : ''}`} />
-          </button>
+        <div className="flex items-center gap-2 lg:gap-3">
+          <Link href="/dashboard/generate">
+            <Button>
+              <IconSparkles className="h-4 w-4" />
+              <span>Generate</span>
+            </Button>
+          </Link>
+
+          {/* Credits UI - Responsive */}
+          <div className="flex items-center gap-2 px-2 py-2 rounded-xl bg-primary/10 border border-primary/20 h-9">
+            <IconSparkles className="h-4 w-4 text-primary" />
+            <span className="text-xs lg:text-sm font-semibold text-primary whitespace-nowrap">
+              {credits.remaining}
+              <span className="hidden sm:inline"> Credits</span>
+            </span>
+            <button
+              onClick={fetchCredits}
+              disabled={isRefreshing}
+              className="p-1 hover:bg-primary/20 rounded transition-colors disabled:opacity-50"
+              title="Refresh credits"
+            >
+              <RefreshCw className={`h-3 w-3 text-primary ${isRefreshing ? 'animate-spin' : ''}`} />
+            </button>
+          </div>
         </div>
       </div>
     </header>

@@ -96,56 +96,56 @@ export default function DashboardPage() {
 
       {/* Stats Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-        <Card className="border border-border/50 bg-card hover:shadow-xl transition-all duration-300 hover:border-primary/20">
+        <Card className="border border-border/50 bg-card hover:bg-accent/30 transition-all duration-300 hover:border-primary/50 group">
           <CardContent className="p-3 sm:p-5">
             <div className="flex items-center justify-between mb-2 sm:mb-3">
-              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-primary/10 flex items-center justify-center">
+              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-primary/10 flex items-center justify-center group-hover:scale-105 transition-transform duration-300">
                 <IconPalette className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
               </div>
-              <span className="text-xl sm:text-2xl font-bold bg-gradient-to-br from-foreground to-foreground/60 bg-clip-text text-transparent">
+              <span className="text-xl sm:text-2xl font-bold text-foreground">
                 {totalDesigns}
               </span>
             </div>
-            <h3 className="font-semibold text-xs sm:text-sm">Total Designs</h3>
+            <h3 className="font-semibold text-xs sm:text-sm text-muted-foreground group-hover:text-foreground transition-colors">Total Designs</h3>
           </CardContent>
         </Card>
 
-        <Card className="border border-border/50 bg-card hover:shadow-xl transition-all duration-300 hover:border-green-500/20">
+        <Card className="border border-border/50 bg-card hover:bg-accent/30 transition-all duration-300 hover:border-green-500/50 group">
           <CardContent className="p-3 sm:p-5">
             <div className="flex items-center justify-between mb-2 sm:mb-3">
-              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-green-500/10 flex items-center justify-center">
+              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-green-500/10 flex items-center justify-center group-hover:scale-105 transition-transform duration-300">
                 <IconClock className="h-4 w-4 sm:h-5 sm:w-5 text-green-600" />
               </div>
-              <span className="text-xl sm:text-2xl font-bold bg-gradient-to-br from-green-600 to-green-700 bg-clip-text text-transparent">
+              <span className="text-xl sm:text-2xl font-bold text-foreground">
                 {thisWeekDesigns}
               </span>
             </div>
-            <h3 className="font-semibold text-xs sm:text-sm">This Week</h3>
+            <h3 className="font-semibold text-xs sm:text-sm text-muted-foreground group-hover:text-foreground transition-colors">This Week</h3>
           </CardContent>
         </Card>
 
-        <Card className="border border-border/50 bg-card hover:shadow-xl transition-all duration-300 hover:border-blue-500/20">
+        <Card className="border border-border/50 bg-card hover:bg-accent/30 transition-all duration-300 hover:border-blue-500/50 group">
           <CardContent className="p-3 sm:p-5">
             <div className="flex items-center justify-between mb-2 sm:mb-3">
-              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-blue-500/10 flex items-center justify-center">
+              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-blue-500/10 flex items-center justify-center group-hover:scale-105 transition-transform duration-300">
                 <IconCalendarMonth className="h-4 w-4 sm:h-5 sm:w-5 text-blue-600" />
               </div>
-              <span className="text-xl sm:text-2xl font-bold bg-gradient-to-br from-blue-600 to-blue-700 bg-clip-text text-transparent">
+              <span className="text-xl sm:text-2xl font-bold text-foreground">
                 {thisMonthDesigns}
               </span>
             </div>
-            <h3 className="font-semibold text-xs sm:text-sm">This Month</h3>
+            <h3 className="font-semibold text-xs sm:text-sm text-muted-foreground group-hover:text-foreground transition-colors">This Month</h3>
           </CardContent>
         </Card>
 
-        <Card className="border border-border/50 bg-card hover:shadow-xl transition-all duration-300 hover:border-primary/20 cursor-pointer group">
+        <Card className="border border-border/50 bg-card hover:bg-accent/30 transition-all duration-300 hover:border-primary/50 cursor-pointer group">
           <Link href="/dashboard/generate">
             <CardContent className="p-3 sm:p-5">
               <div className="flex flex-col items-center justify-center h-full">
-                <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-br from-primary to-primary/80 p-2 sm:p-3 mb-1 sm:mb-2 shadow-lg group-hover:shadow-xl transition-shadow">
+                <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-br from-primary to-primary/80 p-2 sm:p-3 mb-1 sm:mb-2 shadow-md group-hover:shadow-lg transition-shadow group-hover:scale-105 duration-300">
                   <IconRocket className="h-full w-full text-white" />
                 </div>
-                <h3 className="font-semibold text-xs sm:text-sm">Create New</h3>
+                <h3 className="font-semibold text-xs sm:text-sm text-muted-foreground group-hover:text-foreground transition-colors">Create New</h3>
               </div>
             </CardContent>
           </Link>

@@ -1,25 +1,23 @@
 "use client";
 
+import { cn } from "@/lib/utils";
 import { SignedIn, UserButton, useUser } from "@clerk/nextjs";
+import {
+  IconBook,
+  IconBrandAsana,
+  IconChevronDown,
+  IconCreditCard,
+  IconHome,
+  IconHome2,
+  IconMessageCircle,
+  IconPalette,
+  IconSparkles,
+  IconTarget,
+  IconX
+} from "@tabler/icons-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
-import {
-  IconLayoutDashboard,
-  IconSparkles,
-  IconPalette,
-  IconHome,
-  IconCreditCard,
-  IconX,
-  IconChevronDown,
-  IconBrandAsana,
-  IconMessageCircle,
-  IconTarget,
-  IconFileText,
-  IconBook,
-  IconHome2,
-} from "@tabler/icons-react";
-import { cn } from "@/lib/utils";
 
 interface NavItem {
   title: string;
@@ -71,11 +69,6 @@ const navItems: NavItem[] = [
       { title: "Cards", href: "/dashboard/marketing/cards" },
       { title: "ID Cards", href: "/dashboard/marketing/id-cards" },
     ],
-  },
-  {
-    title: "My Designs",
-    href: "/dashboard/my-designs",
-    icon: IconFileText,
   },
   {
     title: "About Your Brand",

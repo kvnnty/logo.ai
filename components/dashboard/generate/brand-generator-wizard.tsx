@@ -1,0 +1,51 @@
+"use client";
+
+import { useState } from "react";
+import { MethodSelection } from "./method-selection";
+import { AIFlow } from "./ai-flow";
+import { UploadFlow } from "./upload-flow";
+import { AnimatePresence, motion } from "framer-motion";
+
+export type GenerationMethod = "ai" | "upload" | null;
+
+export default function BrandGeneratorWizard() {
+  const [method, setMethod] = useState<GenerationMethod>(null);
+
+  return (
+    <div className="w-full max-w-6xl mx-auto p-4 sm:p-6">
+      <AnimatePresence mode="wait">
+        {method === null ? (
+          <motion.div
+            key="selection"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.3 }}
+          >
+            <MethodSelection onSelect={setMethod} />
+          </motion.div>
+        ) : method === "ai" ? (
+          <motion.div
+            key="ai"
+            initial={{ opacity: 0, x: 10 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -10 }}
+            transition={{ duration: 0.3 }}
+          >
+            <AIFlow onBack={() => setMethod(null)} />
+          </motion.div>
+        ) : (
+          <motion.div
+            key="upload"
+            initial={{ opacity: 0, x: 10 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -10 }}
+            transition={{ duration: 0.3 }}
+          >
+            <UploadFlow onBack={() => setMethod(null)} />
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
