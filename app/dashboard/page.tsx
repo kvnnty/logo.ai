@@ -90,7 +90,7 @@ export default function DashboardPage() {
           Welcome Back 👋
         </h1>
         <p className="text-sm sm:text-base text-muted-foreground">
-          Manage your logo designs and create new ones
+          Manage your brand designs and create new ones
         </p>
       </div>
 
@@ -163,7 +163,7 @@ export default function DashboardPage() {
           </Link>
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
           {isLoading ? (
             [...Array(6)].map((_, index) => <SkeletonCard key={index} />)
           ) : logos.length > 0 ? (

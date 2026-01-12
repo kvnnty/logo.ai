@@ -1,221 +1,170 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { Card, CardContent } from "@/components/ui/card";
+import { PageHeader } from "@/components/dashboard/shared/page-header";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Check, CreditCard, Sparkles, Zap } from "lucide-react";
+import { useEffect, useState } from "react";
 import { getCredits, createStripeCheckoutSession } from "@/app/actions/actions";
 import { useToast } from "@/hooks/use-toast";
-import {
-  IconCreditCard,
-  IconSparkles,
-  IconCheck,
-  IconX,
-  IconLoader2,
-} from "@tabler/icons-react";
+import { useSearchParams } from "next/navigation";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function CreditsPage() {
+  const [credits, setCredits] = useState<number | null>(null);
+  const [loading, setLoading] = useState(true);
+  const searchParams = useSearchParams();
   const { toast } = useToast();
-  const [credits, setCredits] = useState({ remaining: 10, limit: 10 });
-  const [isLoading, setIsLoading] = useState(true);
-  const [processingPlan, setProcessingPlan] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchCredits = async () => {
-      const result = await getCredits();
-      setCredits(result);
-      setIsLoading(false);
-    };
+    async function fetchCredits() {
+      try {
+        const data = await getCredits();
+        if (data) {
+          setCredits(data.remaining);
+        }
+      } catch (error) {
+        console.error("Failed to fetch credits", error);
+      } finally {
+        setLoading(false);
+      }
+    }
     fetchCredits();
-  }, []);
+
+    if (searchParams.get("success")) {
+      toast({
+        title: "Payment Successful",
+        description: "Your credits have been added to your account.",
+        variant: "success",
+      });
+      // Refetch credits to ensure UI is up to date
+      fetchCredits();
+    }
+
+    if (searchParams.get("canceled")) {
+      toast({
+        title: "Payment Canceled",
+        description: "You have not been charged.",
+        variant: "info",
+      });
+    }
+  }, [searchParams, toast]);
 
   const handlePurchase = async (planId: string) => {
-    setProcessingPlan(planId);
     try {
       const result = await createStripeCheckoutSession(planId);
-      
       if (result.success && result.url) {
         window.location.href = result.url;
       } else {
-        toast({
-          title: "Error",
-          description: result.error || "Failed to create checkout session",
-          variant: "destructive",
-        });
-        setProcessingPlan(null);
+        throw new Error(result.error || "Failed to start checkout");
       }
     } catch (error) {
-      console.error('Error handling purchase:', error);
       toast({
         title: "Error",
-        description: "An unexpected error occurred",
+        description: "Failed to initiate payment. Please try again.",
         variant: "destructive",
       });
-      setProcessingPlan(null);
     }
   };
 
-  const creditPlans = [
+  const plans = [
     {
       id: "basic",
-      name: "Basic",
+      name: "Starter",
       credits: 50,
-      price: "$9.99",
-      features: [
-        "50 AI logo generations",
-        "HD quality outputs",
-        "All style options",
-        "Commercial license",
-      ],
-      popular: false,
+      price: "$19",
+      description: "Perfect for testing the waters",
+      features: ["50 AI Generations", "High Resolution Downloads", "Basic Support"],
+      icon: Zap
     },
     {
       id: "pro",
-      name: "Pro",
+      name: "Professional",
       credits: 150,
-      price: "$24.99",
-      features: [
-        "150 AI logo generations",
-        "HD quality outputs",
-        "All style options",
-        "Commercial license",
-        "Priority support",
-      ],
+      price: "$49",
+      description: "For serious brand building",
       popular: true,
+      features: ["150 AI Generations", "All File Formats (SVG, PNG, JPG)", "Priority Support", "Commercial License"],
+      icon: Sparkles
     },
     {
       id: "enterprise",
-      name: "Enterprise",
+      name: "Agency",
       credits: 500,
-      price: "$79.99",
-      features: [
-        "500 AI logo generations",
-        "HD quality outputs",
-        "All style options",
-        "Commercial license",
-        "Priority support",
-        "Custom branding",
-      ],
-      popular: false,
-    },
+      price: "$99",
+      description: "Best value for high volume",
+      features: ["500 AI Generations", "White Label Options", "Dedicated Support", "Commercial License", "API Access"],
+      icon: CreditCard
+    }
   ];
 
   return (
-    <div className="space-y-4 sm:space-y-6">
-      {/* Hero Section */}
-      <div>
-        <h1 className="text-2xl sm:text-3xl font-bold mb-2">
-          Credits & Plans
-        </h1>
-        <p className="text-sm sm:text-base text-muted-foreground">
-          Purchase credits to create amazing logos
-        </p>
-      </div>
+    <div className="container mx-auto p-6 max-w-6xl">
+      <PageHeader
+        heading="Credits & Plans"
+        description="Purchase credits to generate more brand assets."
+      />
 
-      {/* Current Credits */}
-      <Card className="border border-border/50 bg-card hover:shadow-xl transition-all duration-300">
-        <CardContent className="p-4 sm:p-6">
-          <div className="flex items-center justify-between flex-wrap gap-4">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-primary/10 flex items-center justify-center">
-                <IconSparkles className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
-              </div>
-              <div>
-                <p className="text-xs sm:text-sm text-muted-foreground">Current Credits</p>
-                <p className="text-xl sm:text-2xl font-bold">
-                  {credits.remaining} Credits
-                </p>
-              </div>
-            </div>
-            <div className="flex items-center gap-2">
-              {credits.remaining > 3 ? (
-                <>
-                  <IconCheck className="h-4 w-4 sm:h-5 sm:w-5 text-green-600" />
-                  <span className="text-xs sm:text-sm text-green-600 font-medium">Good</span>
-                </>
-              ) : credits.remaining > 0 ? (
-                <>
-                  <IconX className="h-4 w-4 sm:h-5 sm:w-5 text-orange-600" />
-                  <span className="text-xs sm:text-sm text-orange-600 font-medium">Low</span>
-                </>
-              ) : (
-                <>
-                  <IconX className="h-4 w-4 sm:h-5 sm:w-5 text-red-600" />
-                  <span className="text-xs sm:text-sm text-red-600 font-medium">Empty</span>
-                </>
-              )}
-            </div>
+      {/* Current Balance */}
+      <Card className="mb-12 bg-primary/5 border-primary/20">
+        <CardContent className="flex items-center justify-between p-8">
+          <div className="space-y-1">
+            <h3 className="text-lg font-medium text-muted-foreground">Current Balance</h3>
+            {loading ? (
+              <Skeleton className="h-10 w-20" />
+            ) : (
+              <div className="text-4xl font-bold text-primary">{credits} Credits</div>
+            )}
           </div>
+          <Sparkles className="w-12 h-12 text-primary/40" />
         </CardContent>
       </Card>
 
-      {/* Credit Plans */}
-      <div>
-        <h2 className="text-lg sm:text-xl font-bold mb-4">Choose a Plan</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {creditPlans.map((plan) => (
-            <Card
-              key={plan.name}
-              className={plan.popular
-                ? "border-primary border-2 hover:shadow-xl transition-all duration-300 relative overflow-hidden"
-                : "border border-border/50 hover:shadow-xl transition-all duration-300"
-              }
-            >
+      <div className="grid md:grid-cols-3 gap-8">
+        {plans.map((plan) => {
+          const Icon = plan.icon;
+          return (
+            <Card key={plan.id} className={`relative flex flex-col ${plan.popular ? 'border-primary shadow-lg scale-105 z-10' : 'hover:border-primary/50 transition-colors'}`}>
               {plan.popular && (
-                <div className="absolute top-0 left-0 right-0 bg-primary text-primary-foreground text-xs font-medium py-1 text-center">
+                <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-primary text-primary-foreground text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wide">
                   Most Popular
                 </div>
               )}
-              <CardContent className={`p-4 sm:p-6 ${plan.popular ? "pt-8 sm:pt-10" : ""}`}>
-                <div className="mb-4">
-                  <h3 className="text-lg sm:text-xl font-bold mb-1">{plan.name}</h3>
-                  <div className="flex items-baseline gap-1">
-                    <span className="text-2xl sm:text-3xl font-bold">{plan.price}</span>
-                    <span className="text-xs sm:text-sm text-muted-foreground">one-time</span>
-                  </div>
+              <CardHeader>
+                <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4 text-primary">
+                  <Icon className="w-6 h-6" />
                 </div>
-
+                <CardTitle className="text-2xl">{plan.name}</CardTitle>
+                <CardDescription>{plan.description}</CardDescription>
+              </CardHeader>
+              <CardContent className="flex-1">
                 <div className="mb-6">
-                  <div className="flex items-center gap-2 mb-4">
-                    <IconCreditCard className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
-                    <span className="text-base sm:text-lg font-semibold">
-                      {plan.credits} Credits
-                    </span>
-                  </div>
-                  <ul className="space-y-2">
-                    {plan.features.map((feature, index) => (
-                      <li key={index} className="flex items-start gap-2 text-xs sm:text-sm">
-                        <IconCheck className="h-3 w-3 sm:h-4 sm:w-4 text-green-600 mt-0.5 flex-shrink-0" />
-                        <span>{feature}</span>
-                      </li>
-                    ))}
-                  </ul>
+                  <span className="text-4xl font-bold">{plan.price}</span>
+                  <span className="text-muted-foreground"> / {plan.credits} credits</span>
                 </div>
-
-                <Button
-                  className={plan.popular
-                    ? "w-full bg-primary hover:bg-primary/90 text-sm"
-                    : "w-full text-sm"
-                  }
-                  variant={plan.popular ? "default" : "outline"}
-                  size="default"
-                  onClick={() => handlePurchase(plan.id)}
-                  disabled={processingPlan === plan.id}
-                >
-                  {processingPlan === plan.id ? (
-                    <>
-                      <IconLoader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Processing...
-                    </>
-                  ) : (
-                    "Get Started"
-                  )}
-                </Button>
+                <ul className="space-y-3">
+                  {plan.features.map((feature, i) => (
+                    <li key={i} className="flex items-center gap-2 text-sm">
+                      <Check className="w-4 h-4 text-primary" />
+                      {feature}
+                    </li>
+                  ))}
+                </ul>
               </CardContent>
+              <CardFooter>
+                <Button
+                  className="w-full"
+                  size="lg"
+                  variant={plan.popular ? "default" : "outline"}
+                  onClick={() => handlePurchase(plan.id)}
+                >
+                  Get Started
+                </Button>
+              </CardFooter>
             </Card>
-          ))}
-        </div>
+          );
+        })}
       </div>
     </div>
   );
 }
-

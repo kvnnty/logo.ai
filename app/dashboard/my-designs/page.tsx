@@ -1,94 +1,133 @@
 "use client";
 
-import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Download } from "lucide-react";
-import { checkHistory, downloadImage } from "../../actions/actions";
 import { useEffect, useState } from "react";
-import { SelectLogo } from "@/db/schema";
+import { PageHeader } from "@/components/dashboard/shared/page-header";
+import { AssetCard } from "@/components/dashboard/shared/asset-card";
+import { Button } from "@/components/ui/button";
+import { Plus } from "lucide-react";
+import Link from "next/link";
+import { checkHistory, downloadImage } from "@/app/actions/actions";
 import { useToast } from "@/hooks/use-toast";
-import LogoCard from "@/components/logo-card";
-import SkeletonCard from "@/components/skeleton-card";
+import { Skeleton } from "@/components/ui/skeleton";
+
+interface Design {
+  id: string;
+  image_url: string;
+  createdAt: string;
+}
 
 export default function MyDesignsPage() {
+  const [designs, setDesigns] = useState<Design[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [downloadingId, setDownloadingId] = useState<string | null>(null);
   const { toast } = useToast();
-  const [logos, setLogos] = useState<SelectLogo[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isDownloading, setIsDownloading] = useState(false);
 
   useEffect(() => {
-    const fetchLogos = async () => {
-      const history = await checkHistory();
-      if (history) {
-        setLogos(history);
+    async function fetchDesigns() {
+      try {
+        const history = await checkHistory();
+        if (history) {
+          // @ts-ignore
+          setDesigns(history);
+        }
+      } catch (error) {
+        console.error("Failed to fetch designs", error);
+        toast({
+          title: "Error",
+          description: "Failed to load your designs.",
+          variant: "destructive"
+        })
+      } finally {
+        setLoading(false);
       }
-      setIsLoading(false);
-    };
-    fetchLogos();
-  }, []);
+    }
+    fetchDesigns();
+  }, [toast]);
 
-  const handleDownload = async (imageUrl: string) => {
-    setIsDownloading(true);
+  const handleDownload = async (design: Design) => {
+    setDownloadingId(design.id);
     try {
-      const result = await downloadImage(imageUrl);
+      const result = await downloadImage(design.image_url);
       if (result.success && result.data) {
         const a = document.createElement("a");
         a.href = result.data;
-        a.download = `logo.webp`;
+        a.download = `brand-${design.id}.webp`;
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
         toast({
           title: "Download started",
-          description: "Your logo is being downloaded",
+          description: "Your design is being downloaded.",
         });
       } else {
-        throw new Error("Failed to download logo");
+        throw new Error("Failed to download");
       }
     } catch (error) {
       toast({
         title: "Error",
-        description: error instanceof Error ? error.message : "An unexpected error occurred while downloading",
+        description: "Failed to download image.",
         variant: "destructive",
       });
     } finally {
-      setIsDownloading(false);
+      setDownloadingId(null);
     }
   };
 
   return (
-    <div className="space-y-4 sm:space-y-6">
-      {/* Hero Section */}
-      <div>
-        <h1 className="text-2xl sm:text-3xl font-bold mb-2">
-          My Designs
-        </h1>
-        <p className="text-sm sm:text-base text-muted-foreground">
-          View and manage all your created logos
-        </p>
-      </div>
+    <div>
+      <PageHeader
+        heading="My Designs"
+        description="Manage and organized your generated brand assets."
+      >
+        <Link href="/dashboard/generate">
+          <Button>
+            <Plus className="mr-2 h-4 w-4" />
+            Create New
+          </Button>
+        </Link>
+      </PageHeader>
 
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3">
-        {isLoading ? (
-          [...Array(12)].map((_, index) => <SkeletonCard key={index} />)
-        ) : logos.length > 0 ? (
-          logos.map((logo) => (
-            <LogoCard
-              key={logo.id}
-              logo={logo}
-              onDownload={() => handleDownload(logo.image_url)}
+      {loading ? (
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+          {[1, 2, 3, 4].map((i) => (
+            <div key={i} className="space-y-4">
+              <Skeleton className="h-aspect-square w-full rounded-xl" />
+              <div className="space-y-2">
+                <Skeleton className="h-4 w-[250px]" />
+                <Skeleton className="h-4 w-[200px]" />
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : designs.length > 0 ? (
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+          {designs.map((design) => (
+            <AssetCard
+              key={design.id}
+              title={`Brand Logo ${new Date(design.createdAt).toLocaleDateString()}`}
+              description="Generated Logo"
+              imageUrl={design.image_url}
+              date={new Date(design.createdAt).toLocaleDateString()}
+              onDownload={() => handleDownload(design)}
+              downloading={downloadingId === design.id}
+              className="bg-card"
             />
-          ))
-        ) : (
-          <div className="col-span-full text-center py-12">
-            <p className="text-lg font-semibold mb-2">No designs yet</p>
-            <p className="text-muted-foreground mb-4">
-              Start creating amazing logos
-            </p>
+          ))}
+        </div>
+      ) : (
+        <div className="flex flex-col items-center justify-center min-h-[400px] border-2 border-dashed rounded-xl p-8 text-center animate-in fade-in-50">
+          <div className="bg-primary/10 p-6 rounded-full mb-4">
+            <Plus className="w-10 h-10 text-primary" />
           </div>
-        )}
-      </div>
+          <h3 className="text-xl font-semibold mb-2">No designs yet</h3>
+          <p className="text-muted-foreground max-w-md mb-8">
+            Start your brand journey by generating your first logo. It takes just a few seconds!
+          </p>
+          <Link href="/dashboard/generate">
+            <Button size="lg" className="px-8">Generate Brand</Button>
+          </Link>
+        </div>
+      )}
     </div>
   );
 }
-
