@@ -6,18 +6,15 @@ import { useEffect, useState } from "react";
 import { SelectLogo } from "@/db/schema";
 import LogoCard from "@/components/logo-card";
 import SkeletonCard from "@/components/skeleton-card";
-import { Download } from "lucide-react";
+import { Download, Plus, Wand2 } from "lucide-react";
 import { downloadImage } from "../actions/actions";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import {
-  IconSparkles,
   IconPalette,
-  IconTrendingUp,
-  IconRocket,
-  IconCalendarMonth,
   IconClock,
+  IconCalendarMonth,
 } from "@tabler/icons-react";
 
 export default function DashboardPage() {
@@ -82,118 +79,108 @@ export default function DashboardPage() {
     }
   };
 
+  const StatCard = ({ title, value, icon: Icon, colorClass, bgClass, borderClass }: any) => (
+    <Card className={`border transition-all duration-300 group shadow-none py-0 ${borderClass}`}>
+      <CardContent className="p-4 flex items-center justify-between">
+        <div className="space-y-1">
+          <p className="text-sm font-medium text-muted-foreground">{title}</p>
+          <p className="text-2xl font-bold">{value}</p>
+        </div>
+        <div className={`p-3 rounded-xl ${bgClass} group-hover:scale-110 transition-transform duration-300`}>
+          <Icon className={`w-5 h-5 ${colorClass}`} />
+        </div>
+      </CardContent>
+    </Card>
+  );
+
   return (
-    <div className="space-y-4 sm:space-y-6">
+    <div className="space-y-8">
       {/* Hero Section */}
-      <div>
-        <h1 className="text-2xl sm:text-3xl font-bold mb-2">
-          Welcome Back 👋
-        </h1>
-        <p className="text-sm sm:text-base text-muted-foreground">
-          Manage your brand designs and create new ones
-        </p>
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-3xl font-bold mb-2 tracking-tight">
+            Dashboard
+          </h1>
+          <p className="text-muted-foreground max-w-lg">
+            Create, manage, and download your brand assets.
+          </p>
+        </div>
+        <Link href="/dashboard/generate">
+          <Button size="lg" className="transition-all w-full md:w-auto">
+            <Plus className="w-5 h-5 mr-2" />
+            Create New Brand
+          </Button>
+        </Link>
       </div>
 
-      {/* Stats Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-        <Card className="border border-border/50 bg-card hover:bg-accent/30 transition-all duration-300 hover:border-primary/50 group">
-          <CardContent className="p-3 sm:p-5">
-            <div className="flex items-center justify-between mb-2 sm:mb-3">
-              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-primary/10 flex items-center justify-center group-hover:scale-105 transition-transform duration-300">
-                <IconPalette className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
-              </div>
-              <span className="text-xl sm:text-2xl font-bold text-foreground">
-                {totalDesigns}
-              </span>
-            </div>
-            <h3 className="font-semibold text-xs sm:text-sm text-muted-foreground group-hover:text-foreground transition-colors">Total Designs</h3>
-          </CardContent>
-        </Card>
-
-        <Card className="border border-border/50 bg-card hover:bg-accent/30 transition-all duration-300 hover:border-green-500/50 group">
-          <CardContent className="p-3 sm:p-5">
-            <div className="flex items-center justify-between mb-2 sm:mb-3">
-              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-green-500/10 flex items-center justify-center group-hover:scale-105 transition-transform duration-300">
-                <IconClock className="h-4 w-4 sm:h-5 sm:w-5 text-green-600" />
-              </div>
-              <span className="text-xl sm:text-2xl font-bold text-foreground">
-                {thisWeekDesigns}
-              </span>
-            </div>
-            <h3 className="font-semibold text-xs sm:text-sm text-muted-foreground group-hover:text-foreground transition-colors">This Week</h3>
-          </CardContent>
-        </Card>
-
-        <Card className="border border-border/50 bg-card hover:bg-accent/30 transition-all duration-300 hover:border-blue-500/50 group">
-          <CardContent className="p-3 sm:p-5">
-            <div className="flex items-center justify-between mb-2 sm:mb-3">
-              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-blue-500/10 flex items-center justify-center group-hover:scale-105 transition-transform duration-300">
-                <IconCalendarMonth className="h-4 w-4 sm:h-5 sm:w-5 text-blue-600" />
-              </div>
-              <span className="text-xl sm:text-2xl font-bold text-foreground">
-                {thisMonthDesigns}
-              </span>
-            </div>
-            <h3 className="font-semibold text-xs sm:text-sm text-muted-foreground group-hover:text-foreground transition-colors">This Month</h3>
-          </CardContent>
-        </Card>
-
-        <Card className="border border-border/50 bg-card hover:bg-accent/30 transition-all duration-300 hover:border-primary/50 cursor-pointer group">
-          <Link href="/dashboard/generate">
-            <CardContent className="p-3 sm:p-5">
-              <div className="flex flex-col items-center justify-center h-full">
-                <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-br from-primary to-primary/80 p-2 sm:p-3 mb-1 sm:mb-2 shadow-md group-hover:shadow-lg transition-shadow group-hover:scale-105 duration-300">
-                  <IconRocket className="h-full w-full text-white" />
-                </div>
-                <h3 className="font-semibold text-xs sm:text-sm text-muted-foreground group-hover:text-foreground transition-colors">Create New</h3>
-              </div>
-            </CardContent>
-          </Link>
-        </Card>
+      {/* Stats Overview */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <StatCard
+          title="Total Brands"
+          value={totalDesigns}
+          icon={IconPalette}
+          colorClass="text-purple-600"
+          bgClass="bg-purple-100"
+          borderClass="hover:border-purple-200"
+        />
+        <StatCard
+          title="This Week"
+          value={thisWeekDesigns}
+          icon={IconClock}
+          colorClass="text-blue-600"
+          bgClass="bg-blue-100"
+          borderClass="hover:border-blue-200"
+        />
+        <StatCard
+          title="This Month"
+          value={thisMonthDesigns}
+          icon={IconCalendarMonth}
+          colorClass="text-green-600"
+          bgClass="bg-green-100"
+          borderClass="hover:border-green-200"
+        />
       </div>
 
       {/* Recent Designs */}
-      <div>
-        <div className="flex items-center justify-between mb-3">
-          <h2 className="text-base sm:text-lg font-bold">Recent Designs</h2>
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <h2 className="text-xl font-bold tracking-tight">Recent Designs</h2>
           <Link href="/dashboard/my-designs">
-            <Button variant="ghost" size="sm" className="text-xs">
+            <Button variant="ghost" className="text-sm">
               View All
             </Button>
           </Link>
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+          {/* Quick Create Card */}
+          <Link href="/dashboard/generate" className="group h-full">
+            <Card className="h-full border-2 border-dashed hover:border-primary/50 hover:bg-muted/50 transition-all duration-300 min-h-[300px] flex items-center justify-center cursor-pointer">
+              <CardContent className="flex flex-col items-center justify-center p-6 text-center space-y-4">
+                <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                  <Wand2 className="w-8 h-8 text-primary" />
+                </div>
+                <div className="space-y-1">
+                  <h3 className="font-semibold">Create New</h3>
+                  <p className="text-sm text-muted-foreground">Start a fresh brand identity</p>
+                </div>
+              </CardContent>
+            </Card>
+          </Link>
+
           {isLoading ? (
-            [...Array(6)].map((_, index) => <SkeletonCard key={index} />)
+            [...Array(4)].map((_, index) => <SkeletonCard key={index} />)
           ) : logos.length > 0 ? (
-            logos.slice(0, 6).map((logo) => (
+            logos.slice(0, 4).map((logo) => (
               <LogoCard
                 key={logo.id}
                 logo={logo}
                 onDownload={handleDownload}
               />
             ))
-          ) : (
-            <Card className="col-span-full border border-dashed">
-              <CardContent className="flex flex-col items-center justify-center py-8">
-                <IconSparkles className="h-8 w-8 text-muted-foreground mb-3" />
-                <h3 className="text-sm font-semibold mb-1">No designs yet</h3>
-                <p className="text-xs text-muted-foreground mb-3 text-center">
-                  Start creating amazing logos
-                </p>
-                <Link href="/dashboard/generate">
-                  <Button size="sm" className="gap-2">
-                    <IconSparkles className="h-3 w-3" />
-                    Create Logo
-                  </Button>
-                </Link>
-              </CardContent>
-            </Card>
-          )}
+          ) : null}
         </div>
       </div>
     </div>
   );
 }
-
