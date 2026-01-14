@@ -10,3 +10,21 @@ export interface SelectLogo {
   updatedAt: Date | string;
 }
 
+export interface SelectBrand {
+  _id: string;
+  userId: string;
+  name: string;
+  description?: string;
+  strategy?: any;
+  identity?: any;
+  blueprints?: any;
+  assets?: Array<{
+    type: string;
+    imageUrl: string;
+    prompt: string;
+    createdAt: Date | string;
+  }>;
+  createdAt: Date | string;
+  updatedAt: Date | string;
+}
+

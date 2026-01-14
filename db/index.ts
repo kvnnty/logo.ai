@@ -33,5 +33,31 @@ const LogoSchema = new Schema(
   { timestamps: { createdAt: 'createdAt', updatedAt: 'updatedAt' } }
 );
 
+
+const BrandSchema = new Schema(
+  {
+    userId: { type: String, required: true },
+    name: { type: String, required: true },
+    description: { type: String }, // User input
+
+    // Stage 1 Output: Brand Strategy & Identity
+    strategy: { type: Schema.Types.Mixed }, // JSON: values, personality, audience
+    identity: { type: Schema.Types.Mixed }, // JSON: colors, typography, style rules
+
+    // Stage 2 Output: Asset Blueprints
+    blueprints: { type: Schema.Types.Mixed }, // JSON: prompts for specific assets
+
+    // Stage 3 Output: Generated Assets
+    assets: [{
+      type: { type: String }, // 'logo', 'social_post', 'business_card'
+      imageUrl: String,
+      prompt: String,
+      createdAt: { type: Date, default: Date.now }
+    }]
+  },
+  { timestamps: true }
+);
+
 export const Logo = models.Logo || model('Logo', LogoSchema);
+export const Brand = models.Brand || model('Brand', BrandSchema);
 
