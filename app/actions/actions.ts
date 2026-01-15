@@ -4,7 +4,7 @@ import OpenAI from 'openai';
 import { z } from 'zod';
 import dedent from 'dedent';
 import { clerkClient, currentUser } from "@clerk/nextjs/server";
-import { ensureDbConnected, Logo, Brand } from '@/db';
+import { ensureDbConnected, Logo, Brand, IBrand, ILogo, IBrandAsset } from '@/db';
 import { BRAND_SYSTEM_PROMPT } from '@/lib/prompts';
 import Stripe from 'stripe';
 
@@ -325,6 +325,76 @@ export async function generateBrandAsset(brandId: string, assetType: 'logo' | 's
   }
 }
 
+// ========================
+// BRAND MANAGEMENT ACTIONS
+// ========================
+
+export async function getUserBrands() {
+  'use server';
+  try {
+    const user = await currentUser();
+    if (!user) return { success: false, error: 'Not authenticated', brands: [] };
+
+    await ensureDbConnected();
+    const brands = await Brand.find({ userId: user.id }).sort({ createdAt: -1 }).lean();
+
+    return {
+      success: true,
+      brands: (brands as any[]).map((b: any) => ({
+        _id: b._id.toString(),
+        name: b.name,
+        description: b.description,
+        createdAt: b.createdAt ? new Date(b.createdAt).toISOString() : new Date().toISOString(),
+        updatedAt: b.updatedAt ? new Date(b.updatedAt).toISOString() : new Date().toISOString(),
+        assetCount: b.assets?.length || 0,
+      })),
+    };
+  } catch (error) {
+    console.error('Error fetching user brands:', error);
+    return { success: false, error: 'Failed to fetch brands', brands: [] };
+  }
+}
+
+export async function getBrandById(brandId: string) {
+  'use server';
+  try {
+    const user = await currentUser();
+    if (!user) return { success: false, error: 'Not authenticated' };
+
+    await ensureDbConnected();
+    const brand = await Brand.findOne({ _id: brandId, userId: user.id }).lean() as any;
+
+    if (!brand) {
+      return { success: false, error: 'Brand not found' };
+    }
+
+    const plainBrand = {
+      _id: brand._id?.toString() || brandId,
+      name: brand.name || '',
+      description: brand.description || '',
+      strategy: brand.strategy || {},
+      identity: brand.identity || {},
+      blueprints: brand.blueprints || {},
+      assets: (brand.assets || []).map((asset: any) => ({
+        type: asset.type || '',
+        imageUrl: asset.imageUrl || '',
+        prompt: asset.prompt || '',
+        createdAt: asset.createdAt ? new Date(asset.createdAt).toISOString() : new Date().toISOString(),
+      })),
+      createdAt: brand.createdAt ? new Date(brand.createdAt).toISOString() : new Date().toISOString(),
+      updatedAt: brand.updatedAt ? new Date(brand.updatedAt).toISOString() : new Date().toISOString(),
+    };
+
+    return {
+      success: true,
+      brand: plainBrand,
+    };
+  } catch (error) {
+    console.error('Error fetching brand:', error);
+    return { success: false, error: 'Failed to fetch brand' };
+  }
+}
+
 export async function checkHistory() {
   const user = await currentUser();
 
@@ -337,7 +407,7 @@ export async function checkHistory() {
     const userIdToQuery = user.externalId ? user.externalId : user.id;
     const userLogos = await Logo.find({ userId: userIdToQuery }).sort({ createdAt: -1 });
 
-    return userLogos.map(logo => ({
+    return (userLogos as any[]).map((logo: any) => ({
       id: logo._id.toString(),
       _id: logo._id.toString(),
       image_url: logo.image_url,
@@ -358,7 +428,7 @@ export async function allLogos() {
   try {
     await ensureDbConnected();
     const allLogos = await Logo.find({}).sort({ createdAt: -1 });
-    return allLogos.map(logo => ({
+    return (allLogos as any[]).map((logo: any) => ({
       id: logo._id.toString(),
       _id: logo._id.toString(),
       image_url: logo.image_url,

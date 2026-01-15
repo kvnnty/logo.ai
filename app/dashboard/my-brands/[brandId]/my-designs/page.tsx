@@ -79,7 +79,7 @@ export default function MyDesignsPage() {
         heading="My Designs"
         description="Manage and organized your generated brand assets."
       >
-        <Link href="/dashboard/generate">
+        <Link href="/dashboard/my-brands/create">
           <Button>
             <Plus className="mr-2 h-4 w-4" />
             Create New
@@ -123,7 +123,7 @@ export default function MyDesignsPage() {
           <p className="text-muted-foreground max-w-md mb-8">
             Start your brand journey by generating your first logo. It takes just a few seconds!
           </p>
-          <Link href="/dashboard/generate">
+          <Link href="/dashboard/my-brands/create">
             <Button size="lg" className="px-8">Generate Brand</Button>
           </Link>
         </div>

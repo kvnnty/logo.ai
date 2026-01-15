@@ -2,10 +2,10 @@
 
 import BrandGeneratorWizard from "@/components/dashboard/generate/brand-generator-wizard";
 import { useUser } from "@clerk/nextjs";
-import { redirect } from "next/navigation";
 import { RefreshCw } from "lucide-react";
+import { redirect } from "next/navigation";
 
-export default function GeneratePage() {
+export default function BrandsCreatePage() {
   const { isSignedIn, isLoaded } = useUser();
 
   if (!isLoaded) {

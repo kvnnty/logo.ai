@@ -26,66 +26,75 @@ interface NavItem {
   items?: { title: string; href: string }[];
 }
 
-const navItems: NavItem[] = [
-  {
-    title: "Home",
-    href: "/dashboard",
-    icon: IconHome2,
-  },
-  {
-    title: "My Designs",
-    href: "/dashboard/my-designs",
-    icon: IconPalette,
-  },
-  {
-    title: "Branding",
-    icon: IconBrandAsana,
-    items: [
-      { title: "Business Cards", href: "/dashboard/branding/business-cards" },
-      { title: "Letterheads", href: "/dashboard/branding/letterheads" },
-      { title: "Email Signature", href: "/dashboard/branding/email-signature" },
-      { title: "Favicon Pack", href: "/dashboard/branding/favicon-pack" },
-      { title: "Brand Book", href: "/dashboard/branding/brand-book" },
-      { title: "License", href: "/dashboard/branding/license" },
-    ],
-  },
-  {
-    title: "Social",
-    icon: IconMessageCircle,
-    items: [
-      { title: "Social Stories", href: "/dashboard/social/social-stories" },
-      { title: "Social Posts", href: "/dashboard/social/social-posts" },
-      { title: "Social covers & profiles", href: "/dashboard/social/social-covers-profiles" },
-      { title: "Youtube Thumbnails", href: "/dashboard/social/youtube-thumbnails" },
-    ],
-  },
-  {
-    title: "Marketing",
-    icon: IconTarget,
-    items: [
-      { title: "Ads", href: "/dashboard/marketing/ads" },
-      { title: "Flyers", href: "/dashboard/marketing/flyers" },
-      { title: "Posters", href: "/dashboard/marketing/posters" },
-      { title: "Cards", href: "/dashboard/marketing/cards" },
-      { title: "ID Cards", href: "/dashboard/marketing/id-cards" },
-    ],
-  },
-  {
-    title: "About Your Brand",
-    href: "/dashboard/about-your-brand",
-    icon: IconBook,
-  },
-];
+// Function to generate nav items with brand-aware routes
+function getNavItems(brandId?: string): NavItem[] {
+  const brandPrefix = brandId ? `/dashboard/my-brands/${brandId}` : '/dashboard';
+
+  return [
+    {
+      title: "Overview",
+      href: brandId ? `${brandPrefix}` : "/dashboard",
+      icon: IconHome2,
+    },
+    {
+      title: "My Designs",
+      href: `${brandPrefix}/my-designs`,
+      icon: IconPalette,
+    },
+    {
+      title: "Branding",
+      icon: IconBrandAsana,
+      items: [
+        { title: "Business Cards", href: `${brandPrefix}/branding/business-cards` },
+        { title: "Letterheads", href: `${brandPrefix}/branding/letterheads` },
+        { title: "Email Signature", href: `${brandPrefix}/branding/email-signature` },
+        { title: "Favicon Pack", href: `${brandPrefix}/branding/favicon-pack` },
+        { title: "Brand Book", href: `${brandPrefix}/branding/brand-book` },
+        { title: "License", href: `${brandPrefix}/branding/license` },
+      ],
+    },
+    {
+      title: "Social",
+      icon: IconMessageCircle,
+      items: [
+        { title: "Social Stories", href: `${brandPrefix}/social/social-stories` },
+        { title: "Social Posts", href: `${brandPrefix}/social/social-posts` },
+        { title: "Social covers & profiles", href: `${brandPrefix}/social/social-covers-profiles` },
+        { title: "Youtube Thumbnails", href: `${brandPrefix}/social/youtube-thumbnails` },
+      ],
+    },
+    {
+      title: "Marketing",
+      icon: IconTarget,
+      items: [
+        { title: "Ads", href: `${brandPrefix}/marketing/ads` },
+        { title: "Flyers", href: `${brandPrefix}/marketing/flyers` },
+        { title: "Posters", href: `${brandPrefix}/marketing/posters` },
+        { title: "Cards", href: `${brandPrefix}/marketing/cards` },
+        { title: "ID Cards", href: `${brandPrefix}/marketing/id-cards` },
+      ],
+    },
+    {
+      title: "About Your Brand",
+      href: `${brandPrefix}/about-your-brand`,
+      icon: IconBook,
+    },
+  ];
+}
 
 interface DashboardSidebarProps {
   isOpen?: boolean;
   onClose?: () => void;
+  brandId?: string;
+  brandName?: string;
 }
 
-export default function DashboardSidebar({ isOpen = false, onClose }: DashboardSidebarProps) {
+export default function DashboardSidebar({ isOpen = false, onClose, brandId, brandName }: DashboardSidebarProps) {
   const pathname = usePathname();
   const { user } = useUser();
   const [expandedSections, setExpandedSections] = useState<string[]>(["Branding", "Social", "Marketing"]);
+
+  const navItems = getNavItems(brandId);
 
   const toggleSection = (title: string) => {
     setExpandedSections((prev) =>
@@ -105,7 +114,7 @@ export default function DashboardSidebar({ isOpen = false, onClose }: DashboardS
     <>
       {/* Mobile Overlay */}
       {isOpen && (
-        <div 
+        <div
           className="fixed inset-0 bg-black/50 z-40 lg:hidden"
           onClick={onClose}
         />
@@ -226,12 +235,12 @@ export default function DashboardSidebar({ isOpen = false, onClose }: DashboardS
               <span>Add Credits</span>
             </Link>
             <Link
-              href="/dashboard/generate"
+              href="/dashboard/my-brands/create"
               onClick={handleNavClick}
               className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-muted-foreground hover:bg-accent/50 hover:text-accent-foreground transition-colors"
             >
               <IconSparkles className="h-5 w-5" />
-              <span>Generate</span>
+              <span>New Brand</span>
             </Link>
             <Link
               href="/"
@@ -241,11 +250,11 @@ export default function DashboardSidebar({ isOpen = false, onClose }: DashboardS
               <IconHome className="h-5 w-5" />
               <span>Back to Home</span>
             </Link>
-            
+
             <SignedIn>
               <div className="px-3 py-3 rounded-xl border border-border/50 bg-muted/20">
                 <div className="flex items-center gap-3">
-                  <UserButton 
+                  <UserButton
                     appearance={{
                       elements: {
                         avatarBox: "w-10 h-10",

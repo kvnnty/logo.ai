@@ -1,4 +1,4 @@
-import mongoose, { Schema, models, model } from 'mongoose';
+import mongoose, { Schema, models, model, Document } from 'mongoose';
 import { config } from 'dotenv';
 
 // Load env from default locations (.env, .env.local)
@@ -20,6 +20,37 @@ export async function ensureDbConnected(): Promise<void> {
   }
   await mongoose.connect(MONGODB_URI);
   isConnected = true;
+}
+
+export interface ILogo {
+  _id?: any;
+  image_url: string;
+  primary_color: string;
+  background_color: string;
+  username: string;
+  userId: string;
+  createdAt?: Date;
+  updatedAt?: Date;
+}
+
+export interface IBrandAsset {
+  type?: string;
+  imageUrl?: string;
+  prompt?: string;
+  createdAt?: Date;
+}
+
+export interface IBrand {
+  _id?: any;
+  userId: string;
+  name: string;
+  description?: string;
+  strategy?: any;
+  identity?: any;
+  blueprints?: any;
+  assets: IBrandAsset[];
+  createdAt?: Date;
+  updatedAt?: Date;
 }
 
 const LogoSchema = new Schema(
@@ -58,6 +89,6 @@ const BrandSchema = new Schema(
   { timestamps: true }
 );
 
-export const Logo = models.Logo || model('Logo', LogoSchema);
-export const Brand = models.Brand || model('Brand', BrandSchema);
+export const Logo = models.Logo || model<ILogo>('Logo', LogoSchema);
+export const Brand = models.Brand || model<IBrand>('Brand', BrandSchema);
 

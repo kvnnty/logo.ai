@@ -2,10 +2,8 @@
 
 import { useUser } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { RefreshCw } from "lucide-react";
-import DashboardSidebar from "@/components/dashboard/sidebar";
-import DashboardTopbar from "@/components/dashboard/topbar";
 
 export default function DashboardLayout({
   children,
@@ -14,25 +12,12 @@ export default function DashboardLayout({
 }) {
   const { isSignedIn, isLoaded } = useUser();
   const router = useRouter();
-  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
     if (isLoaded && !isSignedIn) {
       router.push("/");
     }
   }, [isLoaded, isSignedIn, router]);
-
-  useEffect(() => {
-    // Prevent body scroll when sidebar is open on mobile
-    if (sidebarOpen) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = 'unset';
-    }
-    return () => {
-      document.body.style.overflow = 'unset';
-    };
-  }, [sidebarOpen]);
 
   if (!isLoaded) {
     return (
@@ -50,21 +35,8 @@ export default function DashboardLayout({
   }
 
   return (
-    <div className="flex min-h-screen bg-background">
-      <DashboardSidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
-      <div className="flex-1 lg:ml-72 flex flex-col p-4 overflow-hidden">
-        <div className="flex-1 border border-border/50 rounded-xl sm:rounded-2xl bg-card overflow-hidden">
-          <DashboardTopbar onMenuClick={() => setSidebarOpen(true)} />
-          <main className="flex-1 overflow-y-auto p-2 sm:p-4">
-            <div className="">
-              <div className="p-3 sm:p-4">
-                {children}
-              </div>
-            </div>
-          </main>
-        </div>
-      </div>
+    <div className="min-h-screen bg-background flex-1 flex flex-col overflow-hidden">
+      {children}
     </div>
   );
 }
-
