@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useMemo, useCallback } from "react";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -18,7 +19,7 @@ import {
   Shapes,
   Sparkles,
 } from "lucide-react";
-import { generateLogo, downloadImage } from "@/app/actions/actions";
+import { generateLogo, downloadImage, generateBrandIdentity, prepareAssetBlueprints, generateBrandAsset } from "@/app/actions/actions";
 import {
   Select,
   SelectContent,
@@ -113,6 +114,7 @@ export function AIFlow({ onBack }: { onBack: () => void }) {
   const [generatedLogo, setGeneratedLogo] = useState("");
   const { toast } = useToast();
   const [isDownloading, setIsDownloading] = useState(false);
+  const router = useRouter();
 
   type ModelType = "black-forest-labs/flux-schnell" | "black-forest-labs/flux-dev" | "dall-e-3";
   const [selectedModel, setSelectedModel] = useState<ModelType>("black-forest-labs/flux-schnell");
@@ -161,28 +163,48 @@ export function AIFlow({ onBack }: { onBack: () => void }) {
 
     setLoading(true);
     try {
-      const result = await generateLogo({
+      // STAGE 1: Generate Brand Identity
+      toast({ title: "Phase 1/3", description: "Generating Brand Strategy & Identity..." });
+
+      const identityResult = await generateBrandIdentity({
         companyName,
+        description: additionalInfo,
         style: selectedStyle,
-        symbolPreference: "modern and professional",
-        primaryColor,
-        secondaryColor: backgroundColor,
         model: selectedModel,
-        size: selectedSize,
-        quality: selectedQuality,
-        additionalInfo,
       });
 
-      if (result.success && result.url) {
-        setGeneratedLogo(result.url);
+      if (!identityResult.success || !identityResult.brandId) {
+        throw new Error(identityResult.error || "Failed to generate brand identity");
+      }
+
+      const brandId = identityResult.brandId;
+
+      // STAGE 2: Prepare Blueprints
+      toast({ title: "Phase 2/3", description: "Designing Asset Blueprints..." });
+
+      const blueprintResult = await prepareAssetBlueprints(brandId);
+      if (!blueprintResult.success) {
+        throw new Error(blueprintResult.error || "Failed to prepare blueprints");
+      }
+
+      // STAGE 3: Generate Logo Asset
+      toast({ title: "Phase 3/3", description: "Generating Final Brand Assets..." });
+
+      // We explicitly request the 'logo' asset here
+      const assetResult = await generateBrandAsset(brandId, 'logo', selectedModel);
+
+      if (assetResult.success && assetResult.imageUrl) {
+        setGeneratedLogo(assetResult.imageUrl);
         window.dispatchEvent(new CustomEvent('refreshCredits'));
         toast({
           title: "Success!",
-          description: "Your brand assets have been generated successfully",
+          description: "Redirecting to your new brand dashboard...",
           variant: "success",
         });
+        // Redirect to the new brand's dashboard
+        router.push(`/dashboard/my-brands/${brandId}`);
       } else {
-        throw new Error(result.error || "Failed to generate logo");
+        throw new Error(assetResult.error || "Failed to generate final assets");
       }
     } catch (error) {
       toast({
@@ -643,7 +665,7 @@ export function AIFlow({ onBack }: { onBack: () => void }) {
                   {/* Text Content */}
                   <div className="space-y-3">
                     <h3 className="text-3xl font-bold bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
-                      Your Brand Preview
+                      Your Brand kit
                     </h3>
                     <p className="text-muted-foreground text-base leading-relaxed">
                       {currentStep >= 5

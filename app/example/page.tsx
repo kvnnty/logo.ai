@@ -79,7 +79,7 @@ export default function Example() {
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
-      
+
       {/* Hero Section */}
       <section className="relative pt-24 pb-12 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
@@ -93,19 +93,19 @@ export default function Example() {
               <Sparkles className="w-4 h-4 text-primary" />
               <span className="text-sm font-medium text-primary">AI-Generated Logos</span>
             </div>
-            
+
             <h1 className="text-4xl md:text-6xl font-bold mb-6">
               Logo{" "}
               <span className="bg-gradient-to-r from-primary via-primary/80 to-primary bg-clip-text text-transparent">
                 Examples
               </span>
             </h1>
-            
+
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-8">
               Explore stunning logos created by our community. Get inspired and create your own unique brand identity with AI.
             </p>
 
-            <Link href="/dashboard/generate">
+            <Link href="/dashboard/my-brands/create">
               <Button size="lg" className="shadow-lg shadow-primary/25">
                 Create Your Logo
                 <Sparkles className="ml-2 w-4 h-4" />
@@ -172,7 +172,7 @@ export default function Example() {
                 <p className="text-muted-foreground mb-6">
                   Be the first to create an amazing logo!
                 </p>
-                <Link href="/dashboard/generate">
+                <Link href="/dashboard/my-brands/create">
                   <Button>
                     Start Creating
                     <ArrowRight className="ml-2 w-4 h-4" />

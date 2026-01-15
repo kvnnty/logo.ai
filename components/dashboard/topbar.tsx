@@ -56,7 +56,7 @@ export default function DashboardTopbar({ onMenuClick }: DashboardTopbarProps) {
         <div className="flex-1" />
 
         <div className="flex items-center gap-2 lg:gap-3">
-          <Link href="/dashboard/generate">
+          <Link href="/dashboard/my-brands/create">
             <Button>
               <IconSparkles className="h-4 w-4" />
               <span>Generate</span>
