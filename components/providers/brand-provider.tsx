@@ -8,9 +8,10 @@ export interface BrandContextType {
   description?: string;
   strategy?: any;
   identity?: any;
-  blueprints?: any;
+  blueprints?: any[];
   assets?: Array<{
-    type: string;
+    category: string;
+    subType: string;
     imageUrl: string;
     prompt: string;
     createdAt: string | Date;

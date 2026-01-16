@@ -4,6 +4,7 @@ import { ClerkProvider } from "@clerk/nextjs";
 import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
 import Script from "next/script";
+import NextTopLoader from "nextjs-toploader";
 
 const manrope = Manrope({
   variable: "--font-manrope",
@@ -73,14 +74,15 @@ export default function RootLayout({
     <ClerkProvider>
       <html lang="en" suppressHydrationWarning>
         <body className={`${manrope.variable} font-primary antialiased`}>
+          <NextTopLoader color="#f97316" showSpinner={false} height={3} />
           {children}
           <Toaster />
         </body>
         <Script
-        async
-        src="https://cloud.umami.is/script.js"
-        data-website-id="314e7cd3-1a01-43c1-947f-c855c077906f"
-      />
+          async
+          src="https://cloud.umami.is/script.js"
+          data-website-id="314e7cd3-1a01-43c1-947f-c855c077906f"
+        />
       </html>
     </ClerkProvider>
   );
