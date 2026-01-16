@@ -19,7 +19,7 @@ import {
   Shapes,
   Sparkles,
 } from "lucide-react";
-import { generateLogo, downloadImage, generateBrandIdentity, prepareAssetBlueprints, generateBrandAsset } from "@/app/actions/actions";
+import { generateLogo, downloadImage, generateBrandIdentity, prepareAssetBlueprints, generateBrandAsset, finalizeBrandLogo } from "@/app/actions/actions";
 import {
   Select,
   SelectContent,
@@ -575,14 +575,27 @@ export function AIFlow({ onBack }: { onBack: () => void }) {
 
                 <Button
                   className="w-full h-12 text-lg font-bold"
-                  disabled={selectedResultIndex === null || !lastBrandId}
-                  onClick={() => {
-                    if (lastBrandId) {
-                      router.push(`/dashboard/my-brands/${lastBrandId}`);
+                  disabled={selectedResultIndex === null || !lastBrandId || loading}
+                  onClick={async () => {
+                    if (lastBrandId && selectedResultIndex !== null) {
+                      setLoading(true);
+                      try {
+                        const selectedUrl = generatedOptions[selectedResultIndex];
+                        await finalizeBrandLogo(lastBrandId, selectedUrl);
+                        router.push(`/dashboard/my-brands/${lastBrandId}`);
+                      } catch (error) {
+                        toast({
+                          title: "Error",
+                          description: "Failed to finalize logo selection",
+                          variant: "destructive",
+                        });
+                      } finally {
+                        setLoading(false);
+                      }
                     }
                   }}
                 >
-                  Continue with Selection
+                  {loading ? "Finalizing..." : "Continue with Selection"}
                 </Button>
               </motion.div>
             ) : (

@@ -14,6 +14,7 @@ interface BrandSummary {
   description?: string;
   createdAt: string | Date;
   assetCount: number;
+  primaryLogoUrl?: string | null;
 }
 
 export default function BrandsPage() {
@@ -89,17 +90,31 @@ export default function BrandsPage() {
               transition={{ delay: index * 0.1 }}
             >
               <Card
-                className="cursor-pointer hover:shadow-lg transition-all hover:border-primary/50 group"
+                className="cursor-pointer transition-all hover:border-primary/50 group"
                 onClick={() => router.push(`/dashboard/my-brands/${brand._id}`)}
               >
-                <CardHeader>
-                  <CardTitle className="flex items-center justify-between">
-                    {brand.name}
-                    <ArrowRight className="h-4 w-4 opacity-0 group-hover:opacity-100 transition-opacity" />
-                  </CardTitle>
-                  <CardDescription>
-                    {brand.description || "No description"}
-                  </CardDescription>
+                <CardHeader className="relative">
+                  {brand.primaryLogoUrl ? (
+                    <div className="w-full h-48 rounded-xl border bg-white p-2 flex items-center justify-center shadow-sm group-hover:border-primary/50 transition-colors">
+                      <img
+                        src={brand.primaryLogoUrl}
+                        alt={brand.name}
+                        className="max-w-full max-h-full object-cover"
+                      />
+                    </div>
+                  ) : (
+                    <div className="w-full h-48 rounded-xl bg-primary/5 border border-dashed flex items-center justify-center">
+                      <Sparkles className="h-6 w-6 text-primary/40" />
+                    </div>
+                  )}
+                  <div className="flex items-start justify-between mt-4">
+                    <div className="space-y-1">
+                      <CardTitle className="flex items-center gap-2">
+                        {brand.name}
+                        <ArrowRight className="h-4 w-4 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
+                      </CardTitle>
+                    </div>
+                  </div>
                 </CardHeader>
                 <CardContent>
                   <div className="flex items-center justify-between text-sm text-muted-foreground">

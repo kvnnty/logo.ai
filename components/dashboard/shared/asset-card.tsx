@@ -2,7 +2,7 @@
 
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Download, Edit, MoreVertical, Eye, Share2 } from "lucide-react";
+import { Download, Edit, MoreVertical, Eye, Share2, Sparkles } from "lucide-react";
 import Image from "next/image";
 import {
   DropdownMenu,
@@ -21,8 +21,11 @@ interface AssetCardProps {
   onDownload?: () => void;
   onEdit?: () => void;
   onPreview?: () => void;
+  onAction?: () => void;
+  actionLabel?: string;
   className?: string;
   downloading?: boolean;
+  actionLoading?: boolean;
 }
 
 export function AssetCard({
@@ -34,8 +37,11 @@ export function AssetCard({
   onDownload,
   onEdit,
   onPreview,
+  onAction,
+  actionLabel,
   className,
   downloading = false,
+  actionLoading = false,
 }: AssetCardProps) {
 
   const aspectRatioClass = {
@@ -63,6 +69,11 @@ export function AssetCard({
           {onDownload && (
             <Button size="icon" variant="secondary" className="rounded-full" onClick={onDownload} disabled={downloading}>
               <Download className={cn("w-4 h-4", downloading && "animate-pulse")} />
+            </Button>
+          )}
+          {onAction && (
+            <Button variant="secondary" className="rounded-full px-4 h-9 text-xs font-bold" onClick={onAction} disabled={actionLoading}>
+              {actionLoading ? "Processing..." : actionLabel || "Select"}
             </Button>
           )}
         </div>
@@ -93,6 +104,12 @@ export function AssetCard({
                 <DropdownMenuItem onClick={onDownload}>
                   <Download className="w-4 h-4 mr-2" />
                   Download
+                </DropdownMenuItem>
+              )}
+              {onAction && (
+                <DropdownMenuItem onClick={onAction} disabled={actionLoading}>
+                  <Sparkles className="w-4 h-4 mr-2" />
+                  {actionLabel || "Select"}
                 </DropdownMenuItem>
               )}
               <DropdownMenuItem>
