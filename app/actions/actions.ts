@@ -386,14 +386,20 @@ export async function getUserBrands() {
 
     return {
       success: true,
-      brands: (brands as any[]).map((b: any) => ({
-        _id: b._id.toString(),
-        name: b.name,
-        description: b.description,
-        createdAt: b.createdAt ? new Date(b.createdAt).toISOString() : new Date().toISOString(),
-        updatedAt: b.updatedAt ? new Date(b.updatedAt).toISOString() : new Date().toISOString(),
-        assetCount: b.assets?.length || 0,
-      })),
+      brands: (brands as any[]).map((b: any) => {
+        // Find primary logo first, then fallback to any logo
+        const primaryLogo = b.assets?.find((a: any) => a.subType === 'primary_logo')
+          || b.assets?.find((a: any) => a.category === 'logo');
+        return {
+          _id: b._id.toString(),
+          name: b.name,
+          description: b.description,
+          createdAt: b.createdAt ? new Date(b.createdAt).toISOString() : new Date().toISOString(),
+          updatedAt: b.updatedAt ? new Date(b.updatedAt).toISOString() : new Date().toISOString(),
+          assetCount: b.assets?.length || 0,
+          primaryLogoUrl: primaryLogo?.imageUrl || null,
+        };
+      }),
     };
   } catch (error) {
     console.error('Error fetching user brands:', error);
@@ -442,6 +448,97 @@ export async function getBrandById(brandId: string) {
   }
 }
 
+export async function finalizeBrandLogo(brandId: string, selectedImageUrl: string) {
+  'use server';
+  try {
+    await ensureDbConnected();
+    const brand = await Brand.findById(brandId);
+    if (!brand) throw new Error("Brand not found");
+
+    // Mark the selected logo as primary, others as variations
+    brand.assets = brand.assets.map((asset: any) => {
+      if (asset.category === 'logo') {
+        return {
+          ...asset,
+          subType: asset.imageUrl === selectedImageUrl ? 'primary_logo' : 'logo_variation'
+        };
+      }
+      return asset;
+    });
+
+    // Mark assets as modified since it's an array of mixed/objects in some cases
+    brand.markModified('assets');
+    await brand.save();
+
+    // Note: We no longer delete from the Logo collection to keep "My Designs" populated
+
+    return { success: true };
+  } catch (error) {
+    console.error('Error finalizing logo selection:', error);
+    return { success: false, error: 'Failed to finalize selection' };
+  }
+}
+
+export async function setPrimaryLogo(brandId: string, selectedImageUrl: string) {
+  'use server';
+  try {
+    await ensureDbConnected();
+    const brand = await Brand.findById(brandId);
+    if (!brand) throw new Error("Brand not found");
+
+    // Update subTypes for logos
+    brand.assets = brand.assets.map((asset: any) => {
+      if (asset.category === 'logo') {
+        return {
+          ...asset,
+          subType: asset.imageUrl === selectedImageUrl ? 'primary_logo' : 'logo_variation'
+        };
+      }
+      return asset;
+    });
+
+    brand.markModified('assets');
+    await brand.save();
+
+    return { success: true };
+  } catch (error) {
+    console.error('Error setting primary logo:', error);
+    return { success: false, error: 'Failed to update primary logo' };
+  }
+}
+
+export async function updateBrand(brandId: string, updates: {
+  name?: string;
+  description?: string;
+  primaryColor?: string;
+  secondaryColor?: string;
+}) {
+  'use server';
+  try {
+    await ensureDbConnected();
+    const brand = await Brand.findById(brandId);
+    if (!brand) throw new Error("Brand not found");
+
+    if (updates.name) brand.name = updates.name;
+    if (updates.description) brand.description = updates.description;
+
+    if (updates.primaryColor || updates.secondaryColor) {
+      if (!brand.identity) brand.identity = {};
+      if (updates.primaryColor) brand.identity.primary_color = updates.primaryColor;
+      if (updates.secondaryColor) brand.identity.secondary_color = updates.secondaryColor;
+
+      // Mark identity as modified since it's a Mixed type
+      brand.markModified('identity');
+    }
+
+    await brand.save();
+    return { success: true };
+  } catch (error) {
+    console.error('Error updating brand:', error);
+    return { success: false, error: 'Failed to update brand' };
+  }
+}
+
 export async function getBrandBlueprints(brandId: string) {
   'use server';
   try {
@@ -474,6 +571,7 @@ export async function checkHistory() {
     return (userLogos as any[]).map((logo: any) => ({
       id: logo._id.toString(),
       _id: logo._id.toString(),
+      brandId: logo.brandId?.toString(),
       image_url: logo.image_url,
       primary_color: logo.primary_color,
       background_color: logo.background_color,

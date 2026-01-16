@@ -6,13 +6,15 @@ import { AssetCard } from "@/components/dashboard/shared/asset-card";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import Link from "next/link";
-import { checkHistory, downloadImage } from "@/app/actions/actions";
+import { useParams, useRouter } from "next/navigation";
+import { checkHistory, downloadImage, setPrimaryLogo } from "@/app/actions/actions";
 import { useToast } from "@/hooks/use-toast";
 import { Skeleton } from "@/components/ui/skeleton";
 
 interface Design {
   id: string;
   image_url: string;
+  brandId?: string;
   createdAt: string;
 }
 
@@ -20,7 +22,11 @@ export default function MyDesignsPage() {
   const [designs, setDesigns] = useState<Design[]>([]);
   const [loading, setLoading] = useState(true);
   const [downloadingId, setDownloadingId] = useState<string | null>(null);
+  const [settingPrimaryId, setSettingPrimaryId] = useState<string | null>(null);
   const { toast } = useToast();
+  const params = useParams();
+  const router = useRouter();
+  const brandId = params?.brandId as string;
 
   useEffect(() => {
     async function fetchDesigns() {
@@ -73,6 +79,31 @@ export default function MyDesignsPage() {
     }
   };
 
+  const handleSetPrimary = async (design: Design) => {
+    if (!brandId) return;
+    setSettingPrimaryId(design.id);
+    try {
+      const result = await setPrimaryLogo(brandId, design.image_url);
+      if (result.success) {
+        toast({
+          title: "Primary logo updated",
+          description: "This logo is now the primary identity for your brand.",
+        });
+        router.refresh();
+      } else {
+        throw new Error(result.error || "Failed to update");
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: error instanceof Error ? error.message : "Failed to set primary logo",
+        variant: "destructive",
+      });
+    } finally {
+      setSettingPrimaryId(null);
+    }
+  };
+
   return (
     <div>
       <PageHeader
@@ -110,6 +141,9 @@ export default function MyDesignsPage() {
               date={new Date(design.createdAt).toLocaleDateString()}
               onDownload={() => handleDownload(design)}
               downloading={downloadingId === design.id}
+              onAction={design.brandId === brandId ? () => handleSetPrimary(design) : undefined}
+              actionLabel="Set as Primary"
+              actionLoading={settingPrimaryId === design.id}
               className="bg-card"
             />
           ))}
