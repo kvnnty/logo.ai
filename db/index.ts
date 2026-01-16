@@ -24,6 +24,7 @@ export async function ensureDbConnected(): Promise<void> {
 
 export interface ILogo {
   _id?: any;
+  brandId?: string;
   image_url: string;
   primary_color: string;
   background_color: string;
@@ -34,7 +35,8 @@ export interface ILogo {
 }
 
 export interface IBrandAsset {
-  type?: string;
+  category?: 'logo' | 'social_post' | 'social_story' | 'social_cover' | 'social_profile' | 'youtube_thumbnail' | 'marketing' | 'branding' | string;
+  subType?: string;
   imageUrl?: string;
   prompt?: string;
   createdAt?: Date;
@@ -55,6 +57,7 @@ export interface IBrand {
 
 const LogoSchema = new Schema(
   {
+    brandId: { type: String },
     image_url: { type: String, required: true },
     primary_color: { type: String, required: true },
     background_color: { type: String, required: true },
@@ -80,7 +83,8 @@ const BrandSchema = new Schema(
 
     // Stage 3 Output: Generated Assets
     assets: [{
-      type: { type: String }, // 'logo', 'social_post', 'business_card'
+      category: String, // 'logo', 'social_post', etc.
+      subType: String,
       imageUrl: String,
       prompt: String,
       createdAt: { type: Date, default: Date.now }

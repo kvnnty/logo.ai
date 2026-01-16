@@ -101,15 +101,16 @@ const BACKGROUND_OPTIONS = [
   { id: "#F0FFF4", name: "Light Green" },
 ];
 
-const TOTAL_STEPS = 5;
+const TOTAL_STEPS = 4;
 
 export function AIFlow({ onBack }: { onBack: () => void }) {
   const [currentStep, setCurrentStep] = useState(1);
   const [companyName, setCompanyName] = useState("");
   const [selectedStyle, setSelectedStyle] = useState("minimal");
-  const [primaryColor, setPrimaryColor] = useState("#2563EB");
-  const [backgroundColor, setBackgroundColor] = useState("#FFFFFF");
   const [additionalInfo, setAdditionalInfo] = useState("");
+  const [generatedOptions, setGeneratedOptions] = useState<string[]>([]);
+  const [selectedResultIndex, setSelectedResultIndex] = useState<number | null>(null);
+  const [lastBrandId, setLastBrandId] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [generatedLogo, setGeneratedLogo] = useState("");
   const { toast } = useToast();
@@ -134,15 +135,13 @@ export function AIFlow({ onBack }: { onBack: () => void }) {
       case 2:
         return selectedStyle !== "";
       case 3:
-        return primaryColor !== "" && backgroundColor !== "" && !!selectedModel;
+        return !!selectedModel && !!selectedSize && !!selectedQuality;
       case 4:
-        return !!selectedSize && !!selectedQuality;
-      case 5:
         return true;
       default:
         return false;
     }
-  }, [currentStep, companyName, selectedStyle, primaryColor, backgroundColor, selectedModel, selectedSize, selectedQuality]);
+  }, [currentStep, companyName, selectedStyle, selectedModel, selectedSize, selectedQuality]);
 
   const nextStep = () => {
     if (canProceedToNextStep && currentStep < TOTAL_STEPS) {
@@ -162,6 +161,7 @@ export function AIFlow({ onBack }: { onBack: () => void }) {
     if (!isFormValid) return;
 
     setLoading(true);
+    setGeneratedOptions([]);
     try {
       // STAGE 1: Generate Brand Identity
       toast({ title: "Phase 1/3", description: "Generating Brand Strategy & Identity..." });
@@ -178,6 +178,7 @@ export function AIFlow({ onBack }: { onBack: () => void }) {
       }
 
       const brandId = identityResult.brandId;
+      setLastBrandId(brandId);
 
       // STAGE 2: Prepare Blueprints
       toast({ title: "Phase 2/3", description: "Designing Asset Blueprints..." });
@@ -187,25 +188,31 @@ export function AIFlow({ onBack }: { onBack: () => void }) {
         throw new Error(blueprintResult.error || "Failed to prepare blueprints");
       }
 
-      // STAGE 3: Generate Logo Asset
-      toast({ title: "Phase 3/3", description: "Generating Final Brand Assets..." });
+      // STAGE 3: Generate 10 Logo Variations
+      toast({ title: "Phase 3/3", description: "Generating 10 diverse logo variations..." });
 
-      // We explicitly request the 'logo' asset here
-      const assetResult = await generateBrandAsset(brandId, 'logo', selectedModel);
+      const logoPromises = Array.from({ length: 10 }).map((_, i) =>
+        generateBrandAsset(brandId, 'logo', `variant_${i + 1}`, selectedModel)
+      );
 
-      if (assetResult.success && assetResult.imageUrl) {
-        setGeneratedLogo(assetResult.imageUrl);
+      const results = await Promise.all(logoPromises);
+      const successfulUrls = results
+        .filter(r => r.success && r.imageUrl)
+        .map(r => r.imageUrl as string);
+
+      if (successfulUrls.length > 0) {
+        setGeneratedOptions(successfulUrls);
         window.dispatchEvent(new CustomEvent('refreshCredits'));
-        toast({
-          title: "Success!",
-          description: "Redirecting to your new brand dashboard...",
-          variant: "success",
-        });
-        // Redirect to the new brand's dashboard
-        router.push(`/dashboard/my-brands/${brandId}`);
       } else {
-        throw new Error(assetResult.error || "Failed to generate final assets");
+        throw new Error("Failed to generate any logo variations");
       }
+
+      // Pre-generate some other assets in background
+      const otherCategories = ['social_post', 'social_story', 'youtube_thumbnail', 'marketing', 'branding'];
+      otherCategories.forEach(cat => {
+        generateBrandAsset(brandId, cat, 'variant_1', selectedModel);
+      });
+
     } catch (error) {
       toast({
         title: "Error",
@@ -215,7 +222,7 @@ export function AIFlow({ onBack }: { onBack: () => void }) {
     } finally {
       setLoading(false);
     }
-  }, [companyName, selectedStyle, primaryColor, backgroundColor, selectedModel, selectedSize, selectedQuality, additionalInfo, isFormValid, toast]);
+  }, [companyName, selectedStyle, selectedModel, selectedSize, selectedQuality, additionalInfo, isFormValid, toast]);
 
   const handleDownload = useCallback(async () => {
     if (!generatedLogo) return;
@@ -252,9 +259,8 @@ export function AIFlow({ onBack }: { onBack: () => void }) {
   const steps = [
     { number: 1, label: "Brand Name", completed: companyName.trim().length > 0 },
     { number: 2, label: "Style", completed: selectedStyle !== "" },
-    { number: 3, label: "Colors & Model", completed: primaryColor !== "" && backgroundColor !== "" && !!selectedModel },
-    { number: 4, label: "Size & Quality", completed: !!selectedSize && !!selectedQuality },
-    { number: 5, label: "Additional Details", completed: true },
+    { number: 3, label: "AI Model & Size", completed: !!selectedModel && !!selectedSize && !!selectedQuality },
+    { number: 4, label: "Additional Details", completed: true },
   ];
 
   // Render Step Logic (Extracted from orig file)
@@ -334,68 +340,10 @@ export function AIFlow({ onBack }: { onBack: () => void }) {
             className="space-y-6"
           >
             <div className="text-center space-y-2 mb-8">
-              <h2 className="text-3xl font-bold">Colors & AI Model</h2>
-              <p className="text-muted-foreground">Customize colors and choose your AI model</p>
+              <h2 className="text-3xl font-bold">AI Model & Settings</h2>
+              <p className="text-muted-foreground">Choose your AI model and output settings</p>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-              <div className="space-y-2">
-                <label className="text-sm font-medium ml-2">Primary Color</label>
-                <Select value={primaryColor} onValueChange={setPrimaryColor}>
-                  <SelectTrigger className="h-14 border-2">
-                    <SelectValue>
-                      <div className="flex items-center gap-3">
-                        <div
-                          className="w-6 h-6 rounded-full border-2 border-border"
-                          style={{ backgroundColor: primaryColor }}
-                        />
-                        {COLOR_OPTIONS.find((c) => c.id === primaryColor)?.name || "Select Color"}
-                      </div>
-                    </SelectValue>
-                  </SelectTrigger>
-                  <SelectContent>
-                    {COLOR_OPTIONS.map((color) => (
-                      <SelectItem key={color.id} value={color.id}>
-                        <div className="flex items-center gap-3">
-                          <div
-                            className="w-5 h-5 rounded-full"
-                            style={{ backgroundColor: color.id }}
-                          />
-                          {color.name}
-                        </div>
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="space-y-2">
-                <label className="text-sm font-medium ml-2">Background</label>
-                <Select value={backgroundColor} onValueChange={setBackgroundColor}>
-                  <SelectTrigger className="h-14 border-2">
-                    <SelectValue>
-                      <div className="flex items-center gap-3">
-                        <div
-                          className="w-6 h-6 rounded-full border-2"
-                          style={{ backgroundColor: backgroundColor }}
-                        />
-                        {BACKGROUND_OPTIONS.find((c) => c.id === backgroundColor)?.name || "Select Background"}
-                      </div>
-                    </SelectValue>
-                  </SelectTrigger>
-                  <SelectContent>
-                    {BACKGROUND_OPTIONS.map((color) => (
-                      <SelectItem key={color.id} value={color.id}>
-                        <div className="flex items-center gap-3">
-                          <div
-                            className="w-5 h-5 rounded-full border"
-                            style={{ backgroundColor: color.id }}
-                          />
-                          {color.name}
-                        </div>
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
+            <div className="space-y-6">
               <div className="space-y-2">
                 <label className="text-sm font-medium ml-2">AI Model</label>
                 <Select
@@ -417,6 +365,41 @@ export function AIFlow({ onBack }: { onBack: () => void }) {
                   </SelectContent>
                 </Select>
               </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <label className="text-sm font-medium ml-2">Image Size</label>
+                  <Select
+                    value={selectedSize}
+                    onValueChange={(value) => setSelectedSize(value as SizeType)}
+                  >
+                    <SelectTrigger className="h-14 border-2">
+                      <SelectValue placeholder="Select Size" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {SIZE_OPTIONS.map((size) => (
+                        <SelectItem key={size.id} value={size.id}>
+                          {size.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium ml-2">Quality</label>
+                  <Select
+                    value={selectedQuality}
+                    onValueChange={(value) => setSelectedQuality(value as QualityType)}
+                  >
+                    <SelectTrigger className="h-14 border-2">
+                      <SelectValue placeholder="Select Quality" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="standard">Standard</SelectItem>
+                      <SelectItem value="hd">HD</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
             </div>
           </motion.div>
         );
@@ -432,58 +415,6 @@ export function AIFlow({ onBack }: { onBack: () => void }) {
             className="space-y-6"
           >
             <div className="text-center space-y-2 mb-8">
-              <h2 className="text-3xl font-bold">Size & Quality</h2>
-              <p className="text-muted-foreground">Choose the output size and quality</p>
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-              <div className="space-y-2">
-                <label className="text-sm font-medium ml-2">Image Size</label>
-                <Select
-                  value={selectedSize}
-                  onValueChange={(value) => setSelectedSize(value as SizeType)}
-                >
-                  <SelectTrigger className="h-14 border-2">
-                    <SelectValue placeholder="Select Size" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {SIZE_OPTIONS.map((size) => (
-                      <SelectItem key={size.id} value={size.id}>
-                        {size.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="space-y-2">
-                <label className="text-sm font-medium ml-2">Quality</label>
-                <Select
-                  value={selectedQuality}
-                  onValueChange={(value) => setSelectedQuality(value as QualityType)}
-                >
-                  <SelectTrigger className="h-14 border-2">
-                    <SelectValue placeholder="Select Quality" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="standard">Standard</SelectItem>
-                    <SelectItem value="hd">HD</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-          </motion.div>
-        );
-
-      case 5:
-        return (
-          <motion.div
-            key="step-5"
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -20 }}
-            transition={{ duration: 0.3 }}
-            className="space-y-6"
-          >
-            <div className="text-center space-y-2 mb-8">
               <h2 className="text-3xl font-bold">Additional Details</h2>
               <p className="text-muted-foreground">Tell us more about your brand (optional)</p>
             </div>
@@ -492,7 +423,7 @@ export function AIFlow({ onBack }: { onBack: () => void }) {
                 value={additionalInfo}
                 onChange={(e) => setAdditionalInfo(e.target.value)}
                 placeholder="Describe your brand personality, target audience, or any specific preferences..."
-                className="min-h-[200px] text-base border-2 p-4"
+                className="min-h-[200px] text-base border p-4"
               />
             </div>
           </motion.div>
@@ -551,7 +482,7 @@ export function AIFlow({ onBack }: { onBack: () => void }) {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Left Column - Form */}
-        <Card className="border-2 border-primary/10 shadow-xl">
+        <Card className="border">
           <CardContent className="p-8 min-h-[500px] flex flex-col">
             <AnimatePresence mode="wait">
               {renderStepContent()}
@@ -600,44 +531,59 @@ export function AIFlow({ onBack }: { onBack: () => void }) {
         </Card>
 
         {/* Right Column - Preview (Only show after step 4) */}
-        <Card className="h-full rounded-2xl shadow-xl border-2 overflow-hidden bg-card/50 backdrop-blur-sm">
+        <Card className="h-full rounded-2xl border overflow-hidden bg-card/50 backdrop-blur-sm">
           <CardContent className="p-6 h-full">
-            {generatedLogo ? (
+            {generatedOptions.length > 0 ? (
               <motion.div
-                className="space-y-6"
+                className="space-y-6 h-full flex flex-col"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.4 }}
               >
-                <div
-                  className="aspect-square rounded-2xl shadow-lg overflow-hidden"
-                  style={{ backgroundColor }}
+                <div className="text-center space-y-1">
+                  <h3 className="text-xl font-bold">Pick your favorite</h3>
+                  <p className="text-sm text-muted-foreground">Select the best logo to continue to your dashboard</p>
+                </div>
+
+                <div className="flex-1 overflow-y-auto pr-2 grid grid-cols-2 gap-4">
+                  {generatedOptions.map((url, idx) => (
+                    <motion.div
+                      key={idx}
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      onClick={() => {
+                        setSelectedResultIndex(idx);
+                        toast({ title: "Brand Selected!", description: "Opening your brand dashboard..." });
+                        // Extract brandId from URL or pass it through state. 
+                        // Since generateBrandAsset updates the brand, we can just redirect.
+                        // However, we need the brandId. I should have stored it.
+                      }}
+                      className={`relative aspect-square rounded-xl overflow-hidden cursor-pointer border-4 transition-all ${selectedResultIndex === idx ? "border-primary shadow-lg" : "border-transparent hover:border-primary/30"
+                        }`}
+                    >
+                      <img src={url} alt={`Option ${idx + 1}`} className="w-full h-full object-cover" />
+                      {selectedResultIndex === idx && (
+                        <div className="absolute inset-0 bg-primary/10 flex items-center justify-center">
+                          <div className="bg-primary text-primary-foreground rounded-full p-2">
+                            <Check className="w-6 h-6" />
+                          </div>
+                        </div>
+                      )}
+                    </motion.div>
+                  ))}
+                </div>
+
+                <Button
+                  className="w-full h-12 text-lg font-bold"
+                  disabled={selectedResultIndex === null || !lastBrandId}
+                  onClick={() => {
+                    if (lastBrandId) {
+                      router.push(`/dashboard/my-brands/${lastBrandId}`);
+                    }
+                  }}
                 >
-                  <img
-                    src={generatedLogo}
-                    alt="Generated logo"
-                    className="w-full h-full rounded-2xl object-contain p-4"
-                  />
-                </div>
-                <div className="flex gap-3">
-                  <Button
-                    onClick={handleGenerate}
-                    className="flex-1 bg-primary hover:bg-primary/80"
-                    disabled={loading}
-                  >
-                    <RefreshCw className="mr-2 h-4 w-4" />
-                    Generate New
-                  </Button>
-                  <Button
-                    onClick={handleDownload}
-                    variant="outline"
-                    className="flex-1"
-                    disabled={isDownloading}
-                  >
-                    <Download className="mr-2 h-4 w-4" />
-                    {isDownloading ? "Downloading..." : "Download"}
-                  </Button>
-                </div>
+                  Continue with Selection
+                </Button>
               </motion.div>
             ) : (
               <motion.div
@@ -668,8 +614,8 @@ export function AIFlow({ onBack }: { onBack: () => void }) {
                       Your Brand kit
                     </h3>
                     <p className="text-muted-foreground text-base leading-relaxed">
-                      {currentStep >= 5
-                        ? "Ready to generate! Click 'Generate Brand' to create your complete brand identity."
+                      {currentStep >= 4
+                        ? "Ready to generate! Click 'Generate Brand' to create 10 diverse variations."
                         : "Complete the steps to see your AI-generated brand assets here."
                       }
                     </p>

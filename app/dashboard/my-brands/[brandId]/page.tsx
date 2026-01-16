@@ -84,12 +84,14 @@ export default function BrandDashboardPage() {
                   <div className="aspect-square bg-muted">
                     <img
                       src={asset.imageUrl}
-                      alt={`${brand.name} ${asset.type}`}
+                      alt={`${brand.name} ${asset.category}`}
                       className="w-full h-full object-cover"
                     />
                   </div>
                   <CardContent className="p-4">
-                    <p className="font-medium capitalize">{asset.type.replace("_", " ")}</p>
+                    <p className="font-medium capitalize">
+                      {asset.category?.replace("_", " ")} - {asset.subType?.replace("_", " ")}
+                    </p>
                     <p className="text-sm text-muted-foreground">
                       {new Date(asset.createdAt).toLocaleDateString()}
                     </p>

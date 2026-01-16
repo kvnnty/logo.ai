@@ -1,6 +1,6 @@
 "use client";
 
-import { IconSparkles, IconMenu2 } from "@tabler/icons-react";
+import { IconSparkles, IconMenu2, IconBrandAsana } from "@tabler/icons-react";
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { RefreshCw } from "lucide-react";
@@ -62,7 +62,12 @@ export default function DashboardTopbar({ onMenuClick }: DashboardTopbarProps) {
               <span>Generate</span>
             </Button>
           </Link>
-
+          <Link href="/dashboard/my-brands">
+            <Button variant="secondary">
+              <IconBrandAsana className="h-4 w-4" />
+              <span>My brands</span>
+            </Button>
+          </Link>
           {/* Credits UI - Responsive */}
           <div className="flex items-center gap-2 px-2 py-2 rounded-xl bg-primary/10 border border-primary/20 h-9">
             <IconSparkles className="h-4 w-4 text-primary" />
