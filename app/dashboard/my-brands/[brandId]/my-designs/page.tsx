@@ -10,6 +10,7 @@ import { useParams, useRouter } from "next/navigation";
 import { checkHistory, downloadImage, setPrimaryLogo } from "@/app/actions/actions";
 import { useToast } from "@/hooks/use-toast";
 import { Skeleton } from "@/components/ui/skeleton";
+import { formatDistanceToNowStrict } from "date-fns";
 
 interface Design {
   id: string;
@@ -135,10 +136,10 @@ export default function MyDesignsPage() {
           {designs.map((design) => (
             <AssetCard
               key={design.id}
-              title={`Brand Logo ${new Date(design.createdAt).toLocaleDateString()}`}
+              title={`Logo ${formatDistanceToNowStrict(new Date(design.createdAt), { addSuffix: true })}`}
               description="Generated Logo"
               imageUrl={design.image_url}
-              date={new Date(design.createdAt).toLocaleDateString()}
+              date={formatDistanceToNowStrict(new Date(design.createdAt), { addSuffix: true })}
               onDownload={() => handleDownload(design)}
               downloading={downloadingId === design.id}
               onAction={design.brandId === brandId ? () => handleSetPrimary(design) : undefined}

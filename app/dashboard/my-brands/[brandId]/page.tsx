@@ -8,6 +8,8 @@ import { motion } from "framer-motion";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { EditBrandDialog } from "@/components/dashboard/shared/edit-brand-dialog";
+import { formatDistanceToNowStrict } from "date-fns";
+import Link from "next/link";
 
 export default function BrandDashboardPage() {
   const brand = useBrand();
@@ -96,7 +98,7 @@ export default function BrandDashboardPage() {
           <CardHeader className="pb-2">
             <CardDescription>Created</CardDescription>
             <CardTitle className="text-lg">
-              {new Date(brand.createdAt).toLocaleDateString()}
+              {formatDistanceToNowStrict(new Date(brand.createdAt), { addSuffix: true })}
             </CardTitle>
           </CardHeader>
         </Card>
@@ -196,35 +198,36 @@ export default function BrandDashboardPage() {
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: index * 0.05 }}
-                  onClick={() => router.push(item.href)}
                 >
-                  <Card className="overflow-hidden border shadow-none hover:border-primary/50 transition-all group cursor-pointer bg-white rounded-2xl">
-                    <div className="aspect-[16/10] bg-muted relative overflow-hidden">
-                      {sampleAsset ? (
-                        <img
-                          src={sampleAsset.imageUrl}
-                          alt={item.title}
-                          className="w-full h-full object-cover transition-transform group-hover:scale-105 duration-500"
-                        />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center bg-primary/5">
-                          <ImageIcon className="h-6 w-6 text-primary/20" />
+                  <Link href={item.href}>
+                    <Card className="overflow-hidden border shadow-none hover:border-primary/50 transition-all group cursor-pointer bg-white rounded-2xl">
+                      <div className="aspect-[16/10] bg-muted relative overflow-hidden">
+                        {sampleAsset ? (
+                          <img
+                            src={sampleAsset.imageUrl}
+                            alt={item.title}
+                            className="w-full h-full object-cover transition-transform group-hover:scale-105 duration-500"
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center bg-primary/5">
+                            <ImageIcon className="h-6 w-6 text-primary/20" />
+                          </div>
+                        )}
+                        <div className="absolute top-3 right-3 bg-white/90 backdrop-blur-md px-2 py-1 rounded-lg text-[10px] font-bold text-primary shadow-sm">
+                          {item.count}
                         </div>
-                      )}
-                      <div className="absolute top-3 right-3 bg-white/90 backdrop-blur-md px-2 py-1 rounded-lg text-[10px] font-bold text-primary shadow-sm">
-                        {item.count}
                       </div>
-                    </div>
-                    <CardContent className="p-4 bg-white">
-                      <div className="flex items-center justify-between mb-1">
-                        <h3 className="font-bold text-sm tracking-tight">{item.title}</h3>
-                        <ArrowRight className="h-3 w-3 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
-                      </div>
-                      <p className="text-[11px] text-muted-foreground leading-relaxed">
-                        {item.description}
-                      </p>
-                    </CardContent>
-                  </Card>
+                      <CardContent className="p-4 bg-white">
+                        <div className="flex items-center justify-between mb-1">
+                          <h3 className="font-bold text-sm tracking-tight">{item.title}</h3>
+                          <ArrowRight className="h-3 w-3 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+                        </div>
+                        <p className="text-[11px] text-muted-foreground leading-relaxed">
+                          {item.description}
+                        </p>
+                      </CardContent>
+                    </Card>
+                  </Link>
                 </motion.div>
               );
             })}
@@ -251,70 +254,73 @@ export default function BrandDashboardPage() {
             </div>
           </CardContent>
         </Card>
-      )}
+      )
+      }
 
       {/* Brand Identity / Color Strategy */}
-      {brand.identity && (
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          <Card className="lg:col-span-2 rounded-3xl border shadow-sm overflow-hidden">
-            <CardHeader className="bg-muted/30 pb-6">
-              <CardTitle className="flex items-center gap-2">
-                <Palette className="h-5 w-5 text-primary" />
-                Visual Guidelines
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="p-8">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <div className="space-y-4">
-                  <h4 className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Core Palette</h4>
-                  <div className="flex flex-wrap gap-4">
-                    <div className="space-y-2">
-                      <div className="w-20 h-20 rounded-2xl shadow-inner border border-black/5" style={{ backgroundColor: brand.identity.primary_color }} />
-                      <p className="text-xs font-mono text-center">{brand.identity.primary_color}</p>
-                    </div>
-                    <div className="space-y-2">
-                      <div className="w-20 h-20 rounded-2xl shadow-inner border border-black/5" style={{ backgroundColor: brand.identity.secondary_color }} />
-                      <p className="text-xs font-mono text-center">{brand.identity.secondary_color}</p>
-                    </div>
-                    {brand.identity.accent_color && (
+      {
+        brand.identity && (
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <Card className="lg:col-span-2 rounded-3xl border shadow-sm overflow-hidden">
+              <CardHeader className="bg-muted/30 pb-6">
+                <CardTitle className="flex items-center gap-2">
+                  <Palette className="h-5 w-5 text-primary" />
+                  Visual Guidelines
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="p-8">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                  <div className="space-y-4">
+                    <h4 className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Core Palette</h4>
+                    <div className="flex flex-wrap gap-4">
                       <div className="space-y-2">
-                        <div className="w-20 h-20 rounded-2xl shadow-inner border border-black/5" style={{ backgroundColor: brand.identity.accent_color }} />
-                        <p className="text-xs font-mono text-center">{brand.identity.accent_color}</p>
+                        <div className="w-20 h-20 rounded-2xl shadow-inner border border-black/5" style={{ backgroundColor: brand.identity.primary_color }} />
+                        <p className="text-xs font-mono text-center">{brand.identity.primary_color}</p>
                       </div>
-                    )}
+                      <div className="space-y-2">
+                        <div className="w-20 h-20 rounded-2xl shadow-inner border border-black/5" style={{ backgroundColor: brand.identity.secondary_color }} />
+                        <p className="text-xs font-mono text-center">{brand.identity.secondary_color}</p>
+                      </div>
+                      {brand.identity.accent_color && (
+                        <div className="space-y-2">
+                          <div className="w-20 h-20 rounded-2xl shadow-inner border border-black/5" style={{ backgroundColor: brand.identity.accent_color }} />
+                          <p className="text-xs font-mono text-center">{brand.identity.accent_color}</p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                  <div className="space-y-4">
+                    <h4 className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Typography & Rules</h4>
+                    <p className="text-sm leading-relaxed text-muted-foreground italic">
+                      "{brand.identity.visual_style_rules}"
+                    </p>
                   </div>
                 </div>
-                <div className="space-y-4">
-                  <h4 className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Typography & Rules</h4>
-                  <p className="text-sm leading-relaxed text-muted-foreground italic">
-                    "{brand.identity.visual_style_rules}"
-                  </p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
 
-          <Card className="rounded-3xl border shadow-sm bg-primary/5 border-primary/10">
-            <CardHeader>
-              <CardTitle className="text-lg">Quick Summary</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex items-center justify-between text-sm py-2 border-b border-primary/10">
-                <span className="text-muted-foreground">Archetype</span>
-                <span className="font-bold capitalize">{brand.strategy?.archetype || "N/A"}</span>
-              </div>
-              <div className="flex items-center justify-between text-sm py-2 border-b border-primary/10">
-                <span className="text-muted-foreground">Assets</span>
-                <span className="font-bold">{brand.assets?.length || 0}</span>
-              </div>
-              <div className="flex items-center justify-between text-sm py-2">
-                <span className="text-muted-foreground">Style</span>
-                <span className="font-bold capitalize">{brand.identity?.visual_style || "Minimal"}</span>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      )}
-    </div>
+            <Card className="rounded-3xl border shadow-sm bg-primary/5 border-primary/10">
+              <CardHeader>
+                <CardTitle className="text-lg">Quick Summary</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="flex items-center justify-between text-sm py-2 border-b border-primary/10">
+                  <span className="text-muted-foreground">Archetype</span>
+                  <span className="font-bold capitalize">{brand.strategy?.archetype || "N/A"}</span>
+                </div>
+                <div className="flex items-center justify-between text-sm py-2 border-b border-primary/10">
+                  <span className="text-muted-foreground">Assets</span>
+                  <span className="font-bold">{brand.assets?.length || 0}</span>
+                </div>
+                <div className="flex items-center justify-between text-sm py-2">
+                  <span className="text-muted-foreground">Style</span>
+                  <span className="font-bold capitalize">{brand.identity?.visual_style || "Minimal"}</span>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        )
+      }
+    </div >
   );
 }

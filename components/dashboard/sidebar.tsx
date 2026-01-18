@@ -26,7 +26,6 @@ interface NavItem {
   items?: { title: string; href: string }[];
 }
 
-// Function to generate nav items with brand-aware routes
 function getNavItems(brandId?: string): NavItem[] {
   const brandPrefix = brandId ? `/dashboard/my-brands/${brandId}` : '/dashboard';
 

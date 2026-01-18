@@ -7,6 +7,8 @@ import { deleteBrand, getUserBrands } from "@/app/actions/actions";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { motion } from "framer-motion";
+import Link from "next/link";
+import { formatDistanceToNowStrict } from "date-fns";
 
 interface BrandSummary {
   _id: string;
@@ -71,11 +73,13 @@ export default function BrandsPage() {
           </p>
         </div>
         <Button
-          onClick={() => router.push("/dashboard/my-brands/create")}
+          asChild
           className="flex items-center gap-2"
         >
-          <Plus className="h-4 w-4" />
-          Create New Brand
+          <Link href="/dashboard/my-brands/create">
+            <Plus className="h-4 w-4" />
+            Create New Brand
+          </Link>
         </Button>
       </div>
 
@@ -93,9 +97,11 @@ export default function BrandsPage() {
             <p className="text-muted-foreground mb-6 max-w-md">
               Create your first brand to get started with AI-powered brand identity generation.
             </p>
-            <Button onClick={() => router.push("/dashboard/my-brands/create")} size="lg">
-              <Plus className="mr-2 h-5 w-5" />
-              Create Your First Brand
+            <Button asChild size="lg">
+              <Link href="/dashboard/my-brands/create">
+                <Plus className="mr-2 h-5 w-5" />
+                Create Your First Brand
+              </Link>
             </Button>
           </CardContent>
         </Card>
@@ -108,52 +114,51 @@ export default function BrandsPage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.1 }}
             >
-              <Card
-                className="cursor-pointer transition-all hover:border-primary/50 group"
-                onClick={() => router.push(`/dashboard/my-brands/${brand._id}`)}
-              >
-                <CardHeader className="relative">
-                  {brand.primaryLogoUrl ? (
-                    <div className="w-full h-48 rounded-xl border bg-white p-2 flex items-center justify-center shadow-sm group-hover:border-primary/50 transition-colors">
-                      <img
-                        src={brand.primaryLogoUrl}
-                        alt={brand.name}
-                        className="max-w-full max-h-full object-cover"
-                      />
+              <Link href={`/dashboard/my-brands/${brand._id}`}>
+                <Card className="cursor-pointer transition-all hover:border-primary/50 group">
+                  <CardHeader className="relative">
+                    {brand.primaryLogoUrl ? (
+                      <div className="w-full h-48 rounded-xl border bg-white p-2 flex items-center justify-center shadow-sm group-hover:border-primary/50 transition-colors">
+                        <img
+                          src={brand.primaryLogoUrl}
+                          alt={brand.name}
+                          className="max-w-full max-h-full object-cover"
+                        />
+                      </div>
+                    ) : (
+                      <div className="w-full h-48 rounded-xl bg-primary/5 border border-dashed flex items-center justify-center">
+                        <Sparkles className="h-6 w-6 text-primary/40" />
+                      </div>
+                    )}
+                    <div className="flex items-start justify-between mt-4">
+                      <div className="space-y-1">
+                        <CardTitle className="flex items-center justify-between w-full">
+                          <span className="flex items-center gap-2">
+                            {brand.name}
+                            <ArrowRight className="h-4 w-4 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
+                          </span>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8 text-muted-foreground hover:text-destructive hover:bg-destructive/10 opacity-0 group-hover:opacity-100 transition-opacity"
+                            onClick={(e) => handleDelete(e, brand._id, brand.name)}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </CardTitle>
+                      </div>
                     </div>
-                  ) : (
-                    <div className="w-full h-48 rounded-xl bg-primary/5 border border-dashed flex items-center justify-center">
-                      <Sparkles className="h-6 w-6 text-primary/40" />
+                  </CardHeader>
+                  <CardContent>
+                    <div className="flex items-center justify-between text-sm text-muted-foreground">
+                      <span>{brand.assetCount} assets</span>
+                      <span>
+                        {formatDistanceToNowStrict(new Date(brand.createdAt), { addSuffix: true })}
+                      </span>
                     </div>
-                  )}
-                  <div className="flex items-start justify-between mt-4">
-                    <div className="space-y-1">
-                      <CardTitle className="flex items-center justify-between w-full">
-                        <span className="flex items-center gap-2">
-                          {brand.name}
-                          <ArrowRight className="h-4 w-4 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
-                        </span>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-8 w-8 text-muted-foreground hover:text-destructive hover:bg-destructive/10 opacity-0 group-hover:opacity-100 transition-opacity"
-                          onClick={(e) => handleDelete(e, brand._id, brand.name)}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </CardTitle>
-                    </div>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="flex items-center justify-between text-sm text-muted-foreground">
-                    <span>{brand.assetCount} assets</span>
-                    <span>
-                      {new Date(brand.createdAt).toLocaleDateString()}
-                    </span>
-                  </div>
-                </CardContent>
-              </Card>
+                  </CardContent>
+                </Card>
+              </Link>
             </motion.div>
           ))}
         </div>
