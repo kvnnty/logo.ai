@@ -35,9 +35,9 @@ export function PageHeader({
             Back
           </Button>
         )}
-        <h2 className="text-3xl font-bold tracking-tight">{heading}</h2>
+        <h2 className="text-xl font-bold tracking-tight">{heading}</h2>
         {description && (
-          <p className="text-muted-foreground">
+          <p className="text-sm text-muted-foreground">
             {description}
           </p>
         )}

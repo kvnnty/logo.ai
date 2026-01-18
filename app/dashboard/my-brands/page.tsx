@@ -2,10 +2,10 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { getUserBrands } from "@/app/actions/actions";
+import { Plus, Sparkles, RefreshCw, ArrowRight, Trash2 } from "lucide-react";
+import { deleteBrand, getUserBrands } from "@/app/actions/actions";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Plus, Sparkles, RefreshCw, ArrowRight } from "lucide-react";
 import { motion } from "framer-motion";
 
 interface BrandSummary {
@@ -22,16 +22,35 @@ export default function BrandsPage() {
   const [loading, setLoading] = useState(true);
   const router = useRouter();
 
-  useEffect(() => {
-    async function fetchBrands() {
-      const result = await getUserBrands();
-      if (result.success) {
-        setBrands(result.brands);
-      }
-      setLoading(false);
+  async function fetchBrands() {
+    setLoading(true);
+    const result = await getUserBrands();
+    if (result.success) {
+      setBrands(result.brands);
     }
+    setLoading(false);
+  }
+
+  useEffect(() => {
     fetchBrands();
   }, []);
+
+  const handleDelete = async (e: React.MouseEvent, brandId: string, brandName: string) => {
+    e.stopPropagation();
+    if (window.confirm(`Are you sure you want to delete "${brandName}"? This will remove all associated assets and cannot be undone.`)) {
+      try {
+        const result = await deleteBrand(brandId);
+        if (result.success) {
+          fetchBrands();
+        } else {
+          alert(result.error || "Failed to delete brand");
+        }
+      } catch (error) {
+        console.error("Delete error:", error);
+        alert("An unexpected error occurred");
+      }
+    }
+  };
 
   if (loading) {
     return (
@@ -46,8 +65,8 @@ export default function BrandsPage() {
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-4xl font-bold">My Brands</h1>
-          <p className="text-muted-foreground mt-2">
+          <h1 className="text-2xl font-bold tracking-tight">My Brands</h1>
+          <p className="text-sm text-muted-foreground mt-1">
             Select a brand to manage, or create a new one.
           </p>
         </div>
@@ -109,9 +128,19 @@ export default function BrandsPage() {
                   )}
                   <div className="flex items-start justify-between mt-4">
                     <div className="space-y-1">
-                      <CardTitle className="flex items-center gap-2">
-                        {brand.name}
-                        <ArrowRight className="h-4 w-4 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
+                      <CardTitle className="flex items-center justify-between w-full">
+                        <span className="flex items-center gap-2">
+                          {brand.name}
+                          <ArrowRight className="h-4 w-4 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
+                        </span>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8 text-muted-foreground hover:text-destructive hover:bg-destructive/10 opacity-0 group-hover:opacity-100 transition-opacity"
+                          onClick={(e) => handleDelete(e, brand._id, brand.name)}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
                       </CardTitle>
                     </div>
                   </div>

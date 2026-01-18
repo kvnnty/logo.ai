@@ -2,6 +2,7 @@
 
 import Navbar from "@/components/landing/navbar";
 import Hero from "@/components/landing/hero";
+import BrandKitShowcase from "@/components/landing/brand-kit-showcase";
 import Features from "@/components/landing/features";
 import LogoShowcase from "@/components/landing/logo-showcase";
 import Footer from "@/components/landing/footer";
@@ -17,6 +18,7 @@ const Index = () => {
           </div>
           <Navbar />
           <Hero />
+          <BrandKitShowcase />
         </div>
 
         <main className="max-w-6xl mx-auto relative z-10">

@@ -539,6 +539,33 @@ export async function updateBrand(brandId: string, updates: {
   }
 }
 
+export async function deleteBrand(brandId: string) {
+  'use server';
+  try {
+    const user = await currentUser();
+    if (!user) return { success: false, error: 'Not authenticated' };
+
+    await ensureDbConnected();
+
+    // 1. Double check ownership
+    const brand = await Brand.findOne({ _id: brandId, userId: user.id });
+    if (!brand) {
+      return { success: false, error: 'Brand not found or access denied' };
+    }
+
+    // 2. Delete associated logos from the Logo collection
+    await Logo.deleteMany({ brandId: brandId });
+
+    // 3. Delete the brand itself
+    await Brand.deleteOne({ _id: brandId, userId: user.id });
+
+    return { success: true };
+  } catch (error) {
+    console.error('Error deleting brand:', error);
+    return { success: false, error: 'Failed to delete brand' };
+  }
+}
+
 export async function getBrandBlueprints(brandId: string) {
   'use server';
   try {
