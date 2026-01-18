@@ -398,6 +398,8 @@ export async function getUserBrands() {
           updatedAt: b.updatedAt ? new Date(b.updatedAt).toISOString() : new Date().toISOString(),
           assetCount: b.assets?.length || 0,
           primaryLogoUrl: primaryLogo?.imageUrl || null,
+          industry: b.industry || '',
+          contactInfo: b.contactInfo || {},
         };
       }),
     };
@@ -436,6 +438,8 @@ export async function getBrandById(brandId: string) {
       })),
       createdAt: brand.createdAt ? new Date(brand.createdAt).toISOString() : new Date().toISOString(),
       updatedAt: brand.updatedAt ? new Date(brand.updatedAt).toISOString() : new Date().toISOString(),
+      industry: brand.industry || '',
+      contactInfo: brand.contactInfo || {},
     };
 
     return {
@@ -756,6 +760,58 @@ export async function createStripeCheckoutSession(planId: string) {
   } catch (error) {
     console.error('Error creating checkout session:', error);
     return { success: false, error: 'Failed to create checkout session' };
+  }
+}
+
+export async function updateBrandDetails(brandId: string, details: {
+  industry?: string;
+  contactInfo?: {
+    website?: string;
+    email?: string;
+    phone?: string;
+    address?: string;
+    mobile?: string;
+    facebook?: string;
+    instagram?: string;
+    twitter?: string;
+  }
+}) {
+  'use server';
+  try {
+    const user = await currentUser();
+    if (!user) return { success: false, error: 'Not authenticated' };
+
+    await ensureDbConnected();
+
+    console.log(`[updateBrandDetails] Updating brand ${brandId}. Details:`, JSON.stringify(details, null, 2));
+
+    const update: any = {};
+    if (details.industry !== undefined) update.industry = details.industry;
+    if (details.contactInfo !== undefined) {
+      // Use dot notation for nested object updates to avoid overwriting the whole object if not intended,
+      // though here we are replacing/merging. Since we receive the full contactInfo object usually, 
+      // we can set the fields.
+      Object.keys(details.contactInfo).forEach(key => {
+        update[`contactInfo.${key}`] = (details.contactInfo as any)[key];
+      });
+    }
+
+    const updatedBrand = await Brand.findOneAndUpdate(
+      { _id: brandId, userId: user.id },
+      { $set: update },
+      { new: true, upsert: false }
+    );
+
+    if (!updatedBrand) {
+      console.warn(`[updateBrandDetails] Brand not found or unauthorized: ${brandId}`);
+      return { success: false, error: 'Brand not found' };
+    }
+
+    console.log(`[updateBrandDetails] Success. Industry: ${updatedBrand.industry}, Email: ${updatedBrand.contactInfo?.email}`);
+    return { success: true };
+  } catch (error) {
+    console.error('Error updating brand details:', error);
+    return { success: false, error: 'Failed to update brand details' };
   }
 }
 

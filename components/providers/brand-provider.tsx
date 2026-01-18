@@ -18,6 +18,17 @@ export interface BrandContextType {
   }>;
   createdAt: string | Date;
   updatedAt: string | Date;
+  industry?: string;
+  contactInfo?: {
+    website?: string;
+    email?: string;
+    phone?: string;
+    address?: string;
+    mobile?: string;
+    facebook?: string;
+    instagram?: string;
+    twitter?: string;
+  };
 }
 
 const BrandContext = createContext<BrandContextType | null>(null);
