@@ -51,7 +51,7 @@ export function AssetCard({
   };
 
   return (
-    <Card className={cn("overflow-hidden group hover:border-primary/50 transition-all duration-300 border shadow-none", className)}>
+    <Card className={cn("overflow-hidden group hover:shadow-lg transition-all duration-300 border-2", className)}>
       <div className={cn("relative overflow-hidden bg-muted/20", aspectRatioClass[aspectRatio])}>
         <Image
           src={imageUrl}
@@ -82,9 +82,9 @@ export function AssetCard({
       <CardContent className="p-4">
         <div className="flex justify-between items-start">
           <div className="space-y-1">
-            <h3 className="font-bold text-sm leading-none truncate pr-4" title={title}>{title}</h3>
-            {description && <p className="text-[11px] text-muted-foreground line-clamp-1">{description}</p>}
-            {date && <p className="text-[10px] text-muted-foreground pt-1">{date}</p>}
+            <h3 className="font-semibold leading-none truncate pr-4" title={title}>{title}</h3>
+            {description && <p className="text-sm text-muted-foreground line-clamp-1">{description}</p>}
+            {date && <p className="text-xs text-muted-foreground pt-1">{date}</p>}
           </div>
 
           <DropdownMenu>
