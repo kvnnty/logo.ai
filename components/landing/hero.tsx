@@ -30,12 +30,12 @@ export default function Hero() {
               className="space-y-6"
             >
               <div className="space-y-4">
-                <h1 className="text-3xl sm:text-4xl lg:text-5xl font-light text-foreground leading-tight tracking-tight">
+                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-foreground leading-tight tracking-tight">
                   <span className="block">Create Professional</span>
                   <span className="block">Logos Instantly</span>
                 </h1>
-                <p className="text-lg sm:text-xl text-muted-foreground leading-relaxed max-w-lg">
-                  Enter your company name, choose your style and preferences, and watch our AI create a unique logo in seconds.
+                <p className="text-base sm:text-lg text-muted-foreground leading-relaxed max-w-lg">
+                  Enter your company name, choose your style and watch our AI create a unique logo & brand kit in seconds.
                 </p>
               </div>
 

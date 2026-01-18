@@ -21,11 +21,11 @@ export default function BrandDashboardPage() {
     <div className="space-y-8 pb-12">
       {/* Brand Overview */}
       <div className="flex items-start justify-between bg-white p-8 rounded-3xl border shadow-sm">
-        <div className="space-y-4">
+        <div className="space-y-2">
           <div>
-            <h1 className="text-4xl font-bold tracking-tight">{brand.name}</h1>
+            <h1 className="text-2xl font-bold tracking-tight">{brand.name}</h1>
             {brand.description && (
-              <p className="text-muted-foreground mt-2 max-w-2xl text-lg leading-relaxed">
+              <p className="text-muted-foreground mt-1 max-w-2xl text-sm leading-relaxed">
                 {brand.description}
               </p>
             )}
@@ -106,42 +106,128 @@ export default function BrandDashboardPage() {
       {brand.assets && brand.assets.length > 0 ? (
         <div className="space-y-6">
           <div className="flex items-center justify-between">
-            <div className="space-y-1">
-              <h2 className="text-2xl font-bold tracking-tight">Brand Kit Highlights</h2>
-              <p className="text-muted-foreground">A curated selection of your brand's core visual assets.</p>
+            <div className="space-y-0.5">
+              <h2 className="text-lg font-bold tracking-tight">Your Brand Kit</h2>
+              <p className="text-xs text-muted-foreground">Complete branding assets generated for your identity.</p>
             </div>
             <Button variant="ghost" className="text-primary hover:text-primary/80 group">
               View full kit <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
             </Button>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            {brand.assets.slice(0, 8).map((asset, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.05 }}
-              >
-                <Card className="overflow-hidden border-none shadow-sm hover:shadow-md transition-all group cursor-pointer bg-white rounded-2xl">
-                  <div className="aspect-[4/3] bg-muted relative">
-                    <img
-                      src={asset.imageUrl}
-                      alt={`${brand.name} ${asset.category}`}
-                      className="w-full h-full object-cover transition-transform group-hover:scale-105 duration-500"
-                    />
-                    <div className="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity" />
-                  </div>
-                  <CardContent className="p-4 bg-white">
-                    <p className="font-bold text-sm tracking-tight capitalize mb-0.5">
-                      {asset.category?.replace("_", " ")}
-                    </p>
-                    <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-widest">
-                      {asset.subType?.replace("_", " ")}
-                    </p>
-                  </CardContent>
-                </Card>
-              </motion.div>
-            ))}
+            {[
+              {
+                id: "social-stories",
+                title: "Social Stories",
+                count: "+100",
+                description: "Customizable story templates",
+                category: "social_story",
+                href: `/dashboard/my-brands/${brand._id}/social/social-stories`,
+              },
+              {
+                id: "social-posts",
+                title: "Social Posts",
+                count: "+100",
+                description: "Ready-to-post designs",
+                category: "social_post",
+                href: `/dashboard/my-brands/${brand._id}/social/social-posts`,
+              },
+              {
+                id: "social-covers-profiles",
+                title: "Covers & Profiles",
+                count: "+30",
+                description: "Brand-aligned headers & icons",
+                category: "social_cover", // mapped to covers
+                href: `/dashboard/my-brands/${brand._id}/social/social-covers-profiles`,
+              },
+              {
+                id: "youtube-thumbnails",
+                title: "YouTube Thumbnails",
+                count: "+50",
+                description: "Eye-catching thumbnails",
+                category: "youtube_thumbnail",
+                href: `/dashboard/my-brands/${brand._id}/social/youtube-thumbnails`,
+              },
+              {
+                id: "business-cards",
+                title: "Business Cards",
+                count: "+50",
+                description: "Professional business cards",
+                category: "branding",
+                href: `/dashboard/my-brands/${brand._id}/branding/business-cards`,
+              },
+              {
+                id: "letterheads",
+                title: "Letterheads",
+                count: "+50",
+                description: "Letterheads (Microsoft Word)",
+                category: "branding",
+                href: `/dashboard/my-brands/${brand._id}/branding/letterheads`,
+              },
+              {
+                id: "ads",
+                title: "Marketing Ads",
+                count: "+50",
+                description: "High-conversion ads",
+                category: "marketing",
+                href: `/dashboard/my-brands/${brand._id}/marketing/ads`,
+              },
+              {
+                id: "flyers",
+                title: "Flyers & Brochures",
+                count: "+50",
+                description: "Print-ready layouts",
+                category: "marketing",
+                href: `/dashboard/my-brands/${brand._id}/marketing/flyers`,
+              },
+            ].map((item, index) => {
+              // Find a sample asset for this category if it exists
+              const sampleAsset = brand.assets?.find((a: any) =>
+                a.category === item.category ||
+                (item.id === "social-stories" && a.category === "social_story") ||
+                (item.id === "social-posts" && a.category === "social_post") ||
+                (item.id === "flyers" && a.subType?.includes("flyer")) ||
+                (item.id === "ads" && a.subType?.includes("ad"))
+              );
+
+              return (
+                <motion.div
+                  key={item.id}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.05 }}
+                  onClick={() => router.push(item.href)}
+                >
+                  <Card className="overflow-hidden border shadow-none hover:border-primary/50 transition-all group cursor-pointer bg-white rounded-2xl">
+                    <div className="aspect-[16/10] bg-muted relative overflow-hidden">
+                      {sampleAsset ? (
+                        <img
+                          src={sampleAsset.imageUrl}
+                          alt={item.title}
+                          className="w-full h-full object-cover transition-transform group-hover:scale-105 duration-500"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center bg-primary/5">
+                          <ImageIcon className="h-6 w-6 text-primary/20" />
+                        </div>
+                      )}
+                      <div className="absolute top-3 right-3 bg-white/90 backdrop-blur-md px-2 py-1 rounded-lg text-[10px] font-bold text-primary shadow-sm">
+                        {item.count}
+                      </div>
+                    </div>
+                    <CardContent className="p-4 bg-white">
+                      <div className="flex items-center justify-between mb-1">
+                        <h3 className="font-bold text-sm tracking-tight">{item.title}</h3>
+                        <ArrowRight className="h-3 w-3 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+                      </div>
+                      <p className="text-[11px] text-muted-foreground leading-relaxed">
+                        {item.description}
+                      </p>
+                    </CardContent>
+                  </Card>
+                </motion.div>
+              );
+            })}
           </div>
         </div>
       ) : (

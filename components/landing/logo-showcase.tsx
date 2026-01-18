@@ -9,10 +9,10 @@ export default function LogoShowcase() {
           <p className="text-sm md:text-base text-muted-foreground mb-2">
             No design skills required
           </p>
-          <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-foreground mb-4">
+          <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-foreground mb-4">
             Easy to use, beautiful results.
           </h2>
-          <p className="text-base md:text-lg text-muted-foreground max-w-2xl mx-auto mb-4">
+          <p className="text-sm md:text-base text-muted-foreground max-w-xl mx-auto mb-4">
             Powered by AI, LogoAIpro helps business owners create beautiful logos.
           </p>
           <div className="w-24 h-1 bg-primary mx-auto rounded-full mb-8"></div>

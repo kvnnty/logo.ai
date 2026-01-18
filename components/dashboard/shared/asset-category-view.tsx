@@ -132,24 +132,24 @@ export function AssetCategoryView({
           }
 
           return (
-            <Card key={blueprint.subType} className="border-dashed border-2 flex flex-col items-center justify-center p-6 text-center group hover:border-primary/50 transition-colors">
-              <div className="mb-4 p-4 rounded-full bg-primary/5 text-primary group-hover:bg-primary/10 transition-colors">
-                <Sparkles className="w-8 h-8" />
+            <Card key={blueprint.subType} className="border-dashed border-2 flex flex-col items-center justify-center p-6 text-center group hover:border-primary/50 transition-colors bg-white shadow-none rounded-2xl">
+              <div className="mb-4 p-4 rounded-xl bg-primary/5 text-primary group-hover:bg-primary/10 transition-colors">
+                <Sparkles className="w-6 h-6" />
               </div>
-              <h3 className="font-semibold capitalize mb-1">{blueprint.subType.replace("_", " ")}</h3>
-              <p className="text-xs text-muted-foreground mb-6 line-clamp-2 px-4 italic">
+              <h3 className="font-bold text-sm capitalize mb-1">{blueprint.subType.replace("_", " ")}</h3>
+              <p className="text-[10px] text-muted-foreground mb-4 line-clamp-2 px-4 italic leading-relaxed">
                 {blueprint.prompt}
               </p>
               <Button
                 onClick={() => handleGenerate(blueprint.subType)}
                 disabled={generatingId === blueprint.subType}
-                className="w-full"
+                className="w-full h-9 text-xs rounded-xl"
                 variant="secondary"
               >
                 {generatingId === blueprint.subType ? (
-                  <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
+                  <RefreshCw className="w-3 h-3 mr-2 animate-spin" />
                 ) : (
-                  <Sparkles className="w-4 h-4 mr-2" />
+                  <Sparkles className="w-3 h-3 mr-2" />
                 )}
                 Generate Item
               </Button>
