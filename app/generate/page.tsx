@@ -6,12 +6,12 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import Link from "next/link";
-import { 
-  Palette, 
-  Download, 
-  RefreshCw, 
-  ChevronRight, 
-  ChevronLeft, 
+import {
+  Palette,
+  Download,
+  RefreshCw,
+  ChevronRight,
+  ChevronLeft,
   Check,
   Circle,
   Monitor,
@@ -154,7 +154,7 @@ export default function Home() {
   const { toast } = useToast();
 
   const [isDownloading, setIsDownloading] = useState(false);
-  
+
   const isFormValid = useMemo(() => {
     return companyName.trim().length > 0;
   }, [companyName]);
@@ -190,7 +190,7 @@ export default function Home() {
 
   const handleGenerate = useCallback(async () => {
     if (!isFormValid) return;
-    
+
     setLoading(true);
     try {
       const result = await generateLogo({
@@ -228,7 +228,7 @@ export default function Home() {
 
   const handleDownload = useCallback(async () => {
     if (!generatedLogo) return;
-    
+
     setIsDownloading(true);
     try {
       const result = await downloadImage(generatedLogo);
@@ -327,20 +327,19 @@ export default function Home() {
               {STYLE_OPTIONS.map((style) => {
                 const IconComponent = style.icon;
                 return (
-                <motion.button
-                  key={style.id}
-                  onClick={() => setSelectedStyle(style.id)}
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  className={`p-6 rounded-xl border-2 flex flex-col items-center gap-3 text-center transition-all ${
-                    selectedStyle === style.id
-                      ? "border-primary bg-primary/10 text-foreground font-semibold ring-2 ring-primary shadow-lg"
-                      : "border-border hover:bg-accent/50 hover:border-primary/50"
-                  }`}
-                >
+                  <motion.button
+                    key={style.id}
+                    onClick={() => setSelectedStyle(style.id)}
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    className={`p-6 rounded-xl border-2 flex flex-col items-center gap-3 text-center transition-all ${selectedStyle === style.id
+                        ? "border-primary bg-primary/10 text-foreground font-semibold ring-2 ring-primary shadow-lg"
+                        : "border-border hover:bg-accent/50 hover:border-primary/50"
+                      }`}
+                  >
                     <IconComponent className={`w-8 h-8 ${selectedStyle === style.id ? "text-primary" : ""}`} />
-                  <div className="font-semibold">{style.name}</div>
-                </motion.button>
+                    <div className="font-semibold">{style.name}</div>
+                  </motion.button>
                 );
               })}
             </div>
@@ -539,9 +538,11 @@ export default function Home() {
               logo in minutes
             </span>
           </div>
-          <Button onClick={() => router.push("/history")} variant="outline" className="w-fit">
-            <History className="w-4 scale-y-[-1] h-4 mr-2" />
-            History
+          <Button asChild variant="outline" className="w-fit">
+            <Link href="/history">
+              <History className="w-4 scale-y-[-1] h-4 mr-2" />
+              History
+            </Link>
           </Button>
         </div>
 
@@ -553,13 +554,12 @@ export default function Home() {
                 <div className="flex flex-col items-center flex-1">
                   <div className="relative">
                     <div
-                      className={`w-12 h-12 rounded-full flex items-center justify-center font-semibold border-2 transition-all ${
-                        currentStep > step.number
+                      className={`w-12 h-12 rounded-full flex items-center justify-center font-semibold border-2 transition-all ${currentStep > step.number
                           ? "bg-primary border-primary text-primary-foreground"
                           : currentStep === step.number
-                          ? "border-primary bg-primary text-primary-foreground ring-4 ring-primary/20"
-                          : "border-border bg-background text-muted-foreground"
-                      }`}
+                            ? "border-primary bg-primary text-primary-foreground ring-4 ring-primary/20"
+                            : "border-border bg-background text-muted-foreground"
+                        }`}
                     >
                       {currentStep > step.number ? (
                         <Check className="w-6 h-6" />
@@ -573,9 +573,8 @@ export default function Home() {
                   </div>
                 </div>
                 {index < steps.length - 1 && (
-                  <div className={`flex-1 h-1 mx-2 transition-all ${
-                    currentStep > step.number ? "bg-primary" : "bg-border"
-                  }`} />
+                  <div className={`flex-1 h-1 mx-2 transition-all ${currentStep > step.number ? "bg-primary" : "bg-border"
+                    }`} />
                 )}
               </div>
             ))}
@@ -644,57 +643,57 @@ export default function Home() {
           {/* Right Column - Preview (Only show after step 4) */}
           {currentStep >= 4 && (
             <Card className="h-full rounded-2xl shadow-xl border-2 overflow-hidden">
-            <CardContent className="p-6 h-full">
-              {generatedLogo ? (
-                <motion.div
-                  className="space-y-6"
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.4 }}
-                >
-                  <div
-                      className="aspect-square rounded-2xl shadow-lg overflow-hidden"
-                    style={{ backgroundColor }}
+              <CardContent className="p-6 h-full">
+                {generatedLogo ? (
+                  <motion.div
+                    className="space-y-6"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.4 }}
                   >
-                    <img
-                      src={generatedLogo}
-                      alt="Generated logo"
-                      className="w-full h-full rounded-2xl object-contain p-4"
-                    />
-                  </div>
-                  <div className="flex gap-3">
-                    <Button
-                      onClick={handleGenerate}
-                      className="flex-1 bg-primary hover:bg-primary/80"
-                      disabled={loading}
+                    <div
+                      className="aspect-square rounded-2xl shadow-lg overflow-hidden"
+                      style={{ backgroundColor }}
                     >
-                      <RefreshCw className="mr-2 h-4 w-4" />
-                      Generate New
-                    </Button>
-                    <Button
-                      onClick={handleDownload}
-                      variant="outline"
-                      className="flex-1"
-                      disabled={isDownloading}
-                    >
-                      <Download className="mr-2 h-4 w-4" />
-                      {isDownloading ? "Downloading..." : "Download"}
-                    </Button>
-                  </div>
-                </motion.div>
-              ) : (
-                <motion.div
+                      <img
+                        src={generatedLogo}
+                        alt="Generated logo"
+                        className="w-full h-full rounded-2xl object-contain p-4"
+                      />
+                    </div>
+                    <div className="flex gap-3">
+                      <Button
+                        onClick={handleGenerate}
+                        className="flex-1 bg-primary hover:bg-primary/80"
+                        disabled={loading}
+                      >
+                        <RefreshCw className="mr-2 h-4 w-4" />
+                        Generate New
+                      </Button>
+                      <Button
+                        onClick={handleDownload}
+                        variant="outline"
+                        className="flex-1"
+                        disabled={isDownloading}
+                      >
+                        <Download className="mr-2 h-4 w-4" />
+                        {isDownloading ? "Downloading..." : "Download"}
+                      </Button>
+                    </div>
+                  </motion.div>
+                ) : (
+                  <motion.div
                     className="h-full min-h-[500px] rounded-2xl flex items-center justify-center text-center p-8 relative overflow-hidden"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ duration: 0.4 }}
-                >
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 0.4 }}
+                  >
                     {/* Background Gradient */}
                     <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-primary/10 to-orange-500/5"></div>
-                    
+
                     {/* Animated Border */}
                     <div className="absolute inset-0 rounded-2xl border-2 border-dashed border-primary/20"></div>
-                    
+
                     {/* Content */}
                     <div className="relative z-10 max-w-md space-y-6">
                       {/* Icon with animated background */}
@@ -704,40 +703,39 @@ export default function Home() {
                           <Sparkles className="h-16 w-16 text-primary" />
                         </div>
                       </div>
-                      
+
                       {/* Text Content */}
                       <div className="space-y-3">
                         <h3 className="text-3xl font-bold bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
                           Your Logo Preview
                         </h3>
                         <p className="text-muted-foreground text-base leading-relaxed">
-                          {currentStep === 4 
+                          {currentStep === 4
                             ? "Complete the final step and generate your logo. It will appear here once ready."
                             : currentStep === 5
-                            ? "Ready to generate! Click the button below to create your logo."
-                            : "Your generated logo will appear here."
+                              ? "Ready to generate! Click the button below to create your logo."
+                              : "Your generated logo will appear here."
                           }
-                    </p>
+                        </p>
                       </div>
-                      
+
                       {/* Progress Indicator */}
                       <div className="flex items-center justify-center gap-2 pt-2">
                         {[1, 2, 3, 4, 5].map((step) => (
                           <div
                             key={step}
-                            className={`h-2 w-2 rounded-full transition-all duration-300 ${
-                              step <= currentStep
+                            className={`h-2 w-2 rounded-full transition-all duration-300 ${step <= currentStep
                                 ? "bg-primary scale-125"
                                 : "bg-muted-foreground/30"
-                            }`}
+                              }`}
                           />
                         ))}
                       </div>
-                  </div>
-                </motion.div>
-              )}
-            </CardContent>
-          </Card>
+                    </div>
+                  </motion.div>
+                )}
+              </CardContent>
+            </Card>
           )}
         </div>
         <Footer />

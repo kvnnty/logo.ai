@@ -51,6 +51,17 @@ export interface IBrand {
   identity?: any;
   blueprints?: any;
   assets: IBrandAsset[];
+  industry?: string;
+  contactInfo?: {
+    website?: string;
+    email?: string;
+    phone?: string;
+    address?: string;
+    mobile?: string;
+    facebook?: string;
+    instagram?: string;
+    twitter?: string;
+  };
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -88,11 +99,27 @@ const BrandSchema = new Schema(
       imageUrl: String,
       prompt: String,
       createdAt: { type: Date, default: Date.now }
-    }]
+    }],
+    industry: { type: String, default: "" },
+    contactInfo: {
+      website: { type: String, default: "" },
+      email: { type: String, default: "" },
+      phone: { type: String, default: "" },
+      address: { type: String, default: "" },
+      mobile: { type: String, default: "" },
+      facebook: { type: String, default: "" },
+      instagram: { type: String, default: "" },
+      twitter: { type: String, default: "" },
+    }
   },
-  { timestamps: true }
+  { timestamps: true, strict: false }
 );
 
 export const Logo = models.Logo || model<ILogo>('Logo', LogoSchema);
+
+// Force refresh Brand model in development to pick up schema changes
+if (process.env.NODE_ENV === 'development') {
+  delete models.Brand;
+}
 export const Brand = models.Brand || model<IBrand>('Brand', BrandSchema);
 

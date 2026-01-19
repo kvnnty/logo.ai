@@ -7,14 +7,14 @@ export default function Features() {
     <>
       <div id="features" className="bg-background py-10 mt-20">
         <div className="flex flex-col max-w-6xl mx-auto px-4 mb-2">
-          <div className="text-3xl md:text-5xl font-bold text-center mb-4">
+          <div className="text-5xl md:text-7xl font-bold text-center mb-4">
             Why Choose
             <br />
             <span className="bg-gradient-to-r from-primary via-purple-500 to-primary bg-clip-text text-transparent">
               LogoAIpro?
             </span>
           </div>
-          <p className="text-base md:text-lg text-center text-muted-foreground max-w-xl mx-auto">
+          <p className="text-lg md:text-xl text-center text-muted-foreground max-w-2xl mx-auto">
             Experience the future of logo design with AI-powered creativity
           </p>
         </div>
@@ -42,10 +42,10 @@ export default function Features() {
                     <div className="text-sm md:text-base font-semibold text-primary mb-2 uppercase tracking-wider">
                       {feature.smallHeading}
                     </div>
-                    <h3 className="text-xl md:text-2xl font-bold mb-3 text-foreground">
+                    <h3 className="text-3xl md:text-4xl font-bold mb-4 text-foreground">
                       {feature.title}
                     </h3>
-                    <p className="text-sm md:text-base text-gray-600 leading-relaxed">
+                    <p className="text-base md:text-lg text-gray-600 leading-relaxed">
                       {feature.description}
                     </p>
                   </div>

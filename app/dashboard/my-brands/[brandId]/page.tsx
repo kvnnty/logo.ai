@@ -8,11 +8,21 @@ import { motion } from "framer-motion";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { EditBrandDialog } from "@/components/dashboard/shared/edit-brand-dialog";
+import { BrandOnboardingDialog } from "@/components/dashboard/brand-onboarding-dialog";
+import { useEffect } from "react";
 
 export default function BrandDashboardPage() {
   const brand = useBrand();
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [isOnboardingOpen, setIsOnboardingOpen] = useState(false);
   const router = useRouter();
+
+  useEffect(() => {
+    // Show onboarding if industry is missing (undefined, null, or empty string)
+    if (!brand.industry || brand.industry.trim() === "") {
+      setIsOnboardingOpen(true);
+    }
+  }, [brand.industry]);
 
   // Get primary color from identity
   const primaryColor = brand.identity?.primary_color || "#2563eb";
@@ -21,11 +31,11 @@ export default function BrandDashboardPage() {
     <div className="space-y-8 pb-12">
       {/* Brand Overview */}
       <div className="flex items-start justify-between bg-white p-8 rounded-3xl border shadow-sm">
-        <div className="space-y-2">
+        <div className="space-y-4">
           <div>
-            <h1 className="text-2xl font-bold tracking-tight">{brand.name}</h1>
+            <h1 className="text-4xl font-bold tracking-tight">{brand.name}</h1>
             {brand.description && (
-              <p className="text-muted-foreground mt-1 max-w-2xl text-sm leading-relaxed">
+              <p className="text-muted-foreground mt-2 max-w-2xl text-lg leading-relaxed">
                 {brand.description}
               </p>
             )}
@@ -40,21 +50,8 @@ export default function BrandDashboardPage() {
               <Settings className="h-4 w-4 mr-2" />
               Edit Brand Details
             </Button>
-            <Button variant="outline" size="sm" className="rounded-full px-4">
-              <Share2 className="h-4 w-4 mr-2" />
-              Share Kit
-            </Button>
           </div>
         </div>
-        <motion.div
-          initial={{ scale: 0.8, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          className="w-24 h-24 rounded-2xl shadow-xl flex items-center justify-center relative overflow-hidden group"
-          style={{ backgroundColor: primaryColor }}
-        >
-          <div className="absolute inset-0 bg-white/10 group-hover:bg-transparent transition-colors" />
-          <Palette className="h-8 w-8 text-white relative z-10" />
-        </motion.div>
       </div>
 
       <EditBrandDialog
@@ -62,6 +59,16 @@ export default function BrandDashboardPage() {
         open={isEditDialogOpen}
         onOpenChange={setIsEditDialogOpen}
         onSuccess={() => router.refresh()}
+      />
+
+      <BrandOnboardingDialog
+        brandId={brand._id}
+        brandName={brand.name}
+        isOpen={isOnboardingOpen}
+        onClose={() => {
+          setIsOnboardingOpen(false);
+          router.refresh();
+        }}
       />
 
       {/* Quick Stats */}
@@ -102,156 +109,102 @@ export default function BrandDashboardPage() {
         </Card>
       </div>
 
-      {/* Brand Kit Highlights */}
-      {brand.assets && brand.assets.length > 0 ? (
-        <div className="space-y-6">
-          <div className="flex items-center justify-between">
-            <div className="space-y-0.5">
-              <h2 className="text-lg font-bold tracking-tight">Your Brand Kit</h2>
-              <p className="text-xs text-muted-foreground">Complete branding assets generated for your identity.</p>
-            </div>
-            <Button variant="ghost" className="text-primary hover:text-primary/80 group">
-              View full kit <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
-            </Button>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            {[
-              {
-                id: "social-stories",
-                title: "Social Stories",
-                count: "+100",
-                description: "Customizable story templates",
-                category: "social_story",
-                href: `/dashboard/my-brands/${brand._id}/social/social-stories`,
-              },
-              {
-                id: "social-posts",
-                title: "Social Posts",
-                count: "+100",
-                description: "Ready-to-post designs",
-                category: "social_post",
-                href: `/dashboard/my-brands/${brand._id}/social/social-posts`,
-              },
-              {
-                id: "social-covers-profiles",
-                title: "Covers & Profiles",
-                count: "+30",
-                description: "Brand-aligned headers & icons",
-                category: "social_cover", // mapped to covers
-                href: `/dashboard/my-brands/${brand._id}/social/social-covers-profiles`,
-              },
-              {
-                id: "youtube-thumbnails",
-                title: "YouTube Thumbnails",
-                count: "+50",
-                description: "Eye-catching thumbnails",
-                category: "youtube_thumbnail",
-                href: `/dashboard/my-brands/${brand._id}/social/youtube-thumbnails`,
-              },
-              {
-                id: "business-cards",
-                title: "Business Cards",
-                count: "+50",
-                description: "Professional business cards",
-                category: "branding",
-                href: `/dashboard/my-brands/${brand._id}/branding/business-cards`,
-              },
-              {
-                id: "letterheads",
-                title: "Letterheads",
-                count: "+50",
-                description: "Letterheads (Microsoft Word)",
-                category: "branding",
-                href: `/dashboard/my-brands/${brand._id}/branding/letterheads`,
-              },
-              {
-                id: "ads",
-                title: "Marketing Ads",
-                count: "+50",
-                description: "High-conversion ads",
-                category: "marketing",
-                href: `/dashboard/my-brands/${brand._id}/marketing/ads`,
-              },
-              {
-                id: "flyers",
-                title: "Flyers & Brochures",
-                count: "+50",
-                description: "Print-ready layouts",
-                category: "marketing",
-                href: `/dashboard/my-brands/${brand._id}/marketing/flyers`,
-              },
-            ].map((item, index) => {
-              // Find a sample asset for this category if it exists
-              const sampleAsset = brand.assets?.find((a: any) =>
-                a.category === item.category ||
-                (item.id === "social-stories" && a.category === "social_story") ||
-                (item.id === "social-posts" && a.category === "social_post") ||
-                (item.id === "flyers" && a.subType?.includes("flyer")) ||
-                (item.id === "ads" && a.subType?.includes("ad"))
-              );
-
-              return (
-                <motion.div
-                  key={item.id}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.05 }}
-                  onClick={() => router.push(item.href)}
-                >
-                  <Card className="overflow-hidden border shadow-none hover:border-primary/50 transition-all group cursor-pointer bg-white rounded-2xl">
-                    <div className="aspect-[16/10] bg-muted relative overflow-hidden">
-                      {sampleAsset ? (
-                        <img
-                          src={sampleAsset.imageUrl}
-                          alt={item.title}
-                          className="w-full h-full object-cover transition-transform group-hover:scale-105 duration-500"
-                        />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center bg-primary/5">
-                          <ImageIcon className="h-6 w-6 text-primary/20" />
-                        </div>
-                      )}
-                      <div className="absolute top-3 right-3 bg-white/90 backdrop-blur-md px-2 py-1 rounded-lg text-[10px] font-bold text-primary shadow-sm">
-                        {item.count}
-                      </div>
-                    </div>
-                    <CardContent className="p-4 bg-white">
-                      <div className="flex items-center justify-between mb-1">
-                        <h3 className="font-bold text-sm tracking-tight">{item.title}</h3>
-                        <ArrowRight className="h-3 w-3 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
-                      </div>
-                      <p className="text-[11px] text-muted-foreground leading-relaxed">
-                        {item.description}
-                      </p>
-                    </CardContent>
-                  </Card>
-                </motion.div>
-              );
-            })}
-          </div>
+      {/* Your Brand Kit */}
+      <div className="space-y-12">
+        <div className="space-y-1">
+          <h2 className="text-3xl font-bold tracking-tight">Your Brand Kit</h2>
+          <p className="text-muted-foreground text-lg">Everything you need to grow your brand, all in one place.</p>
         </div>
-      ) : (
-        <Card className="border-dashed border-2 bg-muted/30">
-          <CardContent className="flex flex-col items-center justify-center py-20 text-center">
-            <div className="relative mb-6">
-              <div className="absolute inset-0 bg-primary/20 rounded-full blur-2xl animate-pulse" />
-              <div className="relative bg-white rounded-full p-6 shadow-xl border">
-                <Sparkles className="h-10 w-10 text-primary" />
+
+        {[
+          {
+            title: "Social Media",
+            description: "Ready-to-post designs for all major platforms",
+            items: [
+              { name: "Social Stories", count: "+100", desc: "Customizable story templates", href: `/dashboard/my-brands/${brand._id}/social/social-stories`, category: "social_story" },
+              { name: "Social Posts", count: "+100", desc: "Ready-to-post designs", href: `/dashboard/my-brands/${brand._id}/social/social-posts`, category: "social_post" },
+              { name: "Social Covers", count: "+50", desc: "High-quality profile and cover images", href: `/dashboard/my-brands/${brand._id}/social/social-covers-profiles`, category: "social_cover" },
+              { name: "YouTube Thumbnails", count: "+50", desc: "Eye-catching thumbnails", href: `/dashboard/my-brands/${brand._id}/social/youtube-thumbnails`, category: "youtube_thumbnail" },
+            ]
+          },
+          {
+            title: "Marketing Materials",
+            description: "Professional assets for your marketing campaigns",
+            items: [
+              { name: "Marketing Ads", count: "+50", desc: "High-conversion ad designs", href: `/dashboard/my-brands/${brand._id}/marketing/ads`, category: "marketing" },
+              { name: "Flyers & Posters", count: "+50", desc: "Print-ready marketing material", href: `/dashboard/my-brands/${brand._id}/marketing/flyers`, category: "marketing" },
+              { name: "Business Posters", count: "+50", desc: "Large format designs", href: `/dashboard/my-brands/${brand._id}/marketing/posters`, category: "marketing" },
+              { name: "ID Cards", count: "+20", desc: "Professional identification", href: `/dashboard/my-brands/${brand._id}/marketing/id-cards`, category: "marketing" },
+              { name: "Marketing Cards", count: "+50", desc: "Themed cards and stationary", href: `/dashboard/my-brands/${brand._id}/marketing/cards`, category: "marketing" },
+            ]
+          },
+          {
+            title: "Branding Assets",
+            description: "Core identity assets for your business",
+            items: [
+              { name: "Brand Book", count: "", desc: "Detailed brand guidelines", href: `/dashboard/my-brands/${brand._id}/branding/brand-book`, category: "branding" },
+              { name: "Business Cards", count: "+50", desc: "Professional business cards", href: `/dashboard/my-brands/${brand._id}/branding/business-cards`, category: "branding" },
+              { name: "Letterheads", count: "+50", desc: "Letterheads(Microsoft word)", href: `/dashboard/my-brands/${brand._id}/branding/letterheads`, category: "branding" },
+              { name: "Email Signatures", count: "+10", desc: "Branded email footers", href: `/dashboard/my-brands/${brand._id}/branding/email-signature`, category: "branding" },
+              { name: "Favicon Pack", count: "+5", desc: "Digital markers for web", href: `/dashboard/my-brands/${brand._id}/branding/favicon-pack`, category: "branding" },
+              { name: "Brand License", count: "", desc: "Commercial usage rights", href: `/dashboard/my-brands/${brand._id}/branding/license`, category: "branding" },
+            ]
+          }
+        ].map((section, sIndex) => (
+          <div key={sIndex} className="space-y-6">
+            <div className="flex items-end justify-between border-b pb-4">
+              <div className="space-y-1">
+                <h3 className="text-xl font-bold tracking-tight">{section.title}</h3>
+                <p className="text-sm text-muted-foreground">{section.description}</p>
               </div>
             </div>
-            <h3 className="text-2xl font-bold mb-2">Building your brand kit...</h3>
-            <p className="text-muted-foreground mb-8 max-w-sm mx-auto">
-              We're currently generating your unique brand assets. This will only take a moment.
-            </p>
-            <div className="flex gap-4">
-              <Button className="rounded-full px-8">
-                <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
-                Checking Progress
-              </Button>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {section.items.map((item, iIndex) => {
+                const asset = brand.assets?.find(a => a.category === item.category);
+                return (
+                  <motion.div
+                    key={iIndex}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: (sIndex * 4 + iIndex) * 0.05 }}
+                    onClick={() => router.push(item.href)}
+                  >
+                    <Card className="overflow-hidden border shadow-sm hover:shadow-xl transition-all group cursor-pointer bg-white rounded-2xl flex flex-col h-full border-none shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)]">
+                      <div className="aspect-[16/10] bg-muted relative overflow-hidden">
+                        {asset ? (
+                          <img
+                            src={asset.imageUrl}
+                            alt={item.name}
+                            className="w-full h-full object-cover transition-transform group-hover:scale-110 duration-700"
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary/5 to-primary/10 group-hover:from-primary/10 group-hover:to-primary/20 transition-colors">
+                            <Sparkles className="h-8 w-8 text-primary/20 group-hover:text-primary/40 transition-colors" />
+                          </div>
+                        )}
+                        <div className="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity" />
+                      </div>
+                      <CardContent className="p-6 flex-grow flex flex-col space-y-1.5">
+                        <h4 className="font-bold text-lg tracking-tight group-hover:text-primary transition-colors">
+                          {item.name}
+                        </h4>
+                        {item.count && (
+                          <p className="text-primary font-bold text-sm">
+                            {item.count}
+                          </p>
+                        )}
+                        <p className="text-[13px] text-muted-foreground leading-snug">
+                          {item.desc}
+                        </p>
+                      </CardContent>
+                    </Card>
+                  </motion.div>
+                );
+              })}
             </div>
-          </CardContent>
-        </Card>
-      )}
+          </div>
+        ))}
+      </div>
 
       {/* Brand Identity / Color Strategy */}
       {brand.identity && (

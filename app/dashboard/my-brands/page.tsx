@@ -65,8 +65,8 @@ export default function BrandsPage() {
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">My Brands</h1>
-          <p className="text-sm text-muted-foreground mt-1">
+          <h1 className="text-4xl font-bold">My Brands</h1>
+          <p className="text-muted-foreground mt-2">
             Select a brand to manage, or create a new one.
           </p>
         </div>
