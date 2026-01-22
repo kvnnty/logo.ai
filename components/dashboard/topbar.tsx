@@ -12,7 +12,7 @@ interface DashboardTopbarProps {
 }
 
 export default function DashboardTopbar({ onMenuClick }: DashboardTopbarProps) {
-  const [credits, setCredits] = useState({ remaining: 10, limit: 10 });
+  const [credits, setCredits] = useState({ remaining: 0 });
   const [isRefreshing, setIsRefreshing] = useState(false);
 
   const fetchCredits = async () => {

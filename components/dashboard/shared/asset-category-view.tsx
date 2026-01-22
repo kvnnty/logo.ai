@@ -1,14 +1,15 @@
 "use client";
 
+
 import { useState, useEffect, useCallback } from "react";
 import { PageHeader } from "./page-header";
 import { AssetCard } from "./asset-card";
 import { Button } from "@/components/ui/button";
-import { Sparkles, RefreshCw, AlertCircle } from "lucide-react";
+import { Sparkles, RefreshCw, Plus } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "@/hooks/use-toast";
-import { getBrandById, generateBrandAsset, downloadImage } from "@/app/actions/actions";
-import { Card, CardContent } from "@/components/ui/card";
+import { getBrandById, generateInteractiveAsset, downloadImage } from "@/app/actions/actions";
+import { BrandCanvasEditor } from "../canvas/brand-canvas-editor";
 
 interface AssetCategoryViewProps {
   brandId: string;
@@ -27,8 +28,9 @@ export function AssetCategoryView({
 }: AssetCategoryViewProps) {
   const [brand, setBrand] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const [generatingId, setGeneratingId] = useState<string | null>(null);
+  const [isGenerating, setIsGenerating] = useState(false);
   const [downloading, setDownloading] = useState<string | null>(null);
+  const [activeEditorAsset, setActiveEditorAsset] = useState<{ sceneData: any, assetId: string } | null>(null);
 
   const fetchData = useCallback(async () => {
     try {
@@ -47,13 +49,18 @@ export function AssetCategoryView({
     fetchData();
   }, [fetchData]);
 
-  const handleGenerate = async (subType: string) => {
-    setGeneratingId(subType);
+  const handleGenerate = async () => {
+    setIsGenerating(true);
     try {
-      const result = await generateBrandAsset(brandId, category, subType);
-      if (result.success) {
-        toast({ title: "Asset Generated!", description: `New ${subType} has been created.` });
-        fetchData(); // Refresh to show new asset
+      // For general generation, we just use a default subType or ask user. 
+      // For now, let's just use "New Design".
+      const subType = `New ${title.slice(0, -1)}`;
+      const result = await generateInteractiveAsset(brandId, category, subType);
+      if (result.success && result.sceneData) {
+        toast({ title: "Asset Generated!", description: `New design has been created.` });
+        fetchData();
+        // Auto-open in editor
+        setActiveEditorAsset({ sceneData: result.sceneData, assetId: "new" });
       } else {
         throw new Error(result.error);
       }
@@ -64,7 +71,7 @@ export function AssetCategoryView({
         variant: "destructive"
       });
     } finally {
-      setGeneratingId(null);
+      setIsGenerating(false);
     }
   };
 
@@ -87,6 +94,18 @@ export function AssetCategoryView({
     }
   };
 
+  const handleOpenEditor = (asset: any) => {
+    if (asset.sceneData) {
+      setActiveEditorAsset({ sceneData: asset.sceneData, assetId: asset._id });
+    } else {
+      toast({
+        title: "No Scene Data",
+        description: "This asset is a static image and cannot be edited in the canvas.",
+        variant: "destructive"
+      });
+    }
+  };
+
   if (loading) {
     return (
       <div className="space-y-6">
@@ -102,71 +121,88 @@ export function AssetCategoryView({
 
   if (!brand) return <div className="p-8 text-center">Brand not found.</div>;
 
-  // Filter blueprints for this category
-  const categoryBlueprints = (Array.isArray(brand.blueprints) ? brand.blueprints : []).filter((b: any) => b.category === category);
-
   // Find generated assets for this category
-  const categoryAssets = (Array.isArray(brand.assets) ? brand.assets : []).filter((a: any) => a.category === category);
+  const categoryAssets = (Array.isArray(brand.assets) ? brand.assets : [])
+    .filter((a: any) => {
+      // Loose matching for categories
+      const catMatch = a.category?.toLowerCase() === category.toLowerCase() ||
+        a.category?.includes(category.toLowerCase()) ||
+        category.toLowerCase().includes(a.category?.toLowerCase() || "");
+      return catMatch;
+    });
 
   return (
-    <div className="space-y-8 pb-12">
-      <PageHeader heading={title} description={description} />
+    <div className="pb-12">
+      <div className="flex items-end justify-between gap-4">
+        <PageHeader heading={title} description={description} className="flex-1" />
+        <Button
+          onClick={handleGenerate}
+          disabled={isGenerating}
+          className="bg-primary hover:bg-primary/90 shadow-lg"
+        >
+          {isGenerating ? (
+            <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
+          ) : (
+            <Plus className="w-4 h-4 mr-2" />
+          )}
+          Generate New Variant
+        </Button>
+      </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {categoryBlueprints.map((blueprint: any, index: number) => {
-          // Check if this specific blueprint has been generated
-          const generatedAsset = categoryAssets.find((a: any) => a.subType === blueprint.subType);
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-8">
+        {categoryAssets.map((asset: any) => (
+          <AssetCard
+            key={asset._id}
+            title={asset.subType?.replace("_", " ") || "Brand Asset"}
+            description={asset.prompt}
+            imageUrl={asset.imageUrl || "/placeholder-asset.png"}
+            aspectRatio={aspectRatio}
+            onDownload={() => handleDownload(asset.imageUrl, asset._id)}
+            onEdit={() => handleOpenEditor(asset)}
+            onAction={() => handleOpenEditor(asset)}
+            actionLabel="Customize"
+            downloading={downloading === asset._id}
+          />
+        ))}
 
-          if (generatedAsset) {
-            return (
-              <AssetCard
-                key={blueprint.subType}
-                title={blueprint.subType.replace("_", " ")}
-                description={blueprint.prompt}
-                imageUrl={generatedAsset.imageUrl}
-                aspectRatio={aspectRatio}
-                onDownload={() => handleDownload(generatedAsset.imageUrl, blueprint.subType)}
-                downloading={downloading === blueprint.subType}
-              />
-            );
-          }
-
-          return (
-            <Card key={blueprint.subType} className="border-dashed border-2 flex flex-col items-center justify-center p-6 text-center group hover:border-primary/50 transition-colors">
-              <div className="mb-4 p-4 rounded-full bg-primary/5 text-primary group-hover:bg-primary/10 transition-colors">
-                <Sparkles className="w-8 h-8" />
-              </div>
-              <h3 className="font-semibold capitalize mb-1">{blueprint.subType.replace("_", " ")}</h3>
-              <p className="text-xs text-muted-foreground mb-6 line-clamp-2 px-4 italic">
-                {blueprint.prompt}
-              </p>
-              <Button
-                onClick={() => handleGenerate(blueprint.subType)}
-                disabled={generatingId === blueprint.subType}
-                className="w-full"
-                variant="secondary"
-              >
-                {generatingId === blueprint.subType ? (
-                  <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
-                ) : (
-                  <Sparkles className="w-4 h-4 mr-2" />
-                )}
-                Generate Item
-              </Button>
-            </Card>
-          );
-        })}
-
-        {categoryBlueprints.length === 0 && (
-          <div className="col-span-full border-2 border-dashed rounded-2xl p-12 text-center">
-            <AlertCircle className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-            <h3 className="text-xl font-semibold mb-2">No blueprints found</h3>
-            <p className="text-muted-foreground">
-              Try refreshing your brand strategy to generate new asset blueprints.
+        {categoryAssets.length === 0 && !isGenerating && (
+          <div className="col-span-full border-2 border-dashed rounded-3xl p-20 text-center bg-muted/20">
+            <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6">
+              <Sparkles className="w-8 h-8 text-primary" />
+            </div>
+            <h3 className="text-2xl font-bold mb-2">No assets yet</h3>
+            <p className="text-muted-foreground mb-8 max-w-sm mx-auto">
+              Ready to bring your brand to life? Generate your first interactive {title.toLowerCase()} now.
             </p>
+            <Button onClick={handleGenerate} size="lg" className="rounded-full shadow-md">
+              <Plus className="w-4 h-4 mr-2" />
+              Get Started
+            </Button>
           </div>
         )}
       </div>
+
+      {activeEditorAsset && (
+        <BrandCanvasEditor
+          initialScene={activeEditorAsset.sceneData}
+          brandId={brandId}
+          assetId={activeEditorAsset.assetId}
+          onClose={() => {
+            setActiveEditorAsset(null);
+            fetchData(); // Refresh to catch any updates (like image previews if implemented)
+          }}
+        />
+      )}
+
+      {isGenerating && (
+        <div className="fixed inset-0 z-[60] bg-background/80 backdrop-blur-sm flex flex-col items-center justify-center p-6 text-center">
+          <div className="w-20 h-20 border-4 border-primary/30 border-t-primary animate-spin rounded-full mb-6" />
+          <h2 className="text-2xl font-bold mb-2">AI is Designing Your Canvas</h2>
+          <p className="text-muted-foreground max-w-sm">
+            We're arranging layouts, typography, and generating custom visuals...
+          </p>
+        </div>
+      )}
     </div>
   );
 }

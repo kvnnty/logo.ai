@@ -12,10 +12,12 @@ import { updateBrandDetails } from "@/app/actions/actions";
 import { useToast } from "@/hooks/use-toast";
 
 interface BrandOnboardingDialogProps {
-  brandId: string;
+  brand: {
+    _id: string;
+    name: string;
+  };
   isOpen: boolean;
   onClose: () => void;
-  brandName: string;
 }
 
 const steps = [
@@ -24,7 +26,9 @@ const steps = [
   { id: 3, title: "Contact Info" },
 ];
 
-export function BrandOnboardingDialog({ brandId, isOpen, onClose, brandName }: BrandOnboardingDialogProps) {
+export function BrandOnboardingDialog({ brand, isOpen, onClose }: BrandOnboardingDialogProps) {
+  const brandId = brand._id;
+  const brandName = brand.name;
   const [currentStep, setCurrentStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
@@ -303,7 +307,7 @@ export function BrandOnboardingDialog({ brandId, isOpen, onClose, brandName }: B
               disabled={currentStep === 1 || isSubmitting}
               className="rounded-xl h-10 px-6 hover:bg-muted/50 transition-colors"
             >
-              <ArrowLeft className="mr-2 h-4 w-4" />
+              <ArrowLeft className="h-4 w-4" />
               Back
             </Button>
             <Button

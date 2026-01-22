@@ -4,16 +4,13 @@ import OpenAI from 'openai';
 import { z } from 'zod';
 import dedent from 'dedent';
 import { clerkClient, currentUser } from "@clerk/nextjs/server";
-import { ensureDbConnected, Logo, Brand, IBrand, ILogo, IBrandAsset } from '@/db';
-import { BRAND_SYSTEM_PROMPT } from '@/lib/prompts';
+import { ensureDbConnected, Logo, Brand } from '@/db';
+import type { IBrand, ILogo, IBrandAsset } from '@/db';
+import { BRAND_SYSTEM_PROMPT, LOGO_CONCEPT_PROMPT, LOGO_SET_VARIANTS, LOGO_MULTIPLE_CONCEPTS_PROMPT } from '@/lib/prompts';
+import { GET_TEMPLATE, AssetCategory } from '@/lib/templates/brand-kit-templates';
 import Stripe from 'stripe';
 
-const apiKey = process.env.NEBIUS_API_KEY;
-if (!apiKey) {
-  throw new Error('NEBIUS_API_KEY is not defined in environment variables');
-}
-
-
+const apiKey = process.env.NEBIUS_API_KEY || '';
 const { HELICONE_API_KEY } = process.env;
 
 const clientOptions: ConstructorParameters<typeof OpenAI>[0] = {
@@ -28,10 +25,24 @@ const clientOptions: ConstructorParameters<typeof OpenAI>[0] = {
 
 const client = new OpenAI(clientOptions);
 
-// Initialize Stripe
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
   apiVersion: '2025-10-29.clover',
 });
+
+const PLAN_MAPPING: Record<string, { priceId: string, credits: number }> = {
+  'basic': {
+    priceId: process.env.STRIPE_PRICE_ID_BASIC || '',
+    credits: 50
+  },
+  'pro': {
+    priceId: process.env.STRIPE_PRICE_ID_PRO || '',
+    credits: 150
+  },
+  'enterprise': {
+    priceId: process.env.STRIPE_PRICE_ID_ENTERPRISE || '',
+    credits: 500
+  }
+};
 
 const FormSchema = z.object({
   companyName: z.string(),
@@ -54,7 +65,6 @@ const styleLookup: { [key: string]: string } = {
   minimal: "minimal, simple, timeless, versatile, single color logo, use negative space, flat design with minimal details, Light, soft, and subtle.",
 };
 
-// Helper function to convert hex to color name
 function hexToColorName(hex: string): string {
   const colorMap: Record<string, string> = {
     '#2563eb': 'blue',
@@ -64,11 +74,6 @@ function hexToColorName(hex: string): string {
     '#9333ea': 'purple',
     '#000000': 'black',
     '#ffffff': 'white',
-    '#f8fafc': 'light gray',
-    '#fee2e2': 'light red',
-    '#fef2f2': 'light pink',
-    '#eff6ff': 'light blue',
-    '#f0fff4': 'light green',
   };
   return colorMap[hex.toLowerCase()] || hex;
 }
@@ -77,335 +82,301 @@ export async function generateLogo(formData: z.infer<typeof FormSchema>) {
   'use server';
   try {
     const user = await currentUser();
-    if (!user) {
-      return { success: false, error: 'User not authenticated' };
-    }
+    if (!user) return { success: false, error: 'User not authenticated' };
 
-    // Check credits from Clerk metadata
     const currentRemaining = (user.unsafeMetadata?.remaining as number) || 0;
+    if (currentRemaining <= 0) return { success: false, error: "No credits left" };
 
-    if (currentRemaining <= 0) {
-      return {
-        success: false,
-        error: "You've run out of credits. Please purchase more credits to continue."
-      };
-    }
-
-    // Deduct 1 credit
     const newRemaining = currentRemaining - 1;
-
     await (await clerkClient()).users.updateUserMetadata(user.id, {
-      unsafeMetadata: {
-        remaining: newRemaining,
-      },
+      unsafeMetadata: { remaining: newRemaining },
     });
 
-    console.log("your remaining credits:", newRemaining)
-
-    if (newRemaining === 0) {
-      console.log("Warning: Last credit used!");
-    }
-
     const validatedData = FormSchema.parse(formData);
-
-    // Convert hex colors to color names for better AI understanding
     const primaryColorName = hexToColorName(validatedData.primaryColor);
     const secondaryColorName = hexToColorName(validatedData.secondaryColor);
 
-    const prompt = dedent`A single logo, high-quality, award-winning professional design, made for both digital and print media, only contains a few vector shapes, ${styleLookup[validatedData.style]}. Primary color is ${primaryColorName} and background color is ${secondaryColorName}. The company name is ${validatedData.companyName}, make sure to include the company name in the logo. ${validatedData.additionalInfo ? `Additional info: ${validatedData.additionalInfo}` : ""}`;
+    const prompt = dedent`A single logo, high-quality, professional design, ${styleLookup[validatedData.style]}. Primary color is ${primaryColorName} and background is ${secondaryColorName}. Company: ${validatedData.companyName}.`;
 
     const response = await client.images.generate({
       model: validatedData.model,
       prompt: prompt,
-      response_format: "url",
       size: validatedData.size,
-      quality: validatedData.quality,
-      n: 1,
     });
 
     const imageUrl = response.data?.[0]?.url || "";
-
-    const DatabaseData = {
+    await ensureDbConnected();
+    await Logo.create({
       image_url: imageUrl,
       primary_color: validatedData.primaryColor,
       background_color: validatedData.secondaryColor,
-      username: user.username ?? user.firstName ?? 'Anonymous',
+      username: user.username || 'Anonymous',
       userId: user.id,
-    };
+      brandId: (formData as any).brandId
+    });
 
-    try {
-      await ensureDbConnected();
-      await Logo.create({
-        ...DatabaseData,
-        brandId: (formData as any).brandId || undefined
-      });
-    } catch (error) {
-      console.error('Error inserting logo into database:', error);
-      throw error;
-    }
-
-    return {
-      success: true,
-      url: imageUrl,
-    };
+    return { success: true, url: imageUrl };
   } catch (error) {
     console.error('Error generating logo:', error);
-    return { success: false, error: 'Failed to generate logo' };
+    return { success: false, error: 'Failed' };
   }
 }
 
-// STAGE 1: Brand Intelligence Generation
 export async function generateBrandIdentity(data: {
   companyName: string;
   description: string;
   style: string;
-  model: string; // Keep model selection for later steps or if we need a specific model for text generation
+  model: string;
 }) {
-  'use server';
-  try {
-    const user = await currentUser();
-    if (!user) return { success: false, error: 'User not authenticated' };
-
-    await ensureDbConnected();
-
-    // 1. Construct Prompt
-    const prompt = BRAND_SYSTEM_PROMPT
-      .replace('{{name}}', data.companyName)
-      .replace('{{description}}', data.description)
-      .replace('{{style}}', data.style);
-
-    // 2. Call LLM for Strategy & Identity (Using a fast/smart model for JSON)
-    // We'll use the user-selected model or default to a text-capable one if "flux" (image only) is passed.
-    // For text JSON generation, we likely need a text model. Assuming 'client' is configured for Nebius which supports Llama/Qwen/etc.
-    // However, the current client initialization in this file might be set up for *image* generation endpoints or generic OpenAI.
-    // If the user selects FLUX (image model), we can't use it for text.
-    // *ASSUMPTION*: We will use a default text completion model available on the platform for this stage.
-    // Since I don't have the full list of text models, I'll use a standard one often available, or rely on the user's key affecting default.
-    // Let's assume we can use "meta-llama/Meta-Llama-3.1-70B-Instruct" or similar if we specify it, 
-    // OR we just use the client.chat.completions.create method which usually routes correctly.
-
-    // NOTE: The existing code only does images.generate. I need to add chat.completions.
-
-    const completion = await client.chat.completions.create({
-      model: "meta-llama/Llama-3.3-70B-Instruct", // slightly newer model
-      messages: [
-        { role: "system", content: "You are a JSON-only API. return valid JSON." },
-        { role: "user", content: prompt }
-      ],
-      response_format: { type: "json_object" },
-    });
-
-    const content = completion.choices[0].message.content;
-    if (!content) throw new Error("No content generated");
-
-    const brandData = JSON.parse(content);
-
-    // 3. Create Brand Record
-    const newBrand = await Brand.create({
-      userId: user.id,
-      name: data.companyName,
-      description: data.description,
-      strategy: brandData.strategy,
-      identity: brandData.identity,
-      assets: [],
-    });
-
-    return { success: true, brandId: newBrand._id.toString(), brandData };
-
-  } catch (error) {
-    console.error('Error generating brand identity:', error);
-    return { success: false, error: 'Failed to generate brand identity' };
-  }
-}
-
-
-// STAGE 2: Asset Blueprinting
-export async function prepareAssetBlueprints(brandId: string) {
-  'use server';
-  try {
-    await ensureDbConnected();
-    const brand = await Brand.findById(brandId);
-    if (!brand) throw new Error("Brand not found");
-
-    const identity = brand.identity;
-    const strategy = brand.strategy;
-
-    // Use LLM to generate a massive list of prompts
-    // We'll ask for a set of varied prompts for each category to ensure diversity within the same brand theme.
-    const blueprintPrompt = dedent`
-      You are a Brand Asset Strategist. Generate a comprehensive list of image generation prompts for a branding kit.
-      Brand Name: ${brand.name}
-      Visual Style: ${identity.visual_style_rules}
-      Identity: ${JSON.stringify(identity)}
-      Strategy: ${JSON.stringify(strategy)}
-
-      REQUIRED CATEGORIES & QUANTITIES:
-      1. Logo Variations (10 prompts): Different layouts, icons, and compositions.
-      2. Social Posts (10 prompts): Varied themes (launch, testimonial, quote, product feature).
-      3. Social Stories (10 prompts): Vertical format, engaging layouts.
-      4. Social Covers (5 prompts): Wide format for headers (FB, LinkedIn, Twitter).
-      5. Social Profiles (5 prompts): Circular/Square focused profile images.
-      6. YouTube Thumbnails (10 prompts): Bold, eye-catching, high contrast.
-      7. Marketing Materials (10 prompts): Flyers, brochures, ads.
-      8. Branding Stationary (10 prompts): Business cards, letterheads, envelopes.
-
-      OUTPUT FORMAT (JSON ONLY):
-      {
-        "blueprints": [
-          { "category": "logo", "subType": "variant_1", "prompt": "..." },
-          ...
-        ]
-      }
-
-      CRITICAL: All prompts must maintain strict adherence to the brand's primary color (${identity.primary_color}), secondary color (${identity.secondary_color}), and visual style rules. 
-      Total prompts to generate: 60. (We will double these programmatically for variety).
-    `;
-
-    const completion = await client.chat.completions.create({
-      model: "meta-llama/Llama-3.3-70B-Instruct",
-      messages: [
-        { role: "system", content: "You are a JSON-only API. return valid JSON." },
-        { role: "user", content: blueprintPrompt }
-      ],
-      response_format: { type: "json_object" },
-    });
-
-    const content = completion.choices[0].message.content;
-    if (!content) throw new Error("No blueprints generated");
-
-    const data = JSON.parse(content);
-    const rawBlueprints = data.blueprints || [];
-
-    // Programmatically expand to 20 per category if needed, or just use what we have.
-    // To reach "20 items per branding kit item", we can slightly vary the LLM output.
-    const expandedBlueprints: any[] = [];
-
-    // Group by category to ensure we can track counts
-    const categories = ['logo', 'social_post', 'social_story', 'social_cover', 'social_profile', 'youtube_thumbnail', 'marketing', 'branding'];
-
-    categories.forEach(cat => {
-      const catBlueprints = rawBlueprints.filter((b: any) =>
-        b.category === cat ||
-        (cat === 'social_post' && (b.category === 'social' || b.category.includes('post'))) ||
-        (cat === 'social_story' && b.category.includes('story'))
-      );
-
-      // If LLM gave us fewer than 20, we'll clones with slight variations in the prompt instructions
-      for (let i = 0; i < 20; i++) {
-        const source = catBlueprints[i % catBlueprints.length] || (rawBlueprints.find((b: any) => b.category.includes(cat.split('_')[0])) || rawBlueprints[0]);
-        expandedBlueprints.push({
-          ...source,
-          category: cat,
-          subType: `variant_${i + 1}`,
-          prompt: `${source?.prompt || 'Brand asset'} -- Variation ${i + 1}: ${i % 2 === 0 ? 'emphasize lighting and depth' : 'focus on clean minimalism and flat design'}.`
-        });
-      }
-    });
-
-    // Save blueprints to Brand
-    brand.blueprints = expandedBlueprints;
-    await brand.save();
-
-    return { success: true, blueprintCount: expandedBlueprints.length };
-  } catch (error) {
-    console.error('Error preparing blueprints:', error);
-    return { success: false, error: 'Failed to prepare blueprints' };
-  }
-}
-
-// STAGE 3: Asset Generation
-export async function generateBrandAsset(brandId: string, category: string, subType: string, model: string = 'black-forest-labs/flux-schnell') {
   'use server';
   try {
     const user = await currentUser();
     if (!user) return { success: false, error: 'Not authenticated' };
 
     await ensureDbConnected();
-    const brand = await Brand.findById(brandId);
-    if (!brand || !brand.blueprints) throw new Error("Brand or blueprints not found");
+    const prompt = BRAND_SYSTEM_PROMPT
+      .replace('{{name}}', data.companyName)
+      .replace('{{description}}', data.description)
+      .replace('{{style}}', data.style);
 
-    const blueprint = (brand.blueprints as any[]).find(b => b.category === category && b.subType === subType);
-    if (!blueprint) throw new Error("Specific blueprint not found");
-
-    const response = await client.images.generate({
-      model: model, // User selected model
-      prompt: blueprint.prompt,
-      response_format: "url",
-      size: "1024x1024", // Standardize for now
-      quality: "standard",
-      n: 1,
+    const completion = await client.chat.completions.create({
+      model: "meta-llama/Llama-3.3-70B-Instruct",
+      messages: [{ role: "user", content: prompt }],
+      response_format: { type: "json_object" },
     });
 
-    const imageUrl = response.data?.[0]?.url || "";
-    if (!imageUrl) throw new Error("Failed to generate image");
+    const content = completion.choices[0].message.content;
+    if (!content) throw new Error("No content");
 
-    // Persist Asset
-    const newAsset = {
-      category,
-      subType,
-      imageUrl,
-      prompt: blueprint.prompt,
-      createdAt: new Date(),
+    const brandData = JSON.parse(content);
+
+    return {
+      success: true,
+      brandData: {
+        name: data.companyName,
+        description: data.description,
+        strategy: brandData.strategy,
+        identity: brandData.identity,
+      }
     };
-
-    brand.assets.push(newAsset);
-    await brand.save();
-
-    // Also save to Logo collection if it's a logo, for backward compatibility with "My Designs"
-    if (category === 'logo') {
-      await Logo.create({
-        brandId,
-        image_url: imageUrl,
-        primary_color: brand.identity.primary_color,
-        background_color: brand.identity.secondary_color || '#ffffff',
-        username: user.username || 'Anonymous',
-        userId: user.id,
-      });
-    }
-
-    return { success: true, imageUrl, asset: newAsset };
-
   } catch (error) {
-    console.error(`Error generating brand asset:`, error);
-    return { success: false, error: `Failed to generate asset` };
+    console.error('Error:', error);
+    return { success: false, error: 'Failed' };
   }
 }
 
-// ========================
-// BRAND MANAGEMENT ACTIONS
-// ========================
+export async function generateInteractiveAsset(brandId: string, category: string, subType: string, templateIndex: number = 0) {
+  'use server';
+  try {
+    const user = await currentUser();
+    if (!user) return { success: false, error: 'Not authenticated' };
+
+    await ensureDbConnected();
+    const brand = await Brand.findOne({ _id: brandId, userId: user.id });
+    if (!brand) throw new Error("Brand not found");
+
+    const primaryLogo = brand.assets?.find((a: any) => a.category === 'logo' || a.subType === 'primary_logo');
+
+    const sceneData = GET_TEMPLATE(category as AssetCategory, templateIndex, {
+      brandName: brand.name,
+      primaryColor: brand.identity?.primary_color || '#000000',
+      secondaryColor: brand.identity?.secondary_color || '#ffffff',
+      logoUrl: primaryLogo?.imageUrl || '',
+      website: brand.contactInfo?.website || 'www.example.com',
+      email: brand.contactInfo?.email || 'hello@example.com',
+      phone: brand.contactInfo?.phone || '+1 234 567 890',
+      address: brand.contactInfo?.address || 'City, Country',
+    });
+
+    if (!sceneData) throw new Error(`No template for ${category}`);
+
+    brand.assets.push({
+      category,
+      subType,
+      sceneData,
+      createdAt: new Date()
+    } as any);
+
+    await brand.save();
+    return { success: true, sceneData };
+  } catch (error) {
+    console.error('Error:', error);
+    return { success: false, error: 'Failed' };
+  }
+}
+
+export async function generateLogos(brandData: { name: string, description: string, identity: any }, model: string = 'black-forest-labs/flux-schnell') {
+  'use server';
+  try {
+    const user = await currentUser();
+    if (!user) return { success: false, error: 'Not authenticated' };
+
+    const currentRemaining = (user.unsafeMetadata?.remaining as number) || 0;
+    if (currentRemaining <= 0) return { success: false, error: "No credits" };
+
+    const newRemaining = currentRemaining - 1;
+    await (await clerkClient()).users.updateUserMetadata(user.id, {
+      unsafeMetadata: { remaining: newRemaining },
+    });
+
+    const conceptPrompt = LOGO_MULTIPLE_CONCEPTS_PROMPT
+      .replace('{{name}}', brandData.name)
+      .replace('{{industry}}', 'General')
+      .replace('{{style}}', brandData.identity?.visual_style || 'modern')
+      .replace('{{description}}', brandData.description || '')
+      .replace('{{primaryColor}}', brandData.identity?.primary_color || '#000000')
+      .replace('{{secondaryColor}}', brandData.identity?.secondary_color || '#ffffff');
+
+    const conceptResponse = await client.chat.completions.create({
+      model: "meta-llama/Llama-3.3-70B-Instruct",
+      messages: [{ role: "user", content: conceptPrompt }],
+      response_format: { type: "json_object" },
+    });
+
+    const { concepts } = JSON.parse(conceptResponse.choices[0].message.content || '{"concepts":[]}');
+    const finalConcepts = [];
+
+    for (const concept of concepts) {
+      // Create a specific prompt for this icon using its unique colors
+      const colorString = concept.colors.join(', ');
+      const symbolPrompt = `A single minimalist logo icon: ${concept.symbolPrompt}. 
+      CRITICAL: Use these colors: ${colorString}. 
+      Simple clean white background. High contrast. professional vector style.`;
+
+      const imgResponse = await client.images.generate({
+        model: model,
+        prompt: symbolPrompt,
+        size: "1024x1024",
+      });
+
+      const iconUrl = imgResponse.data?.[0]?.url || "";
+      if (!iconUrl) continue;
+
+      const conceptId = `concept_${Math.random().toString(36).substring(2, 9)}`;
+      const variations = [
+        { label: 'Icon Only', subType: 'logo_icon', sceneData: { width: 1024, height: 1024, elements: [{ type: 'image', src: iconUrl, x: 256, y: 256, width: 512, height: 512 }] } },
+        { label: 'Text Only', subType: 'logo_text', sceneData: { width: 1024, height: 1024, elements: [{ type: 'text', content: brandData.name, x: 512, y: 512, fontSize: 100, fontStyle: concept.fontFamily, fill: concept.colors[0], align: 'center' }] } },
+        { label: 'Horizontal', subType: 'logo_horizontal', sceneData: { width: 1024, height: 300, elements: [{ type: 'image', src: iconUrl, x: 50, y: 50, width: 200, height: 200 }, { type: 'text', content: brandData.name, x: 300, y: 100, fontSize: 80, fontStyle: concept.fontFamily, fill: concept.colors[0] }] } },
+        { label: 'Vertical', subType: 'logo_vertical', sceneData: { width: 600, height: 800, elements: [{ type: 'image', src: iconUrl, x: 150, y: 100, width: 300, height: 300 }, { type: 'text', content: brandData.name, x: 300, y: 500, fontSize: 70, fontStyle: concept.fontFamily, fill: concept.colors[0], align: 'center' }] } },
+      ];
+
+      finalConcepts.push({ ...concept, iconUrl, variations: variations });
+    }
+
+    return { success: true, concepts: finalConcepts, remainingCredits: newRemaining };
+  } catch (error) {
+    console.error('Error:', error);
+    return { success: false, error: 'Failed' };
+  }
+}
+
+export async function saveFinalBrand(data: {
+  brandData: any,
+  concepts: any[],
+  selectedConceptIndex: number
+}) {
+  'use server';
+  try {
+    const user = await currentUser();
+    if (!user) return { success: false, error: 'Not authenticated' };
+
+    await ensureDbConnected();
+    const { brandData, concepts, selectedConceptIndex } = data;
+
+    // Create the Brand
+    const newBrand = await Brand.create({
+      userId: user.id,
+      name: brandData.name,
+      description: brandData.description,
+      strategy: brandData.strategy,
+      identity: brandData.identity,
+    });
+
+    const brandId = newBrand._id.toString();
+    const selectedConcept = concepts[selectedConceptIndex];
+
+    // Update Brand Identity Colors to match selected concept
+    newBrand.identity = {
+      ...newBrand.identity,
+      primary_color: selectedConcept.colors[0],
+      secondary_color: selectedConcept.colors[1] || selectedConcept.colors[0],
+    };
+
+    // Flatten and save all logo variations
+    for (let cIdx = 0; cIdx < concepts.length; cIdx++) {
+      const concept = concepts[cIdx];
+      const conceptId = `concept_${Math.random().toString(36).substring(2, 9)}`;
+
+      for (const variant of concept.variations) {
+        let subType = 'logo_variation';
+        if (cIdx === selectedConceptIndex) {
+          if (variant.subType === 'logo_horizontal') subType = 'primary_logo';
+          else subType = 'primary_variation';
+        }
+
+        newBrand.assets.push({
+          category: 'logo',
+          subType: subType,
+          imageUrl: variant.subType === 'logo_icon' ? concept.iconUrl : "",
+          prompt: `Logo concept: ${concept.name}`,
+          sceneData: variant.sceneData,
+          conceptId,
+          conceptColors: concept.colors,
+          createdAt: new Date(),
+        });
+      }
+    }
+
+    await newBrand.save();
+    return { success: true, brandId };
+  } catch (error) {
+    console.error('Error saving brand:', error);
+    return { success: false, error: 'Failed to save brand' };
+  }
+}
+
+export async function updateAssetScene(brandId: string, assetId: string, sceneData: any) {
+  'use server';
+  try {
+    const user = await currentUser();
+    if (!user) return { success: false, error: 'Not authenticated' };
+    await ensureDbConnected();
+    const brand = await Brand.findOne({ _id: brandId, userId: user.id });
+    if (!brand) throw new Error("Brand not found");
+    const asset = (brand.assets as any).id(assetId);
+    if (!asset) throw new Error("Asset not found");
+    asset.sceneData = sceneData;
+    brand.markModified('assets');
+    await brand.save();
+    return { success: true };
+  } catch (error) {
+    console.error('Error:', error);
+    return { success: false, error: 'Failed' };
+  }
+}
 
 export async function getUserBrands() {
   'use server';
   try {
     const user = await currentUser();
     if (!user) return { success: false, error: 'Not authenticated', brands: [] };
-
     await ensureDbConnected();
     const brands = await Brand.find({ userId: user.id }).sort({ createdAt: -1 }).lean();
-
     return {
       success: true,
-      brands: (brands as any[]).map((b: any) => {
-        // Find primary logo first, then fallback to any logo
-        const primaryLogo = b.assets?.find((a: any) => a.subType === 'primary_logo')
-          || b.assets?.find((a: any) => a.category === 'logo');
-        return {
-          _id: b._id.toString(),
-          name: b.name,
-          description: b.description,
-          createdAt: b.createdAt ? new Date(b.createdAt).toISOString() : new Date().toISOString(),
-          updatedAt: b.updatedAt ? new Date(b.updatedAt).toISOString() : new Date().toISOString(),
-          assetCount: b.assets?.length || 0,
-          primaryLogoUrl: primaryLogo?.imageUrl || null,
-          industry: b.industry || '',
-          contactInfo: b.contactInfo || {},
-        };
-      }),
+      brands: (brands as any[]).map((b: any) => ({
+        _id: b._id.toString(),
+        name: b.name,
+        description: b.description,
+        createdAt: b.createdAt?.toISOString(),
+        updatedAt: b.updatedAt?.toISOString(),
+        assetCount: b.assets?.length || 0,
+        primaryLogoUrl: b.assets?.find((a: any) => a.subType === 'primary_logo')?.imageUrl || null,
+        industry: b.industry || '',
+      })),
     };
   } catch (error) {
-    console.error('Error fetching user brands:', error);
-    return { success: false, error: 'Failed to fetch brands', brands: [] };
+    return { success: false, error: 'Failed', brands: [] };
   }
 }
 
@@ -414,132 +385,19 @@ export async function getBrandById(brandId: string) {
   try {
     const user = await currentUser();
     if (!user) return { success: false, error: 'Not authenticated' };
-
     await ensureDbConnected();
     const brand = await Brand.findOne({ _id: brandId, userId: user.id }).lean() as any;
-
-    if (!brand) {
-      return { success: false, error: 'Brand not found' };
-    }
-
-    const plainBrand = {
-      _id: brand._id?.toString() || brandId,
-      name: brand.name || '',
-      description: brand.description || '',
-      strategy: brand.strategy || {},
-      identity: brand.identity || {},
-      blueprints: Array.isArray(brand.blueprints) ? brand.blueprints : [],
-      assets: (Array.isArray(brand.assets) ? brand.assets : []).map((asset: any) => ({
-        category: asset.category || '',
-        subType: asset.subType || '',
-        imageUrl: asset.imageUrl || '',
-        prompt: asset.prompt || '',
-        createdAt: asset.createdAt ? new Date(asset.createdAt).toISOString() : new Date().toISOString(),
-      })),
-      createdAt: brand.createdAt ? new Date(brand.createdAt).toISOString() : new Date().toISOString(),
-      updatedAt: brand.updatedAt ? new Date(brand.updatedAt).toISOString() : new Date().toISOString(),
-      industry: brand.industry || '',
-      contactInfo: brand.contactInfo || {},
-    };
-
+    if (!brand) return { success: false, error: 'Not found' };
     return {
       success: true,
-      brand: plainBrand,
+      brand: {
+        ...brand,
+        _id: brand._id.toString(),
+        assets: brand.assets.map((a: any) => ({ ...a, _id: a._id.toString() }))
+      }
     };
   } catch (error) {
-    console.error('Error fetching brand:', error);
-    return { success: false, error: 'Failed to fetch brand' };
-  }
-}
-
-export async function finalizeBrandLogo(brandId: string, selectedImageUrl: string) {
-  'use server';
-  try {
-    await ensureDbConnected();
-    const brand = await Brand.findById(brandId);
-    if (!brand) throw new Error("Brand not found");
-
-    // Mark the selected logo as primary, others as variations
-    brand.assets = brand.assets.map((asset: any) => {
-      if (asset.category === 'logo') {
-        return {
-          ...asset,
-          subType: asset.imageUrl === selectedImageUrl ? 'primary_logo' : 'logo_variation'
-        };
-      }
-      return asset;
-    });
-
-    // Mark assets as modified since it's an array of mixed/objects in some cases
-    brand.markModified('assets');
-    await brand.save();
-
-    // Note: We no longer delete from the Logo collection to keep "My Designs" populated
-
-    return { success: true };
-  } catch (error) {
-    console.error('Error finalizing logo selection:', error);
-    return { success: false, error: 'Failed to finalize selection' };
-  }
-}
-
-export async function setPrimaryLogo(brandId: string, selectedImageUrl: string) {
-  'use server';
-  try {
-    await ensureDbConnected();
-    const brand = await Brand.findById(brandId);
-    if (!brand) throw new Error("Brand not found");
-
-    // Update subTypes for logos
-    brand.assets = brand.assets.map((asset: any) => {
-      if (asset.category === 'logo') {
-        return {
-          ...asset,
-          subType: asset.imageUrl === selectedImageUrl ? 'primary_logo' : 'logo_variation'
-        };
-      }
-      return asset;
-    });
-
-    brand.markModified('assets');
-    await brand.save();
-
-    return { success: true };
-  } catch (error) {
-    console.error('Error setting primary logo:', error);
-    return { success: false, error: 'Failed to update primary logo' };
-  }
-}
-
-export async function updateBrand(brandId: string, updates: {
-  name?: string;
-  description?: string;
-  primaryColor?: string;
-  secondaryColor?: string;
-}) {
-  'use server';
-  try {
-    await ensureDbConnected();
-    const brand = await Brand.findById(brandId);
-    if (!brand) throw new Error("Brand not found");
-
-    if (updates.name) brand.name = updates.name;
-    if (updates.description) brand.description = updates.description;
-
-    if (updates.primaryColor || updates.secondaryColor) {
-      if (!brand.identity) brand.identity = {};
-      if (updates.primaryColor) brand.identity.primary_color = updates.primaryColor;
-      if (updates.secondaryColor) brand.identity.secondary_color = updates.secondaryColor;
-
-      // Mark identity as modified since it's a Mixed type
-      brand.markModified('identity');
-    }
-
-    await brand.save();
-    return { success: true };
-  } catch (error) {
-    console.error('Error updating brand:', error);
-    return { success: false, error: 'Failed to update brand' };
+    return { success: false, error: 'Failed' };
   }
 }
 
@@ -548,121 +406,12 @@ export async function deleteBrand(brandId: string) {
   try {
     const user = await currentUser();
     if (!user) return { success: false, error: 'Not authenticated' };
-
     await ensureDbConnected();
-
-    // 1. Double check ownership
-    const brand = await Brand.findOne({ _id: brandId, userId: user.id });
-    if (!brand) {
-      return { success: false, error: 'Brand not found or access denied' };
-    }
-
-    // 2. Delete associated logos from the Logo collection
-    await Logo.deleteMany({ brandId: brandId });
-
-    // 3. Delete the brand itself
     await Brand.deleteOne({ _id: brandId, userId: user.id });
-
+    await Logo.deleteMany({ brandId });
     return { success: true };
   } catch (error) {
-    console.error('Error deleting brand:', error);
-    return { success: false, error: 'Failed to delete brand' };
-  }
-}
-
-export async function getBrandBlueprints(brandId: string) {
-  'use server';
-  try {
-    await ensureDbConnected();
-    const brand = await Brand.findById(brandId).lean() as any;
-    if (!brand) return { success: false, error: 'Brand not found' };
-
-    return {
-      success: true,
-      blueprints: brand.blueprints || []
-    };
-  } catch (error) {
-    console.error('Error fetching blueprints:', error);
-    return { success: false, error: 'Failed to fetch blueprints' };
-  }
-}
-
-export async function checkHistory() {
-  const user = await currentUser();
-
-  if (!user) {
-    return null;
-  }
-
-  try {
-    await ensureDbConnected();
-    const userIdToQuery = user.externalId ? user.externalId : user.id;
-    const userLogos = await Logo.find({ userId: userIdToQuery }).sort({ createdAt: -1 });
-
-    return (userLogos as any[]).map((logo: any) => ({
-      id: logo._id.toString(),
-      _id: logo._id.toString(),
-      brandId: logo.brandId?.toString(),
-      image_url: logo.image_url,
-      primary_color: logo.primary_color,
-      background_color: logo.background_color,
-      username: logo.username,
-      userId: logo.userId,
-      createdAt: logo.createdAt,
-      updatedAt: logo.updatedAt,
-    }));
-  } catch (error) {
-    console.error('Error fetching user logos:', error);
-    return null;
-  }
-}
-
-export async function allLogos() {
-  try {
-    await ensureDbConnected();
-    const allLogos = await Logo.find({}).sort({ createdAt: -1 });
-    return (allLogos as any[]).map((logo: any) => ({
-      id: logo._id.toString(),
-      _id: logo._id.toString(),
-      image_url: logo.image_url,
-      primary_color: logo.primary_color,
-      background_color: logo.background_color,
-      username: logo.username,
-      userId: logo.userId,
-      createdAt: logo.createdAt,
-      updatedAt: logo.updatedAt,
-    }));
-  } catch (error) {
-    console.error('Error fetchiing logos' + error)
-    return null;
-  }
-}
-
-export async function downloadImage(url: string) {
-  'use server';
-
-  try {
-    const response = await fetch(url);
-
-    if (!response.ok) {
-      throw new Error('Failed to fetch image');
-    }
-
-    const contentType = response.headers.get('content-type');
-    const buffer = await response.arrayBuffer();
-    const base64Image = Buffer.from(buffer).toString('base64');
-
-    return {
-      success: true,
-      data: `data:${contentType};base64,${base64Image}`
-    };
-
-  } catch (error) {
-    console.error('Error downloading image:', error);
-    return {
-      success: false,
-      error: 'Failed to download image'
-    };
+    return { success: false, error: 'Failed' };
   }
 }
 
@@ -670,35 +419,87 @@ export async function getCredits() {
   'use server';
   try {
     const user = await currentUser();
-    if (!user) {
-      return { remaining: 0, limit: 999999 };
-    }
+    if (!user) return { remaining: 0 };
+    return { remaining: (user.unsafeMetadata?.remaining as number) || 0 };
+  } catch (error) {
+    return { remaining: 0 };
+  }
+}
 
-    // Initialize free credits for first-time users
-    const FREE_CREDITS = 10;
-    if (!user.unsafeMetadata || user.unsafeMetadata.remaining === undefined) {
-      await (await clerkClient()).users.updateUserMetadata(user.id, {
-        unsafeMetadata: {
-          remaining: FREE_CREDITS,
-        },
-      });
-      return {
-        remaining: FREE_CREDITS,
-        limit: 999999
+export async function downloadImage(url: string) {
+  'use server';
+  try {
+    const response = await fetch(url);
+    const contentType = response.headers.get('content-type');
+    const buffer = await response.arrayBuffer();
+    const base64 = Buffer.from(buffer).toString('base64');
+    return { success: true, data: `data:${contentType};base64,${base64}` };
+  } catch (error) {
+    return { success: false };
+  }
+}
+
+export async function updateBrand(brandId: string, details: any) {
+  'use server';
+  try {
+    const user = await currentUser();
+    if (!user) return { success: false, error: 'Not authenticated' };
+    await ensureDbConnected();
+
+    const updateData: any = {
+      name: details.name,
+      description: details.description,
+    };
+
+    if (details.primaryColor || details.secondaryColor) {
+      updateData.identity = {
+        primary_color: details.primaryColor,
+        secondary_color: details.secondaryColor
       };
     }
 
-    // Get credits from Clerk metadata
-    const remaining = (user.unsafeMetadata.remaining as number) || 0;
-
-    // Return unlimited display - credits are tracked individually
-    return {
-      remaining,
-      limit: 999999
-    };
+    await Brand.findOneAndUpdate(
+      { _id: brandId, userId: user.id },
+      { $set: updateData }
+    );
+    return { success: true };
   } catch (error) {
-    console.error('Error fetching credits:', error);
-    return { remaining: 0, limit: 999999 };
+    console.error('Error updating brand:', error);
+    return { success: false };
+  }
+}
+
+export async function updateBrandDetails(brandId: string, details: any) {
+  'use server';
+  try {
+    const user = await currentUser();
+    if (!user) return { success: false, error: 'Not authenticated' };
+    await ensureDbConnected();
+    await Brand.findOneAndUpdate({ _id: brandId, userId: user.id }, { $set: details });
+    return { success: true };
+  } catch (error) {
+    console.error('Error updating brand details:', error);
+    return { success: false };
+  }
+}
+
+export async function checkHistory() {
+  'use server';
+  try {
+    const user = await currentUser();
+    if (!user) return null;
+    await ensureDbConnected();
+    const history = await Logo.find({ userId: user.id }).sort({ createdAt: -1 }).lean();
+    return (history as any[]).map(h => ({
+      ...h,
+      _id: h._id.toString(),
+      id: h._id.toString(),
+      createdAt: h.createdAt?.toISOString(),
+      updatedAt: h.updatedAt?.toISOString()
+    }));
+  } catch (error) {
+    console.error('Error checking history:', error);
+    return null;
   }
 }
 
@@ -706,112 +507,122 @@ export async function createStripeCheckoutSession(planId: string) {
   'use server';
   try {
     const user = await currentUser();
-    if (!user) {
-      return { success: false, error: 'User not authenticated' };
+    if (!user) return { success: false, error: 'Not authenticated' };
+
+    const plan = PLAN_MAPPING[planId];
+    if (!plan || !plan.priceId) {
+      return { success: false, error: 'Invalid plan or price not configured' };
     }
 
-    // Map plan IDs to Stripe price IDs and credit amounts
-    const planConfig: Record<string, { priceId: string; credits: number }> = {
-      basic: {
-        priceId: process.env.STRIPE_PRICE_ID_BASIC || '',
-        credits: 50,
-      },
-      pro: {
-        priceId: process.env.STRIPE_PRICE_ID_PRO || '',
-        credits: 150,
-      },
-      enterprise: {
-        priceId: process.env.STRIPE_PRICE_ID_ENTERPRISE || '',
-        credits: 500,
-      },
-    };
-
-    const config = planConfig[planId];
-    if (!config || !config.priceId) {
-      return { success: false, error: 'Invalid plan or Stripe not configured' };
-    }
-
-    // Create Stripe checkout session
     const session = await stripe.checkout.sessions.create({
-      customer_email: user.emailAddresses[0]?.emailAddress,
       payment_method_types: ['card'],
       line_items: [
         {
-          price: config.priceId,
+          price: plan.priceId,
           quantity: 1,
         },
       ],
       mode: 'payment',
-      success_url: `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/dashboard/credits?success=true`,
-      cancel_url: `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/dashboard/credits?canceled=true`,
-      client_reference_id: user.id,
+      success_url: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard/credits?success=true`,
+      cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard/credits?canceled=true`,
       metadata: {
         userId: user.id,
-        planId,
-        credits: config.credits.toString(),
+        credits: plan.credits.toString(),
       },
     });
 
-    return {
-      success: true,
-      url: session.url,
-      sessionId: session.id,
-    };
+    return { success: true, url: session.url };
   } catch (error) {
-    console.error('Error creating checkout session:', error);
-    return { success: false, error: 'Failed to create checkout session' };
+    console.error('Stripe error:', error);
+    return { success: false, error: 'Failed' };
   }
 }
 
-export async function updateBrandDetails(brandId: string, details: {
-  industry?: string;
-  contactInfo?: {
-    website?: string;
-    email?: string;
-    phone?: string;
-    address?: string;
-    mobile?: string;
-    facebook?: string;
-    instagram?: string;
-    twitter?: string;
-  }
-}) {
+export async function finalizeBrandLogo(brandId: string, assetId: string) {
   'use server';
   try {
     const user = await currentUser();
     if (!user) return { success: false, error: 'Not authenticated' };
 
     await ensureDbConnected();
+    const brand = await Brand.findOne({ _id: brandId, userId: user.id });
+    if (!brand) throw new Error("Brand not found");
 
-    console.log(`[updateBrandDetails] Updating brand ${brandId}. Details:`, JSON.stringify(details, null, 2));
+    // Update the subType of assets.
+    // The asset with assetId becomes 'primary_logo'.
+    // Other 'primary_logo' assets become 'logo_variation'.
+    brand.assets = brand.assets.map((asset: any) => {
+      const assetIdStr = asset._id ? asset._id.toString() : '';
+      if (assetIdStr === assetId) {
+        return { ...asset.toObject(), subType: 'primary_logo' };
+      } else if (asset.subType === 'primary_logo') {
+        return { ...asset.toObject(), subType: 'logo_variation' };
+      }
+      return asset;
+    });
 
-    const update: any = {};
-    if (details.industry !== undefined) update.industry = details.industry;
-    if (details.contactInfo !== undefined) {
-      // Use dot notation for nested object updates to avoid overwriting the whole object if not intended,
-      // though here we are replacing/merging. Since we receive the full contactInfo object usually, 
-      // we can set the fields.
-      Object.keys(details.contactInfo).forEach(key => {
-        update[`contactInfo.${key}`] = (details.contactInfo as any)[key];
-      });
+    brand.markModified('assets');
+
+    // Also update the brand identity primary color if the new logo has concept colors
+    const selectedAsset = brand.assets.find((a: any) => (a._id ? a._id.toString() : '') === assetId);
+    if (selectedAsset && selectedAsset.conceptColors && selectedAsset.conceptColors.length > 0) {
+      brand.identity = {
+        ...brand.identity,
+        primary_color: selectedAsset.conceptColors[0],
+        secondary_color: selectedAsset.conceptColors[1] || selectedAsset.conceptColors[0],
+      };
     }
 
-    const updatedBrand = await Brand.findOneAndUpdate(
-      { _id: brandId, userId: user.id },
-      { $set: update },
-      { new: true, upsert: false }
-    );
-
-    if (!updatedBrand) {
-      console.warn(`[updateBrandDetails] Brand not found or unauthorized: ${brandId}`);
-      return { success: false, error: 'Brand not found' };
-    }
-
-    console.log(`[updateBrandDetails] Success. Industry: ${updatedBrand.industry}, Email: ${updatedBrand.contactInfo?.email}`);
+    await brand.save();
     return { success: true };
   } catch (error) {
-    console.error('Error updating brand details:', error);
-    return { success: false, error: 'Failed to update brand details' };
+    console.error('Error finalizing brand logo:', error);
+    return { success: false, error: 'Failed to finalize logo' };
   }
 }
 
+export async function allLogos() {
+  'use server';
+  try {
+    await ensureDbConnected();
+    const logos = await Logo.find({}).sort({ createdAt: -1 }).limit(100).lean();
+    return (logos as any[]).map(h => ({
+      ...h,
+      _id: h._id.toString(),
+      id: h._id.toString(),
+      createdAt: h.createdAt?.toISOString(),
+      updatedAt: h.updatedAt?.toISOString()
+    }));
+  } catch (error) {
+    console.error('Error fetching all logos:', error);
+    return null;
+  }
+}
+
+export async function setPrimaryLogo(brandId: string, imageUrl: string) {
+  'use server';
+  try {
+    const user = await currentUser();
+    if (!user) return { success: false, error: 'Not authenticated' };
+
+    await ensureDbConnected();
+    const brand = await Brand.findOne({ _id: brandId, userId: user.id });
+    if (!brand) throw new Error("Brand not found");
+
+    brand.assets = brand.assets.map((asset: any) => {
+      if (asset.imageUrl === imageUrl) {
+        return { ...asset.toObject(), subType: 'primary_logo' };
+      } else if (asset.subType === 'primary_logo') {
+        return { ...asset.toObject(), subType: 'logo_variation' };
+      }
+      return asset;
+    });
+
+    brand.markModified('assets');
+    await brand.save();
+    return { success: true };
+  } catch (error) {
+    console.error('Error setting primary logo:', error);
+    return { success: false, error: 'Failed' };
+  }
+}

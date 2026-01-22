@@ -8,11 +8,11 @@ export interface BrandContextType {
   description?: string;
   strategy?: any;
   identity?: any;
-  blueprints?: any[];
   assets?: Array<{
     category: string;
     subType: string;
     imageUrl: string;
+    sceneData?: any;
     prompt: string;
     createdAt: string | Date;
   }>;

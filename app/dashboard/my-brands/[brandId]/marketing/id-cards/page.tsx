@@ -86,7 +86,7 @@ export default function IDCardsPage() {
           <div className="flex gap-2">
             <Button variant="outline">Customize</Button>
             <Button>
-              <Download className="mr-2 h-4 w-4" />
+              <Download className="h-4 w-4" />
               Download PNG
             </Button>
           </div>

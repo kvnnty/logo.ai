@@ -69,7 +69,7 @@ export default function NotFound() {
             <h2 className="text-4xl sm:text-5xl font-bold tracking-tight">
               Oops! You've drifted off course.
             </h2>
-            <p className="text-xl text-muted-foreground max-w-lg mx-auto leading-relaxed">
+            <p className="text-lg text-muted-foreground max-w-lg mx-auto leading-relaxed">
               We couldn't find the page you're looking for. It might have been moved, deleted, or never existed in the first place.
             </p>
           </div>
@@ -79,10 +79,9 @@ export default function NotFound() {
             <Button
               asChild
               size="lg"
-              className="h-14 px-8 text-lg font-semibold rounded-2xl transition-all hover:scale-105 active:scale-95"
             >
               <Link href="/">
-                <Home className="mr-2 h-5 w-5" />
+                <Home className="h-5 w-5" />
                 Back to Home
               </Link>
             </Button>
@@ -90,9 +89,8 @@ export default function NotFound() {
               variant="outline"
               size="lg"
               onClick={() => window.history.back()}
-              className="h-14 px-8 text-lg font-semibold border-2 rounded-2xl transition-all hover:bg-accent hover:border-primary/20 hover:scale-105 active:scale-95"
             >
-              <ArrowLeft className="mr-2 h-5 w-5" />
+              <ArrowLeft className="h-5 w-5" />
               Go Back
             </Button>
           </div>
@@ -108,21 +106,22 @@ export default function NotFound() {
           <Search className="w-4 h-4" />
           <span className="text-sm font-medium tracking-wide uppercase">Page Not Found</span>
         </motion.div>
-      </div>
+      </div >
 
       {/* Floating Animated Icons */}
-      <motion.div
+      < motion.div
         animate={{
           y: [-10, 10, -10],
           x: [-5, 5, -5],
-        }}
+        }
+        }
         transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
         className="absolute top-1/4 right-[15%] hidden lg:block opacity-20"
       >
         <div className="p-4 bg-primary/10 rounded-2xl rotate-12">
           <Sparkles className="w-8 h-8 text-primary" />
         </div>
-      </motion.div>
+      </motion.div >
 
       <motion.div
         animate={{
@@ -136,6 +135,6 @@ export default function NotFound() {
           <Search className="w-8 h-8 text-purple-500" />
         </div>
       </motion.div>
-    </div>
+    </div >
   );
 }

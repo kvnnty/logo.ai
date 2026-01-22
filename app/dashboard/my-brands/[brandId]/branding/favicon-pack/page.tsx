@@ -76,7 +76,7 @@ export default function FaviconPackPage() {
         description="Optimized website icons for different browsers and devices."
       >
         <Button>
-          <Download className="mr-2 h-4 w-4" />
+          <Download className="h-4 w-4" />
           Download All (ZIP)
         </Button>
       </PageHeader>

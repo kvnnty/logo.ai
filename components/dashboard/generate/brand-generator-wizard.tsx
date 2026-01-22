@@ -17,9 +17,9 @@ export default function BrandGeneratorWizard() {
         {method === null ? (
           <motion.div
             key="selection"
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
             transition={{ duration: 0.3 }}
           >
             <MethodSelection onSelect={setMethod} />
@@ -27,9 +27,9 @@ export default function BrandGeneratorWizard() {
         ) : method === "ai" ? (
           <motion.div
             key="ai"
-            initial={{ opacity: 0, x: 10 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -10 }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
             transition={{ duration: 0.3 }}
           >
             <AIFlow onBack={() => setMethod(null)} />
@@ -37,9 +37,9 @@ export default function BrandGeneratorWizard() {
         ) : (
           <motion.div
             key="upload"
-            initial={{ opacity: 0, x: 10 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -10 }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
             transition={{ duration: 0.3 }}
           >
             <UploadFlow onBack={() => setMethod(null)} />

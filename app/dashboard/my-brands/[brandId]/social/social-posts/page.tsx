@@ -11,7 +11,7 @@ export default function SocialPostsPage() {
       brandId={brandId as string}
       category="social_post"
       title="Social Media Posts"
-      description="20 high-engagement social media post templates tailored to your brand identity."
+      description="5 high-engagement social media post templates tailored to your brand identity."
       aspectRatio="square"
     />
   );

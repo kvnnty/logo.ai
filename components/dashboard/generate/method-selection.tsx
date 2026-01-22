@@ -3,7 +3,6 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { IconSparkles, IconUpload } from "@tabler/icons-react";
-import { motion } from "framer-motion";
 
 interface MethodSelectionProps {
   onSelect: (method: "ai" | "upload") => void;
@@ -13,7 +12,7 @@ export function MethodSelection({ onSelect }: MethodSelectionProps) {
   return (
     <div className="space-y-6">
       <div className="text-center space-y-2 mb-8">
-        <h2 className="text-3xl font-bold">How would you like to start?</h2>
+        <h2 className="text-2xl font-bold">How would you like to start?</h2>
         <p className="text-muted-foreground">
           Choose to generate a new brand from scratch or expand your existing
           brand
@@ -21,17 +20,14 @@ export function MethodSelection({ onSelect }: MethodSelectionProps) {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
-        <motion.div
-          whileTap={{ scale: 0.98 }}
-          className="h-full"
-        >
+        <div className="h-full">
           <Card
             className="cursor-pointer hover:border-primary/50 transition-colors h-full rounded-3xl"
             onClick={() => onSelect("upload")}
           >
             <CardContent className="p-8 flex flex-col items-center text-center gap-6 h-full justify-center">
               <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center">
-                <IconUpload className="w-10 h-10 text-primary" />
+                <IconUpload className="w-8 h-8 text-primary" />
               </div>
               <div className="space-y-4">
                 <h3 className="text-xl font-bold">Upload Your logo</h3>
@@ -46,12 +42,9 @@ export function MethodSelection({ onSelect }: MethodSelectionProps) {
               </div>
             </CardContent>
           </Card>
-        </motion.div>
+        </div>
 
-        <motion.div
-          whileTap={{ scale: 0.98 }}
-          className="h-full"
-        >
+        <div className="h-full">
           <Card
             className="cursor-pointer hover:border-primary/50 transition-colors h-full rounded-3xl"
             onClick={() => onSelect("ai")}
@@ -73,7 +66,7 @@ export function MethodSelection({ onSelect }: MethodSelectionProps) {
               </div>
             </CardContent>
           </Card>
-        </motion.div>
+        </div>
       </div>
     </div>
   );
