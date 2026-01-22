@@ -13,7 +13,7 @@ export default function LicensePage() {
         description="Official documentation of your asset usage rights."
       >
         <Button variant="outline">
-          <Download className="mr-2 h-4 w-4" />
+          <Download className="h-4 w-4" />
           Download Certificate
         </Button>
       </PageHeader>

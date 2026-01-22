@@ -1,125 +1,92 @@
-import mongoose, { Schema, models, model, Document } from 'mongoose';
-import { config } from 'dotenv';
+import mongoose from 'mongoose';
 
-// Load env from default locations (.env, .env.local)
-config();
+const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/logo-ai';
 
-const MONGODB_URI = process.env.MONGODB_URI as string;
-
-if (!MONGODB_URI) {
-  throw new Error('MONGODB_URI is not defined in environment variables');
+export async function ensureDbConnected() {
+  if (mongoose.connection.readyState === 1) return;
+  await mongoose.connect(MONGODB_URI);
 }
 
-let isConnected = false;
+const ImageAssetSchema = new mongoose.Schema({
+  category: String,
+  subType: String,
+  imageUrl: String,
+  prompt: String,
+  sceneData: mongoose.Schema.Types.Mixed,
+  conceptId: String,
+  conceptColors: [String],
+  createdAt: { type: Date, default: Date.now },
+});
 
-export async function ensureDbConnected(): Promise<void> {
-  if (isConnected) return;
-  if (mongoose.connection.readyState === 1) {
-    isConnected = true;
-    return;
-  }
-  await mongoose.connect(MONGODB_URI);
-  isConnected = true;
+const BrandSchema = new mongoose.Schema({
+  userId: { type: String, required: true, index: true },
+  name: { type: String, required: true },
+  description: String,
+  industry: String,
+  contactInfo: {
+    website: String,
+    email: String,
+    phone: String,
+    address: String,
+    mobile: String,
+    facebook: String,
+    instagram: String,
+    twitter: String,
+  },
+  strategy: mongoose.Schema.Types.Mixed,
+  identity: mongoose.Schema.Types.Mixed,
+  assets: [ImageAssetSchema],
+  createdAt: { type: Date, default: Date.now },
+  updatedAt: { type: Date, default: Date.now },
+});
+
+const LogoSchema = new mongoose.Schema({
+  brandId: { type: mongoose.Schema.Types.ObjectId, ref: 'Brand' },
+  image_url: String,
+  primary_color: String,
+  background_color: String,
+  username: String,
+  userId: String,
+  createdAt: { type: Date, default: Date.now },
+  updatedAt: { type: Date, default: Date.now },
+});
+
+export const Brand = mongoose.models.Brand || mongoose.model('Brand', BrandSchema);
+export const Logo = mongoose.models.Logo || mongoose.model('Logo', LogoSchema);
+
+export interface IBrandAsset {
+  category: string;
+  subType: string;
+  imageUrl: string;
+  prompt: string;
+  sceneData?: any;
+  conceptId?: string;
+  conceptColors?: string[];
+  createdAt: Date;
+}
+
+export interface IBrand {
+  _id: any;
+  userId: string;
+  name: string;
+  description: string;
+  industry?: string;
+  contactInfo?: any;
+  strategy: any;
+  identity: any;
+  assets: IBrandAsset[];
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 export interface ILogo {
-  _id?: any;
-  brandId?: string;
+  _id: any;
+  brandId?: any;
   image_url: string;
   primary_color: string;
   background_color: string;
   username: string;
   userId: string;
-  createdAt?: Date;
-  updatedAt?: Date;
+  createdAt: Date;
+  updatedAt: Date;
 }
-
-export interface IBrandAsset {
-  category?: 'logo' | 'social_post' | 'social_story' | 'social_cover' | 'social_profile' | 'youtube_thumbnail' | 'marketing' | 'branding' | string;
-  subType?: string;
-  imageUrl?: string;
-  prompt?: string;
-  createdAt?: Date;
-}
-
-export interface IBrand {
-  _id?: any;
-  userId: string;
-  name: string;
-  description?: string;
-  strategy?: any;
-  identity?: any;
-  blueprints?: any;
-  assets: IBrandAsset[];
-  industry?: string;
-  contactInfo?: {
-    website?: string;
-    email?: string;
-    phone?: string;
-    address?: string;
-    mobile?: string;
-    facebook?: string;
-    instagram?: string;
-    twitter?: string;
-  };
-  createdAt?: Date;
-  updatedAt?: Date;
-}
-
-const LogoSchema = new Schema(
-  {
-    brandId: { type: String },
-    image_url: { type: String, required: true },
-    primary_color: { type: String, required: true },
-    background_color: { type: String, required: true },
-    username: { type: String, required: true },
-    userId: { type: String, required: true },
-  },
-  { timestamps: { createdAt: 'createdAt', updatedAt: 'updatedAt' } }
-);
-
-
-const BrandSchema = new Schema(
-  {
-    userId: { type: String, required: true },
-    name: { type: String, required: true },
-    description: { type: String }, // User input
-
-    // Stage 1 Output: Brand Strategy & Identity
-    strategy: { type: Schema.Types.Mixed }, // JSON: values, personality, audience
-    identity: { type: Schema.Types.Mixed }, // JSON: colors, typography, style rules
-
-    // Stage 2 Output: Asset Blueprints
-    blueprints: { type: Schema.Types.Mixed }, // JSON: prompts for specific assets
-
-    // Stage 3 Output: Generated Assets
-    assets: [{
-      category: String, // 'logo', 'social_post', etc.
-      subType: String,
-      imageUrl: String,
-      prompt: String,
-      createdAt: { type: Date, default: Date.now }
-    }],
-    industry: { type: String, default: "" },
-    contactInfo: {
-      website: { type: String, default: "" },
-      email: { type: String, default: "" },
-      phone: { type: String, default: "" },
-      address: { type: String, default: "" },
-      mobile: { type: String, default: "" },
-      facebook: { type: String, default: "" },
-      instagram: { type: String, default: "" },
-      twitter: { type: String, default: "" },
-    }
-  },
-  { timestamps: true, strict: false }
-);
-
-export const Logo = models.Logo || model<ILogo>('Logo', LogoSchema);
-
-// Force refresh Brand model in development to pick up schema changes
-if (process.env.NODE_ENV === 'development') {
-  delete models.Brand;
-}
-export const Brand = models.Brand || model<IBrand>('Brand', BrandSchema);
-

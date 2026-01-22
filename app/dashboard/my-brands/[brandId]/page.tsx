@@ -3,18 +3,22 @@
 import { useBrand } from "@/components/providers/brand-provider";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Sparkles, Palette, Image as ImageIcon, Share2, FileText, Settings, ArrowRight, RefreshCw } from "lucide-react";
+import { Sparkles, Palette, Image as ImageIcon, Share2, FileText, Settings, ArrowRight, RefreshCw, Type, Layout } from "lucide-react";
 import { motion } from "framer-motion";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { EditBrandDialog } from "@/components/dashboard/shared/edit-brand-dialog";
 import { BrandOnboardingDialog } from "@/components/dashboard/brand-onboarding-dialog";
 import { useEffect } from "react";
+import { BrandCanvasEditor } from "@/components/dashboard/canvas/brand-canvas-editor";
+import { generateInteractiveAsset } from "@/app/actions/actions";
 
 export default function BrandDashboardPage() {
   const brand = useBrand();
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isOnboardingOpen, setIsOnboardingOpen] = useState(false);
+  const [activeEditorAsset, setActiveEditorAsset] = useState<{ sceneData: any, assetId: string } | null>(null);
+  const [isGenerating, setIsGenerating] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -24,18 +28,46 @@ export default function BrandDashboardPage() {
     }
   }, [brand.industry]);
 
+  const handleOpenEditor = async (category: string, subType: string) => {
+    // Check if we already have an asset with sceneData for this category
+    const existingAsset = brand.assets?.find((a: any) => a.category === category && a.subType === subType && a.sceneData);
+
+    if (existingAsset) {
+      setActiveEditorAsset({ sceneData: existingAsset.sceneData, assetId: (existingAsset as any)._id });
+      return;
+    }
+
+    // Otherwise generate a new one
+    setIsGenerating(true);
+    try {
+      const result = await generateInteractiveAsset(brand._id, category, subType);
+      if (result.success && result.sceneData) {
+        // Since we saved it to the DB, we can just find it or use the returned data
+        // We'll use the returned data for immediate entry
+        // Note: For a real app, you might want to refresh the brand context here
+        // But for now, we just open the editor with the new data
+        setActiveEditorAsset({ sceneData: result.sceneData, assetId: "new" });
+        router.refresh();
+      }
+    } catch (err) {
+      console.error("Failed to generate asset:", err);
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
   // Get primary color from identity
   const primaryColor = brand.identity?.primary_color || "#2563eb";
 
   return (
-    <div className="space-y-8 pb-12">
+    <div className="pb-12">
       {/* Brand Overview */}
       <div className="flex items-start justify-between bg-white p-8 rounded-3xl border shadow-sm">
         <div className="space-y-4">
           <div>
-            <h1 className="text-4xl font-bold tracking-tight">{brand.name}</h1>
+            <h1 className="text-2xl font-bold tracking-tight">{brand.name}</h1>
             {brand.description && (
-              <p className="text-muted-foreground mt-2 max-w-2xl text-lg leading-relaxed">
+              <p className="text-muted-foreground mt-2 max-w-2xl leading-relaxed">
                 {brand.description}
               </p>
             )}
@@ -62,21 +94,38 @@ export default function BrandDashboardPage() {
       />
 
       <BrandOnboardingDialog
-        brandId={brand._id}
-        brandName={brand.name}
         isOpen={isOnboardingOpen}
         onClose={() => {
           setIsOnboardingOpen(false);
           router.refresh();
         }}
+        brand={brand}
       />
 
+      {activeEditorAsset && (
+        <BrandCanvasEditor
+          initialScene={activeEditorAsset.sceneData}
+          brandId={brand._id}
+          assetId={activeEditorAsset.assetId}
+          onClose={() => setActiveEditorAsset(null)}
+        />
+      )}
+
+      {isGenerating && (
+        <div className="fixed inset-0 z-[60] bg-background/80 backdrop-blur-sm flex flex-col items-center justify-center p-6 text-center">
+          <div className="w-20 h-20 border-4 border-primary/30 border-t-primary animate-spin rounded-full mb-6" />
+          <h2 className="text-2xl font-bold mb-2">AI is Designing Your Canvas</h2>
+          <p className="text-muted-foreground max-w-sm">
+            We're arranging layouts, typography, and generating custom visuals...
+          </p>
+        </div>
+      )}
       {/* Quick Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mt-8">
         <Card>
           <CardHeader className="pb-2">
             <CardDescription>Total Assets</CardDescription>
-            <CardTitle className="text-3xl">{brand.assets?.length || 0}</CardTitle>
+            <CardTitle className="text-2xl">{brand.assets?.length || 0}</CardTitle>
           </CardHeader>
         </Card>
         <Card>
@@ -94,7 +143,7 @@ export default function BrandDashboardPage() {
         <Card>
           <CardHeader className="pb-2">
             <CardDescription>Brand Style</CardDescription>
-            <CardTitle className="text-lg capitalize">
+            <CardTitle className=" capitalize">
               {brand.strategy?.archetype || "Not set"}
             </CardTitle>
           </CardHeader>
@@ -102,113 +151,147 @@ export default function BrandDashboardPage() {
         <Card>
           <CardHeader className="pb-2">
             <CardDescription>Created</CardDescription>
-            <CardTitle className="text-lg">
+            <CardTitle className="">
               {new Date(brand.createdAt).toLocaleDateString()}
             </CardTitle>
           </CardHeader>
         </Card>
       </div>
 
-      {/* Your Brand Kit */}
-      <div className="space-y-12">
+      {/* Logo Collection Section */}
+      {brand.assets?.some((a: any) => a.category === 'logo' && (a.subType === 'primary_logo' || a.subType === 'primary_variation')) && (
+        <div className="space-y-6 mt-8">
+          <div className="flex items-center justify-between">
+            <div className="space-y-1">
+              <h2 className="text-2xl font-bold tracking-tight">Active Logo Collection</h2>
+              <p className="text-muted-foreground">The primary variations for your brand identity.</p>
+            </div>
+            <Button variant="outline" size="sm" onClick={() => router.push(`/dashboard/my-brands/${brand._id}/branding`)}>
+              Manage All
+            </Button>
+          </div>
+
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+            {brand.assets
+              ?.filter((a: any) => a.category === 'logo' && (a.subType === 'primary_logo' || a.subType === 'primary_variation'))
+              .sort((a: any, b: any) => {
+                const order = ['primary_logo', 'primary_variation'];
+                return order.indexOf(a.subType) - order.indexOf(b.subType);
+              })
+              .map((asset: any, idx: number) => (
+                <motion.div
+                  key={idx}
+                  whileHover={{ y: -5 }}
+                  className="group relative cursor-pointer"
+                  onClick={() => setActiveEditorAsset({ sceneData: asset.sceneData, assetId: asset._id })}
+                >
+                  <Card className="overflow-hidden border-border/50 bg-white shadow-sm hover:shadow-md transition-all">
+                    <div className="aspect-square flex items-center justify-center p-8 bg-gradient-to-br from-white to-gray-50 relative">
+                      {asset.subType === 'primary_logo' && (
+                        <div className="absolute top-2 right-2 bg-primary text-primary-foreground text-[10px] font-bold px-2 py-0.5 rounded-full z-10">
+                          PRIMARY
+                        </div>
+                      )}
+
+                      {asset.imageUrl ? (
+                        <img src={asset.imageUrl} alt={asset.subType} className="max-w-full max-h-full object-contain" />
+                      ) : (
+                        <div className="w-full h-full flex flex-col items-center justify-center text-center opacity-80 group-hover:opacity-100 transition-opacity">
+                          {asset.subType === 'logo_text' || (asset.sceneData?.elements?.length === 1 && asset.sceneData.elements[0].type === 'text') ? (
+                            <Type className="w-8 h-8 text-muted-foreground mb-2" />
+                          ) : (
+                            <ImageIcon className="w-8 h-8 text-muted-foreground mb-2" />
+                          )}
+                          <span className="text-[10px] font-medium text-muted-foreground uppercase">{asset.subType.replace('primary_', '').replace('_', ' ')}</span>
+                        </div>
+                      )}
+
+                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100">
+                        <div className="bg-white text-primary text-xs font-bold px-3 py-1.5 rounded-full shadow-sm flex items-center gap-1.5 border">
+                          <Layout className="w-3.5 h-3.5" />
+                          Edit in Canvas
+                        </div>
+                      </div>
+                    </div>
+                  </Card>
+                </motion.div>
+              ))}
+          </div>
+        </div>
+      )}
+      <div className="space-y-8 mt-8">
         <div className="space-y-1">
-          <h2 className="text-3xl font-bold tracking-tight">Your Brand Kit</h2>
-          <p className="text-muted-foreground text-lg">Everything you need to grow your brand, all in one place.</p>
+          <h2 className="text-2xl font-bold tracking-tight">Your Brand Kit</h2>
+          <p className="text-muted-foreground">Select a category to manage and design your brand assets.</p>
         </div>
 
-        {[
-          {
-            title: "Social Media",
-            description: "Ready-to-post designs for all major platforms",
-            items: [
-              { name: "Social Stories", count: "+100", desc: "Customizable story templates", href: `/dashboard/my-brands/${brand._id}/social/social-stories`, category: "social_story" },
-              { name: "Social Posts", count: "+100", desc: "Ready-to-post designs", href: `/dashboard/my-brands/${brand._id}/social/social-posts`, category: "social_post" },
-              { name: "Social Covers", count: "+50", desc: "High-quality profile and cover images", href: `/dashboard/my-brands/${brand._id}/social/social-covers-profiles`, category: "social_cover" },
-              { name: "YouTube Thumbnails", count: "+50", desc: "Eye-catching thumbnails", href: `/dashboard/my-brands/${brand._id}/social/youtube-thumbnails`, category: "youtube_thumbnail" },
-            ]
-          },
-          {
-            title: "Marketing Materials",
-            description: "Professional assets for your marketing campaigns",
-            items: [
-              { name: "Marketing Ads", count: "+50", desc: "High-conversion ad designs", href: `/dashboard/my-brands/${brand._id}/marketing/ads`, category: "marketing" },
-              { name: "Flyers & Posters", count: "+50", desc: "Print-ready marketing material", href: `/dashboard/my-brands/${brand._id}/marketing/flyers`, category: "marketing" },
-              { name: "Business Posters", count: "+50", desc: "Large format designs", href: `/dashboard/my-brands/${brand._id}/marketing/posters`, category: "marketing" },
-              { name: "ID Cards", count: "+20", desc: "Professional identification", href: `/dashboard/my-brands/${brand._id}/marketing/id-cards`, category: "marketing" },
-              { name: "Marketing Cards", count: "+50", desc: "Themed cards and stationary", href: `/dashboard/my-brands/${brand._id}/marketing/cards`, category: "marketing" },
-            ]
-          },
-          {
-            title: "Branding Assets",
-            description: "Core identity assets for your business",
-            items: [
-              { name: "Brand Book", count: "", desc: "Detailed brand guidelines", href: `/dashboard/my-brands/${brand._id}/branding/brand-book`, category: "branding" },
-              { name: "Business Cards", count: "+50", desc: "Professional business cards", href: `/dashboard/my-brands/${brand._id}/branding/business-cards`, category: "branding" },
-              { name: "Letterheads", count: "+50", desc: "Letterheads(Microsoft word)", href: `/dashboard/my-brands/${brand._id}/branding/letterheads`, category: "branding" },
-              { name: "Email Signatures", count: "+10", desc: "Branded email footers", href: `/dashboard/my-brands/${brand._id}/branding/email-signature`, category: "branding" },
-              { name: "Favicon Pack", count: "+5", desc: "Digital markers for web", href: `/dashboard/my-brands/${brand._id}/branding/favicon-pack`, category: "branding" },
-              { name: "Brand License", count: "", desc: "Commercial usage rights", href: `/dashboard/my-brands/${brand._id}/branding/license`, category: "branding" },
-            ]
-          }
-        ].map((section, sIndex) => (
-          <div key={sIndex} className="space-y-6">
-            <div className="flex items-end justify-between border-b pb-4">
-              <div className="space-y-1">
-                <h3 className="text-xl font-bold tracking-tight">{section.title}</h3>
-                <p className="text-sm text-muted-foreground">{section.description}</p>
-              </div>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {section.items.map((item, iIndex) => {
-                const asset = brand.assets?.find(a => a.category === item.category);
-                return (
-                  <motion.div
-                    key={iIndex}
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: (sIndex * 4 + iIndex) * 0.05 }}
-                    onClick={() => router.push(item.href)}
-                  >
-                    <Card className="overflow-hidden border shadow-sm hover:shadow-xl transition-all group cursor-pointer bg-white rounded-2xl flex flex-col h-full border-none shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)]">
-                      <div className="aspect-[16/10] bg-muted relative overflow-hidden">
-                        {asset ? (
-                          <img
-                            src={asset.imageUrl}
-                            alt={item.name}
-                            className="w-full h-full object-cover transition-transform group-hover:scale-110 duration-700"
-                          />
-                        ) : (
-                          <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary/5 to-primary/10 group-hover:from-primary/10 group-hover:to-primary/20 transition-colors">
-                            <Sparkles className="h-8 w-8 text-primary/20 group-hover:text-primary/40 transition-colors" />
-                          </div>
-                        )}
-                        <div className="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity" />
-                      </div>
-                      <CardContent className="p-6 flex-grow flex flex-col space-y-1.5">
-                        <h4 className="font-bold text-lg tracking-tight group-hover:text-primary transition-colors">
-                          {item.name}
-                        </h4>
-                        {item.count && (
-                          <p className="text-primary font-bold text-sm">
-                            {item.count}
-                          </p>
-                        )}
-                        <p className="text-[13px] text-muted-foreground leading-snug">
-                          {item.desc}
-                        </p>
-                      </CardContent>
-                    </Card>
-                  </motion.div>
-                );
-              })}
-            </div>
-          </div>
-        ))}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          {[
+            {
+              title: "Social Media",
+              description: "Ready-to-post designs for Instagram, YouTube, and more.",
+              href: `/dashboard/my-brands/${brand._id}/social`,
+              icon: Share2,
+              color: "bg-blue-500/10",
+              textColor: "text-blue-600",
+              count: brand.assets?.filter((a: any) => a.category?.includes('social') || a.category?.includes('youtube')).length || 0,
+            },
+            {
+              title: "Marketing Materials",
+              description: "Professional flyers, ads, and promotional content.",
+              href: `/dashboard/my-brands/${brand._id}/marketing`,
+              icon: FileText,
+              color: "bg-purple-500/10",
+              textColor: "text-purple-600",
+              count: brand.assets?.filter((a: any) => a.category?.includes('marketing') || a.category?.includes('flyer')).length || 0,
+            },
+            {
+              title: "Branding Assets",
+              description: "Business cards, logos, and core identity items.",
+              href: `/dashboard/my-brands/${brand._id}/branding`,
+              icon: Palette,
+              color: "bg-orange-500/10",
+              textColor: "text-orange-600",
+              count: brand.assets?.filter((a: any) => a.category?.includes('branding') || a.category?.includes('business') || a.category === 'logo').length || 0,
+            }
+          ].map((cat, idx) => (
+            <motion.div
+              key={idx}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: idx * 0.1 }}
+              onClick={() => router.push(cat.href)}
+              className="cursor-pointer group"
+            >
+              <Card className="h-full border-border/50 bg-card/50 hover:bg-card transition-all duration-300">
+                <CardHeader>
+                  <div className={`w-12 h-12 rounded-2xl ${cat.color} flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}>
+                    <cat.icon className={`w-6 h-6 ${cat.textColor}`} />
+                  </div>
+                  <CardTitle className="text-xl font-bold">{cat.title}</CardTitle>
+                  <CardDescription className="text-sm leading-relaxed">
+                    {cat.description}
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex items-center justify-between mt-4">
+                    <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                      {cat.count} ASSETS GENERATED
+                    </span>
+                    <div className="w-8 h-8 rounded-full bg-primary/5 flex items-center justify-center group-hover:bg-primary group-hover:text-primary-foreground transition-all">
+                      <ArrowRight className="w-4 h-4" />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </motion.div>
+          ))}
+        </div>
       </div>
 
       {/* Brand Identity / Color Strategy */}
       {brand.identity && (
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mt-8">
           <Card className="lg:col-span-2 rounded-3xl border shadow-sm overflow-hidden">
             <CardHeader className="bg-muted/30 pb-6">
               <CardTitle className="flex items-center gap-2">
@@ -249,7 +332,7 @@ export default function BrandDashboardPage() {
 
           <Card className="rounded-3xl border shadow-sm bg-primary/5 border-primary/10">
             <CardHeader>
-              <CardTitle className="text-lg">Quick Summary</CardTitle>
+              <CardTitle className="">Quick Summary</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex items-center justify-between text-sm py-2 border-b border-primary/10">

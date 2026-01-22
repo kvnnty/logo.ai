@@ -11,7 +11,7 @@ export default function SocialStoriesPage() {
       brandId={brandId as string}
       category="social_story"
       title="Social Media Stories"
-      description="20 vertical story templates designed to keep your brand looking fresh and engaging."
+      description="5 vertical story templates designed to keep your brand looking fresh and engaging."
       aspectRatio="portrait"
     />
   );

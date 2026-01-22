@@ -11,7 +11,7 @@ export default function BusinessCardsPage() {
       brandId={brandId as string}
       category="branding"
       title="Business Cards"
-      description="20 unique business card designs maintaining your brand's professional identity."
+      description="5 unique business card designs maintaining your brand's professional identity."
       aspectRatio="video"
     />
   );

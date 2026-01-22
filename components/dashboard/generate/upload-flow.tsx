@@ -1,14 +1,13 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { createBrandFromUpload } from "@/app/actions/upload-actions";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { ChevronLeft, Upload, ImageIcon, Check, Loader2, Sparkles } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { createBrandFromUpload } from "@/app/actions/upload-actions";
-import { motion, AnimatePresence } from "framer-motion";
+import { ChevronLeft, ImageIcon, Loader2, Sparkles, Upload } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useRef, useState } from "react";
 
 export function UploadFlow({ onBack }: { onBack: () => void }) {
   const [file, setFile] = useState<File | null>(null);
@@ -134,20 +133,9 @@ export function UploadFlow({ onBack }: { onBack: () => void }) {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
-        {/* Left Column - Form & Upload */}
         <div className="space-y-6">
           <Card className="border shadow-sm overflow-hidden">
-            <CardContent className="p-8 space-y-6">
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Company Name</label>
-                <Input
-                  value={companyName}
-                  onChange={(e) => setCompanyName(e.target.value)}
-                  placeholder="e.g. Acme Corp"
-                  className="h-12 border-2"
-                />
-              </div>
-
+            <CardContent className="space-y-3">
               <div className="space-y-2">
                 <label className="text-sm font-medium">Upload Logo</label>
                 <div
@@ -178,6 +166,16 @@ export function UploadFlow({ onBack }: { onBack: () => void }) {
                   )}
                 </div>
               </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Company Name</label>
+                <Input
+                  value={companyName}
+                  onChange={(e) => setCompanyName(e.target.value)}
+                  placeholder="e.g. Acme Corp"
+                  className="h-12"
+                />
+              </div>
+
             </CardContent>
           </Card>
 
@@ -204,13 +202,13 @@ export function UploadFlow({ onBack }: { onBack: () => void }) {
                     </div>
                   </div>
                 </div>
-                <p className="text-xs text-muted-foreground italic">We will use these colors to generate your matching brand assets.</p>
+                <p className="text-xs text-muted-foreground">We will use these colors to generate your matching brand assets.</p>
               </CardContent>
             </Card>
           )}
 
           <Button
-            className="w-full h-14 text-lg font-bold shadow-lg"
+            className="w-full"
             size="lg"
             disabled={!preview || !companyName || isGenerating}
             onClick={handleGenerateBrandKit}
@@ -229,7 +227,6 @@ export function UploadFlow({ onBack }: { onBack: () => void }) {
           </Button>
         </div>
 
-        {/* Right Column - Preview Montage / Info */}
         <div className="lg:sticky lg:top-8 space-y-6">
           <Card className="border bg-gradient-to-br from-primary/5 to-purple-500/5 min-h-[500px] flex flex-col items-center justify-center p-8 text-center border-dashed">
             <div className="max-w-sm space-y-6">
@@ -237,7 +234,7 @@ export function UploadFlow({ onBack }: { onBack: () => void }) {
                 {preview ? <img src={preview} className="w-16 h-16 object-contain" /> : <ImageIcon className="w-12 h-12 text-muted-foreground" />}
               </div>
               <div className="space-y-2">
-                <h3 className="text-2xl font-bold italic">Instantly expand your brand</h3>
+                <h3 className="text-2xl font-bold">Instantly expand your brand</h3>
                 <p className="text-muted-foreground">
                   Upload your logo and we'll automatically generate:
                 </p>

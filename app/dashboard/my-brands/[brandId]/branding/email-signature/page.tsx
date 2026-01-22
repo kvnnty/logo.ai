@@ -89,7 +89,7 @@ export default function EmailSignaturePage() {
           {/* Controls */}
           <div className="md:col-span-2 flex justify-end">
             <Button onClick={handleCopy} className="w-full md:w-auto">
-              {copied ? <Check className="mr-2 h-4 w-4" /> : <Copy className="mr-2 h-4 w-4" />}
+              {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
               {copied ? "Copied!" : "Copy Signature"}
             </Button>
           </div>

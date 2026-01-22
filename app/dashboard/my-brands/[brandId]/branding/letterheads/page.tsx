@@ -11,7 +11,7 @@ export default function LetterheadsPage() {
       brandId={brandId as string}
       category="branding"
       title="Brand Letterheads"
-      description="20 official letterhead templates for your corporate communication."
+      description="5 official letterhead templates for your corporate communication."
       aspectRatio="portrait"
     />
   );

@@ -39,7 +39,7 @@ export default function BrandBookPage() {
         description="Your official brand guidelines including logo usage, colors, and typography."
       >
         <Button variant="outline">
-          <Download className="mr-2 h-4 w-4" />
+          <Download className="h-4 w-4" />
           Download PDF
         </Button>
       </PageHeader>

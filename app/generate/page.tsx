@@ -333,8 +333,8 @@ export default function Home() {
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                     className={`p-6 rounded-xl border-2 flex flex-col items-center gap-3 text-center transition-all ${selectedStyle === style.id
-                        ? "border-primary bg-primary/10 text-foreground font-semibold ring-2 ring-primary shadow-lg"
-                        : "border-border hover:bg-accent/50 hover:border-primary/50"
+                      ? "border-primary bg-primary/10 text-foreground font-semibold ring-2 ring-primary shadow-lg"
+                      : "border-border hover:bg-accent/50 hover:border-primary/50"
                       }`}
                   >
                     <IconComponent className={`w-8 h-8 ${selectedStyle === style.id ? "text-primary" : ""}`} />
@@ -555,10 +555,10 @@ export default function Home() {
                   <div className="relative">
                     <div
                       className={`w-12 h-12 rounded-full flex items-center justify-center font-semibold border-2 transition-all ${currentStep > step.number
-                          ? "bg-primary border-primary text-primary-foreground"
-                          : currentStep === step.number
-                            ? "border-primary bg-primary text-primary-foreground ring-4 ring-primary/20"
-                            : "border-border bg-background text-muted-foreground"
+                        ? "bg-primary border-primary text-primary-foreground"
+                        : currentStep === step.number
+                          ? "border-primary bg-primary text-primary-foreground ring-4 ring-primary/20"
+                          : "border-border bg-background text-muted-foreground"
                         }`}
                     >
                       {currentStep > step.number ? (
@@ -667,7 +667,7 @@ export default function Home() {
                         className="flex-1 bg-primary hover:bg-primary/80"
                         disabled={loading}
                       >
-                        <RefreshCw className="mr-2 h-4 w-4" />
+                        <RefreshCw className="h-4 w-4" />
                         Generate New
                       </Button>
                       <Button
@@ -676,7 +676,7 @@ export default function Home() {
                         className="flex-1"
                         disabled={isDownloading}
                       >
-                        <Download className="mr-2 h-4 w-4" />
+                        <Download className="h-4 w-4" />
                         {isDownloading ? "Downloading..." : "Download"}
                       </Button>
                     </div>
@@ -725,8 +725,8 @@ export default function Home() {
                           <div
                             key={step}
                             className={`h-2 w-2 rounded-full transition-all duration-300 ${step <= currentStep
-                                ? "bg-primary scale-125"
-                                : "bg-muted-foreground/30"
+                              ? "bg-primary scale-125"
+                              : "bg-muted-foreground/30"
                               }`}
                           />
                         ))}

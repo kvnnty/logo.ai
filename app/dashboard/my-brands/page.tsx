@@ -65,14 +65,13 @@ export default function BrandsPage() {
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-4xl font-bold">My Brands</h1>
+          <h1 className="text-3xl font-bold">My Brands</h1>
           <p className="text-muted-foreground mt-2">
             Select a brand to manage, or create a new one.
           </p>
         </div>
         <Button
           onClick={() => router.push("/dashboard/my-brands/create")}
-          className="flex items-center gap-2"
         >
           <Plus className="h-4 w-4" />
           Create New Brand
@@ -93,8 +92,8 @@ export default function BrandsPage() {
             <p className="text-muted-foreground mb-6 max-w-md">
               Create your first brand to get started with AI-powered brand identity generation.
             </p>
-            <Button onClick={() => router.push("/dashboard/my-brands/create")} size="lg">
-              <Plus className="mr-2 h-5 w-5" />
+            <Button onClick={() => router.push("/dashboard/my-brands/create")}>
+              <Plus className="h-5 w-5" />
               Create Your First Brand
             </Button>
           </CardContent>

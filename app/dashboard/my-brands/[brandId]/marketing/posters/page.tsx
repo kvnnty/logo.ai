@@ -62,7 +62,7 @@ export default function PostersPage() {
 
         <div className="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity z-20">
           <Button variant="secondary">
-            <Download className="mr-2 h-4 w-4" />
+            <Download className="h-4 w-4" />
             Download High-Res
           </Button>
         </div>

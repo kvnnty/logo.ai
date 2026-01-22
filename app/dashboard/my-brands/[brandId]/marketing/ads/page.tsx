@@ -11,7 +11,7 @@ export default function AdsPage() {
       brandId={brandId as string}
       category="marketing"
       title="Marketing Ads"
-      description="20 high-converting ad templates designed for various platforms."
+      description="5 high-converting ad templates designed for various platforms."
       aspectRatio="video"
     />
   );
