@@ -173,13 +173,13 @@ export function Step5Results({
           <Button
             onClick={handleGenerate}
             disabled={loading || (remainingCredits !== null && remainingCredits <= 0)}
-            className="rounded-full h-11 px-8 border-dashed border-primary/40 hover:border-primary transition-all group"
+            className="rounded-full h-14 px-8 bg-primary border-primary transition-all group"
           >
             <div className="flex items-center gap-3">
-              <RefreshCw className={`w-4 h-4 text-primary group-hover:rotate-180 transition-transform ${loading ? 'animate-spin' : ''}`} />
+              <RefreshCw className={`w-4 h-4 text-white group-hover:rotate-180 transition-transform ${loading ? 'animate-spin' : ''}`} />
               <div className="text-left">
-                <p className="text-[10px] font-black tracking-widest text-primary uppercase">Regenerate All</p>
-                <p className="text-[8px] font-medium text-muted-foreground">-1 credit</p>
+                <p className="text-sm font-black tracking-widest text-white uppercase">Generate More</p>
+                <p className="text-xs font-medium text-white">-1 credit</p>
               </div>
             </div>
           </Button>
