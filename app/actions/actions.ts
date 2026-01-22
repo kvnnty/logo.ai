@@ -29,6 +29,21 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
   apiVersion: '2025-10-29.clover',
 });
 
+const PLAN_MAPPING: Record<string, { priceId: string, credits: number }> = {
+  'basic': {
+    priceId: process.env.STRIPE_PRICE_ID_BASIC || '',
+    credits: 50
+  },
+  'pro': {
+    priceId: process.env.STRIPE_PRICE_ID_PRO || '',
+    credits: 150
+  },
+  'enterprise': {
+    priceId: process.env.STRIPE_PRICE_ID_ENTERPRISE || '',
+    credits: 500
+  }
+};
+
 const FormSchema = z.object({
   companyName: z.string(),
   style: z.string(),
@@ -424,6 +439,36 @@ export async function downloadImage(url: string) {
   }
 }
 
+export async function updateBrand(brandId: string, details: any) {
+  'use server';
+  try {
+    const user = await currentUser();
+    if (!user) return { success: false, error: 'Not authenticated' };
+    await ensureDbConnected();
+
+    const updateData: any = {
+      name: details.name,
+      description: details.description,
+    };
+
+    if (details.primaryColor || details.secondaryColor) {
+      updateData.identity = {
+        primary_color: details.primaryColor,
+        secondary_color: details.secondaryColor
+      };
+    }
+
+    await Brand.findOneAndUpdate(
+      { _id: brandId, userId: user.id },
+      { $set: updateData }
+    );
+    return { success: true };
+  } catch (error) {
+    console.error('Error updating brand:', error);
+    return { success: false };
+  }
+}
+
 export async function updateBrandDetails(brandId: string, details: any) {
   'use server';
   try {
@@ -433,7 +478,63 @@ export async function updateBrandDetails(brandId: string, details: any) {
     await Brand.findOneAndUpdate({ _id: brandId, userId: user.id }, { $set: details });
     return { success: true };
   } catch (error) {
+    console.error('Error updating brand details:', error);
     return { success: false };
+  }
+}
+
+export async function checkHistory() {
+  'use server';
+  try {
+    const user = await currentUser();
+    if (!user) return null;
+    await ensureDbConnected();
+    const history = await Logo.find({ userId: user.id }).sort({ createdAt: -1 }).lean();
+    return (history as any[]).map(h => ({
+      ...h,
+      _id: h._id.toString(),
+      id: h._id.toString(),
+      createdAt: h.createdAt?.toISOString(),
+      updatedAt: h.updatedAt?.toISOString()
+    }));
+  } catch (error) {
+    console.error('Error checking history:', error);
+    return null;
+  }
+}
+
+export async function createStripeCheckoutSession(planId: string) {
+  'use server';
+  try {
+    const user = await currentUser();
+    if (!user) return { success: false, error: 'Not authenticated' };
+
+    const plan = PLAN_MAPPING[planId];
+    if (!plan || !plan.priceId) {
+      return { success: false, error: 'Invalid plan or price not configured' };
+    }
+
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types: ['card'],
+      line_items: [
+        {
+          price: plan.priceId,
+          quantity: 1,
+        },
+      ],
+      mode: 'payment',
+      success_url: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard/credits?success=true`,
+      cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard/credits?canceled=true`,
+      metadata: {
+        userId: user.id,
+        credits: plan.credits.toString(),
+      },
+    });
+
+    return { success: true, url: session.url };
+  } catch (error) {
+    console.error('Stripe error:', error);
+    return { success: false, error: 'Failed' };
   }
 }
 
@@ -477,5 +578,51 @@ export async function finalizeBrandLogo(brandId: string, assetId: string) {
   } catch (error) {
     console.error('Error finalizing brand logo:', error);
     return { success: false, error: 'Failed to finalize logo' };
+  }
+}
+
+export async function allLogos() {
+  'use server';
+  try {
+    await ensureDbConnected();
+    const logos = await Logo.find({}).sort({ createdAt: -1 }).limit(100).lean();
+    return (logos as any[]).map(h => ({
+      ...h,
+      _id: h._id.toString(),
+      id: h._id.toString(),
+      createdAt: h.createdAt?.toISOString(),
+      updatedAt: h.updatedAt?.toISOString()
+    }));
+  } catch (error) {
+    console.error('Error fetching all logos:', error);
+    return null;
+  }
+}
+
+export async function setPrimaryLogo(brandId: string, imageUrl: string) {
+  'use server';
+  try {
+    const user = await currentUser();
+    if (!user) return { success: false, error: 'Not authenticated' };
+
+    await ensureDbConnected();
+    const brand = await Brand.findOne({ _id: brandId, userId: user.id });
+    if (!brand) throw new Error("Brand not found");
+
+    brand.assets = brand.assets.map((asset: any) => {
+      if (asset.imageUrl === imageUrl) {
+        return { ...asset.toObject(), subType: 'primary_logo' };
+      } else if (asset.subType === 'primary_logo') {
+        return { ...asset.toObject(), subType: 'logo_variation' };
+      }
+      return asset;
+    });
+
+    brand.markModified('assets');
+    await brand.save();
+    return { success: true };
+  } catch (error) {
+    console.error('Error setting primary logo:', error);
+    return { success: false, error: 'Failed' };
   }
 }
