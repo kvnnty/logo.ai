@@ -3,7 +3,7 @@
 import { useBrand } from "@/components/providers/brand-provider";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Sparkles, Palette, Image as ImageIcon, Share2, FileText, Settings, ArrowRight, RefreshCw, Type, Layout } from "lucide-react";
+import { Sparkles, Palette, Image as ImageIcon, Share2, FileText, Settings, ArrowRight, Loader2, Type, Layout } from "lucide-react";
 import { motion } from "framer-motion";
 import { useState } from "react";
 import { useRouter } from "next/navigation";

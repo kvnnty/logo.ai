@@ -9,7 +9,7 @@ export default function BusinessCardsPage() {
   return (
     <AssetCategoryView
       brandId={brandId as string}
-      category="branding"
+      category="business_card"
       title="Business Cards"
       description="5 unique business card designs maintaining your brand's professional identity."
       aspectRatio="video"

@@ -50,7 +50,7 @@ export function Stepper({ currentStep, steps, totalSteps }: StepperProps) {
           </div>
         ))}
       </div>
-      <div className="fixed top-0 left-0 right-0 w-full bg-border h-1 rounded-full overflow-hidden">
+      <div className="fixed top-0 left-0 right-0 w-full bg-border h-1 rounded-full overflow-hidden z-50">
         <motion.div
           className="h-full bg-gradient-to-r from-primary to-purple-500"
           initial={{ width: 0 }}

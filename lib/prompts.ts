@@ -26,30 +26,7 @@ Return a JSON object with this exact structure:
 
 // SCENE_DESIGNER_PROMPT removed - using templates now
 
-export const LOGO_CONCEPT_PROMPT = `
-You are a world-class Logo Designer creating a cohesive brand identity.
 
-BRAND: {{name}}
-INDUSTRY: {{industry}}
-STYLE: {{style}}
-DESCRIPTION: {{description}}
-PRIMARY COLOR: {{primaryColor}}
-SECONDARY COLOR: {{secondaryColor}}
-
-Design a SINGLE unified logo concept. Describe in detail:
-1. The ICON/SYMBOL: What abstract or literal shape represents this brand? Be specific (e.g., "a stylized falcon silhouette", "interlocking geometric hexagons").
-2. The TYPOGRAPHY STYLE: What font style for the company name? (e.g., "bold sans-serif with rounded terminals", "elegant thin serif").
-3. The COLOR APPLICATION: How are the primary and secondary colors used?
-4. The OVERALL MOOD: Modern? Classic? Playful? Luxurious?
-
-Return JSON:
-{
-  "iconDescription": "detailed description of the icon/symbol",
-  "typographyStyle": "detailed description of the text style",
-  "colorApplication": "how colors are applied",
-  "overallMood": "the visual mood/feeling"
-}
-`;
 
 export const LOGO_MULTIPLE_CONCEPTS_PROMPT = `
 You are a world-class Logo Designer and Brand Strategist.
@@ -86,7 +63,7 @@ Return a JSON object with this exact structure:
       "rationale": "string",
       "colors": ["#hex1", "#hex2"],
       "fontFamily": "string",
-      "symbolPrompt": "detailed description for icon generation, NO text in image",
+      "symbolPrompt": "detailed description for a COMPLETE LOGO DESIGN including the icon and clearly legible text of the brand name",
       "layoutStrategy": "string"
     },
     ... (exactly 4 concepts)
@@ -95,24 +72,8 @@ Return a JSON object with this exact structure:
 `;
 
 export const LOGO_SET_VARIANTS = {
-  horizontal: {
-    subType: 'logo_horizontal',
-    label: 'Horizontal',
-    promptSuffix: 'LAYOUT: Horizontal logo. The icon/symbol is positioned on the LEFT, and the company name "{{name}}" is positioned on the RIGHT in a single horizontal line. Clean spacing between icon and text. No slogan or tagline.',
-  },
-  vertical: {
-    subType: 'logo_vertical',
-    label: 'Vertical',
-    promptSuffix: 'LAYOUT: Vertical/stacked logo. The icon/symbol is positioned on TOP, and the company name "{{name}}" is positioned BELOW the icon, centered. No slogan or tagline.',
-  },
-  text: {
-    subType: 'logo_text',
-    label: 'Text Only',
-    promptSuffix: 'LAYOUT: Text-only logo (wordmark). The company name "{{name}}" is stylized using the typography style described. NO icon, NO symbol. Just the name as a beautiful typographic lockup. No slogan or tagline.',
-  },
-  icon: {
-    subType: 'logo_icon',
-    label: 'Icon Only',
-    promptSuffix: 'LAYOUT: Icon-only logo (brandmark). ONLY the icon/symbol, NO text whatsoever. The symbol should be recognizable and work as a standalone mark (like a favicon or app icon).',
-  },
+  icon: { label: 'Icon Only', subType: 'logo_icon' },
+  text: { label: 'Wordmark', subType: 'logo_text' },
+  horizontal: { label: 'Horizontal', subType: 'logo_horizontal' },
+  vertical: { label: 'Vertical', subType: 'logo_vertical' },
 };

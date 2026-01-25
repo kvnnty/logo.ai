@@ -14,9 +14,9 @@ import { LogoConcept, ModelType, SizeType, QualityType } from "./types";
 import { Stepper } from "./components/stepper";
 import { StepWrapper } from "./components/step-wrapper";
 import { Step1Name } from "./components/step1-name";
-import { Step2Style } from "./components/step2-style";
-import { Step3Preferences } from "./components/step3-preferences";
-import { Step4Review } from "./components/step4-review";
+import { Step2About } from "./components/step2-about";
+import { Step3Style } from "./components/step3-style";
+import { Step4Preferences } from "./components/step4-preferences";
 import { Step5Results } from "./components/step5-results";
 
 export function AIFlow({ onBack }: { onBack: () => void }) {
@@ -47,9 +47,9 @@ export function AIFlow({ onBack }: { onBack: () => void }) {
   const canProceedToNextStep = useMemo(() => {
     switch (currentStep) {
       case 1: return companyName.trim().length > 0;
-      case 2: return selectedStyle !== "";
-      case 3: return !!selectedModel && !!selectedSize && !!selectedQuality;
-      case 4: return true;
+      case 2: return true; // Description is optional
+      case 3: return selectedStyle !== "";
+      case 4: return !!selectedModel && !!selectedSize && !!selectedQuality;
       case 5: return generatedConcepts.length > 0;
       default: return false;
     }
@@ -109,19 +109,19 @@ export function AIFlow({ onBack }: { onBack: () => void }) {
   const renderStepContent = () => {
     switch (currentStep) {
       case 1:
-        return <Step1Name companyName={companyName} setCompanyName={setCompanyName} additionalInfo={additionalInfo} setAdditionalInfo={setAdditionalInfo} />;
+        return <Step1Name companyName={companyName} setCompanyName={setCompanyName} />;
       case 2:
-        return <Step2Style selectedStyle={selectedStyle} setSelectedStyle={setSelectedStyle} />;
+        return <Step2About additionalInfo={additionalInfo} setAdditionalInfo={setAdditionalInfo} />;
       case 3:
+        return <Step3Style selectedStyle={selectedStyle} setSelectedStyle={setSelectedStyle} />;
+      case 4:
         return (
-          <Step3Preferences
+          <Step4Preferences
             selectedModel={selectedModel} setSelectedModel={setSelectedModel}
             selectedSize={selectedSize} setSelectedSize={setSelectedSize}
             selectedQuality={selectedQuality} setSelectedQuality={setSelectedQuality}
           />
         );
-      case 4:
-        return <Step4Review companyName={companyName} selectedStyle={selectedStyle} selectedModel={selectedModel} additionalInfo={additionalInfo} />;
       case 5:
         return (
           <Step5Results
@@ -137,6 +137,7 @@ export function AIFlow({ onBack }: { onBack: () => void }) {
             finalizeBrandLogo={finalizeBrandLogo}
             saveFinalBrand={saveFinalBrand}
             setLastBrandId={setLastBrandId}
+            brandData={brandData}
             router={router}
             toast={toast}
           />

@@ -9,7 +9,7 @@ export default function AdsPage() {
   return (
     <AssetCategoryView
       brandId={brandId as string}
-      category="marketing"
+      category="ads"
       title="Marketing Ads"
       description="5 high-converting ad templates designed for various platforms."
       aspectRatio="video"

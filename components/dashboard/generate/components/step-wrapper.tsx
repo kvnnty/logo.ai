@@ -2,8 +2,8 @@
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { ChevronLeft, ChevronRight, Sparkles, RefreshCw } from "lucide-react";
 import { AnimatePresence } from "framer-motion";
+import { ChevronLeft, ChevronRight, Loader2, Sparkles } from "lucide-react";
 
 interface StepWrapperProps {
   currentStep: number;
@@ -63,13 +63,13 @@ export function StepWrapper({
             >
               {loading ? (
                 <>
+                <Loader2 className="h-5 w-5 animate-spin" />
                   Generating...
-                  <RefreshCw className="w-4 h-4 animate-spin" />
                 </>
               ) : (
                 <>
-                  Generate Brand
                   <Sparkles className="w-4 h-4" />
+                  Generate Brand
                 </>
               )}
             </Button>

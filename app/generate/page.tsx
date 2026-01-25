@@ -9,7 +9,7 @@ import Link from "next/link";
 import {
   Palette,
   Download,
-  RefreshCw,
+  Loader2,
   ChevronRight,
   ChevronLeft,
   Check,
@@ -261,7 +261,7 @@ export default function Home() {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">
-          <RefreshCw className="h-8 w-8 animate-spin text-blue-600" />
+          <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
           <p className="text-slate-600">Loading...</p>
         </div>
       </div>
@@ -626,7 +626,7 @@ export default function Home() {
                     {loading ? (
                       <>
                         Generating...
-                        <RefreshCw className="w-4 h-4 animate-spin" />
+                        <Loader2 className="w-4 h-4 animate-spin" />
                       </>
                     ) : (
                       <>
@@ -667,7 +667,7 @@ export default function Home() {
                         className="flex-1 bg-primary hover:bg-primary/80"
                         disabled={loading}
                       >
-                        <RefreshCw className="h-4 w-4" />
+                        <Loader2 className="h-4 w-4" />
                         Generate New
                       </Button>
                       <Button

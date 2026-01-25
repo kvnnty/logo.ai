@@ -1,12 +1,13 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import { Plus, Sparkles, RefreshCw, ArrowRight, Trash2 } from "lucide-react";
 import { deleteBrand, getUserBrands } from "@/app/actions/actions";
+import Logo from "@/components/shared/Logo";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { motion } from "framer-motion";
+import { ArrowRight, Loader2, Plus, Sparkles, Trash2 } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
 interface BrandSummary {
   _id: string;
@@ -55,18 +56,21 @@ export default function BrandsPage() {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <RefreshCw className="h-8 w-8 animate-spin text-primary" />
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
       </div>
     );
   }
 
   return (
-    <div className="container mx-auto py-12 px-4 max-w-6xl">
-      {/* Header */}
+    <div className="container mx-auto py-8 px-4 max-w-6xl">
+      <div className="mb-10">
+        <Logo/>
+      </div>
+
       <div className="flex items-center justify-between mb-8">
-        <div>
+        <div className="space-y-2">
           <h1 className="text-3xl font-bold">My Brands</h1>
-          <p className="text-muted-foreground mt-2">
+          <p className="text-muted-foreground mt-3">
             Select a brand to manage, or create a new one.
           </p>
         </div>
@@ -78,7 +82,6 @@ export default function BrandsPage() {
         </Button>
       </div>
 
-      {/* Brand Grid */}
       {brands.length === 0 ? (
         <Card className="border-dashed border-2">
           <CardContent className="flex flex-col items-center justify-center py-16 text-center">

@@ -75,8 +75,8 @@ export const TOTAL_STEPS = 5;
 
 export const STEPS = [
   { number: 1, label: "Company" },
-  { number: 2, label: "Style" },
-  { number: 3, label: "Configs" },
-  { number: 4, label: "Review" },
+  { number: 2, label: "About" },
+  { number: 3, label: "Style" },
+  { number: 4, label: "Configs" },
   { number: 5, label: "Selection" },
 ];

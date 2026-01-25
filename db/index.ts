@@ -90,3 +90,29 @@ export interface ILogo {
   createdAt: Date;
   updatedAt: Date;
 }
+
+const TemplateSchema = new mongoose.Schema({
+  category: { type: String, required: true, index: true },
+  style: { type: String, default: 'modern', index: true },
+  name: String,
+  dimensions: {
+    width: Number,
+    height: Number
+  },
+  elements: [mongoose.Schema.Types.Mixed], // Flexible JSON structure for Fabric.js/Canvas
+  isPublic: { type: Boolean, default: true },
+  createdAt: { type: Date, default: Date.now },
+});
+
+export const Template = mongoose.models.Template || mongoose.model('Template', TemplateSchema);
+
+export interface ITemplate {
+  _id: any;
+  category: string;
+  style: string;
+  name: string;
+  dimensions: { width: number; height: number };
+  elements: any[];
+  isPublic: boolean;
+  createdAt: Date;
+}
