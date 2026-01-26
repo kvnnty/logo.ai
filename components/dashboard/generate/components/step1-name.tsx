@@ -1,17 +1,14 @@
 "use client";
 
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { motion } from "framer-motion";
 
 interface Step1Props {
   companyName: string;
   setCompanyName: (val: string) => void;
-  additionalInfo: string;
-  setAdditionalInfo: (val: string) => void;
 }
 
-export function Step1Name({ companyName, setCompanyName, additionalInfo, setAdditionalInfo }: Step1Props) {
+export function Step1Name({ companyName, setCompanyName }: Step1Props) {
   return (
     <motion.div
       key="step1"
@@ -28,16 +25,6 @@ export function Step1Name({ companyName, setCompanyName, additionalInfo, setAddi
           value={companyName}
           onChange={(e) => setCompanyName(e.target.value)}
           className="text-lg h-12"
-        />
-      </div>
-      <div className="space-y-2">
-        <h2 className="text-xl font-bold">Tell us more (Optional)</h2>
-        <p className="text-sm text-muted-foreground">Describe your business, industry, and target audience.</p>
-        <Textarea
-          placeholder="e.g. A sustainable clothing brand for outdoor enthusiasts..."
-          value={additionalInfo}
-          onChange={(e) => setAdditionalInfo(e.target.value)}
-          className="min-h-[120px] text-base"
         />
       </div>
     </motion.div>

@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 import { MODEL_OPTIONS, SIZE_OPTIONS } from "../constants";
 import { ModelType, SizeType, QualityType } from "../types";
 
-interface Step3Props {
+interface Step4Props {
   selectedModel: ModelType;
   setSelectedModel: (val: ModelType) => void;
   selectedSize: SizeType;
@@ -14,14 +14,14 @@ interface Step3Props {
   setSelectedQuality: (val: QualityType) => void;
 }
 
-export function Step3Preferences({
+export function Step4Preferences({
   selectedModel,
   setSelectedModel,
   selectedSize,
   setSelectedSize,
   selectedQuality,
   setSelectedQuality
-}: Step3Props) {
+}: Step4Props) {
   return (
     <motion.div
       key="step3"

@@ -12,7 +12,7 @@ export default function BrandGeneratorWizard() {
   const [method, setMethod] = useState<GenerationMethod>(null);
 
   return (
-    <div className="w-full max-w-6xl mx-auto p-4 sm:p-6">
+    <div className="w-full">
       <AnimatePresence mode="wait">
         {method === null ? (
           <motion.div

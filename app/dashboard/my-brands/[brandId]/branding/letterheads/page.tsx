@@ -9,7 +9,7 @@ export default function LetterheadsPage() {
   return (
     <AssetCategoryView
       brandId={brandId as string}
-      category="branding"
+      category="letterhead"
       title="Brand Letterheads"
       description="5 official letterhead templates for your corporate communication."
       aspectRatio="portrait"

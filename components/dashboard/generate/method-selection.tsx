@@ -10,7 +10,7 @@ interface MethodSelectionProps {
 
 export function MethodSelection({ onSelect }: MethodSelectionProps) {
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 w-full">
       <div className="text-center space-y-2 mb-8">
         <h2 className="text-2xl font-bold">How would you like to start?</h2>
         <p className="text-muted-foreground">
@@ -19,7 +19,7 @@ export function MethodSelection({ onSelect }: MethodSelectionProps) {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-5xl mx-auto">
         <div className="h-full">
           <Card
             className="cursor-pointer hover:border-primary/50 transition-colors h-full rounded-3xl"

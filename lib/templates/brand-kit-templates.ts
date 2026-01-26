@@ -9,7 +9,7 @@ export type TemplateParams = {
   address?: string;
 };
 
-export type AssetCategory = 'social_post' | 'social_story' | 'youtube_thumbnail' | 'business_card' | 'marketing_flyer' | 'letterhead' | 'email_signature' | 'ads';
+export type AssetCategory = 'social_post' | 'social_story' | 'youtube_thumbnail' | 'business_card' | 'marketing_flyer' | 'letterhead' | 'email_signature' | 'ads' | 'favicon' | 'brand_book' | 'branding_license' | 'social_cover' | 'social_profile' | 'marketing_poster' | 'id_card';
 
 export const GET_TEMPLATE = (category: AssetCategory, index: number, params: TemplateParams) => {
   const { brandName, primaryColor, secondaryColor, logoUrl, website, email, phone, address } = params;
@@ -119,6 +119,95 @@ export const GET_TEMPLATE = (category: AssetCategory, index: number, params: Tem
         { type: 'text', content: '50% OFF SERVICE', x: 540, y: 600, fontSize: 60, fontWeight: 'bold', fill: '#ffffff', align: 'center', offsetX: 250, draggable: true },
         { type: 'rect', x: 340, y: 750, width: 400, height: 100, fill: '#ffffff', cornerRadius: 50, draggable: true },
         { type: 'text', content: 'BOOK NOW', x: 540, y: 780, fontSize: 40, fontWeight: 'bold', fill: primaryColor, align: 'center', offsetX: 100, draggable: true },
+      ].filter(Boolean)
+    }),
+    favicon: (i) => ({
+      width: 512,
+      height: 512,
+      elements: [
+        { type: 'rect', x: 0, y: 0, width: 512, height: 512, fill: primaryColor, cornerRadius: 100, draggable: false },
+        logoUrl ? { type: 'image', src: logoUrl, x: 106, y: 106, width: 300, height: 300, draggable: true } : null,
+      ].filter(Boolean)
+    }),
+    brand_book: (i) => ({
+      width: 1920,
+      height: 1080,
+      elements: [
+        { type: 'rect', x: 0, y: 0, width: 1920, height: 1080, fill: '#ffffff', draggable: false },
+        { type: 'rect', x: 0, y: 0, width: 600, height: 1080, fill: secondaryColor, draggable: false },
+        logoUrl ? { type: 'image', src: logoUrl, x: 100, y: 100, width: 400, height: 400, draggable: true } : null,
+        { type: 'text', content: brandName, x: 300, y: 550, fontSize: 80, fontWeight: 'bold', fill: primaryColor, align: 'center', offsetX: 150, draggable: true },
+        { type: 'text', content: 'Brand Guidelines', x: 300, y: 650, fontSize: 40, fill: '#666666', align: 'center', offsetX: 100, draggable: true },
+
+        { type: 'text', content: 'Typography', x: 700, y: 150, fontSize: 60, fontWeight: 'bold', fill: '#333333', draggable: false },
+        { type: 'text', content: 'Aa Bb Cc', x: 700, y: 250, fontSize: 120, fontWeight: 'bold', fill: primaryColor, draggable: false },
+        { type: 'text', content: 'Primary Font', x: 700, y: 400, fontSize: 30, fill: '#666666', draggable: false },
+
+        { type: 'text', content: 'Color Palette', x: 700, y: 600, fontSize: 60, fontWeight: 'bold', fill: '#333333', draggable: false },
+        { type: 'rect', x: 700, y: 700, width: 200, height: 200, fill: primaryColor, cornerRadius: 20, draggable: false },
+        { type: 'text', content: primaryColor, x: 800, y: 920, fontSize: 30, fill: '#333333', align: 'center', offsetX: 50, draggable: false },
+        { type: 'rect', x: 950, y: 700, width: 200, height: 200, fill: secondaryColor, cornerRadius: 20, draggable: false },
+        { type: 'text', content: secondaryColor, x: 1050, y: 920, fontSize: 30, fill: '#333333', align: 'center', offsetX: 50, draggable: false },
+      ].filter(Boolean)
+    }),
+    branding_license: (i) => ({
+      width: 1275,
+      height: 1650,
+      elements: [
+        { type: 'rect', x: 0, y: 0, width: 1275, height: 1650, fill: '#ffffff', draggable: false },
+        { type: 'rect', x: 100, y: 100, width: 1075, height: 1450, border: `2px solid ${secondaryColor}`, draggable: false },
+        logoUrl ? { type: 'image', src: logoUrl, x: 150, y: 150, width: 150, height: 150, draggable: true } : null,
+        { type: 'text', content: 'CERTIFICATE OF OWNERSHIP', x: 637, y: 200, fontSize: 60, fontWeight: 'bold', fill: primaryColor, align: 'center', offsetX: 350, draggable: true },
+        { type: 'text', content: 'This certifies that', x: 637, y: 400, fontSize: 40, fill: '#666666', align: 'center', offsetX: 150, draggable: true },
+        { type: 'text', content: brandName, x: 637, y: 500, fontSize: 80, fontWeight: 'bold', fill: '#333333', align: 'center', offsetX: 200, draggable: true },
+        { type: 'text', content: 'is the sole owner of the attached brand identity assets.', x: 637, y: 650, fontSize: 35, fill: '#666666', align: 'center', offsetX: 400, draggable: true },
+        { type: 'text', content: `Licensed Date: ${new Date().toLocaleDateString()}`, x: 637, y: 1200, fontSize: 30, fill: '#333333', align: 'center', offsetX: 150, draggable: true },
+      ].filter(Boolean)
+    }),
+    social_cover: (i) => ({
+      width: 1500,
+      height: 500,
+      elements: [
+        { type: 'rect', x: 0, y: 0, width: 1500, height: 500, fill: secondaryColor, draggable: false },
+        { type: 'rect', x: 0, y: 0, width: 1500, height: 500, fill: primaryColor, opacity: 0.1, draggable: false },
+        logoUrl ? { type: 'image', src: logoUrl, x: 100, y: 100, width: 300, height: 300, draggable: true } : null,
+        { type: 'text', content: brandName, x: 450, y: 180, fontSize: 100, fontWeight: 'bold', fill: primaryColor, draggable: true },
+        { type: 'text', content: 'Official Brand Page', x: 450, y: 300, fontSize: 50, fill: '#666666', draggable: true },
+      ].filter(Boolean)
+    }),
+    social_profile: (i) => ({
+      width: 800,
+      height: 800,
+      elements: [
+        { type: 'rect', x: 0, y: 0, width: 800, height: 800, fill: '#ffffff', draggable: false },
+        { type: 'rect', x: 50, y: 50, width: 700, height: 700, fill: secondaryColor, cornerRadius: 350, draggable: false },
+        logoUrl ? { type: 'image', src: logoUrl, x: 200, y: 200, width: 400, height: 400, draggable: true } : null,
+      ].filter(Boolean)
+    }),
+    marketing_poster: (i) => ({
+      width: 1650,
+      height: 2338, // A2 size approx at 100dpi
+      elements: [
+        { type: 'rect', x: 0, y: 0, width: 1650, height: 2338, fill: primaryColor, draggable: false },
+        { type: 'rect', x: 100, y: 100, width: 1450, height: 2138, border: '20px solid #ffffff', draggable: false },
+        logoUrl ? { type: 'image', src: logoUrl, x: 575, y: 300, width: 500, height: 500, filter: 'grayscale(100%) brightness(1000%)', draggable: true } : null,
+        { type: 'text', content: 'GRAND OPENING', x: 825, y: 1000, fontSize: 150, fontWeight: 'bold', fill: '#ffffff', align: 'center', offsetX: 600, draggable: true },
+        { type: 'text', content: brandName, x: 825, y: 1250, fontSize: 100, fontWeight: 'bold', fill: secondaryColor, align: 'center', offsetX: 400, draggable: true },
+        { type: 'text', content: 'Join us for an exclusive event', x: 825, y: 1500, fontSize: 60, fill: '#ffffff', align: 'center', offsetX: 400, draggable: true },
+      ].filter(Boolean)
+    }),
+    id_card: (i) => ({
+      width: 638,
+      height: 1012, // CR80 standard
+      elements: [
+        { type: 'rect', x: 0, y: 0, width: 638, height: 1012, fill: '#ffffff', draggable: false },
+        { type: 'rect', x: 0, y: 0, width: 638, height: 300, fill: primaryColor, draggable: false },
+        logoUrl ? { type: 'image', src: logoUrl, x: 219, y: 50, width: 200, height: 200, draggable: true } : null,
+        { type: 'rect', x: 169, y: 350, width: 300, height: 300, fill: '#eeeeee', cornerRadius: 10, draggable: false },
+        { type: 'text', content: 'Photo', x: 319, y: 480, fontSize: 30, fill: '#999999', align: 'center', offsetX: 50, draggable: false },
+        { type: 'text', content: 'John Doe', x: 319, y: 700, fontSize: 50, fontWeight: 'bold', fill: '#333333', align: 'center', offsetX: 100, draggable: true },
+        { type: 'text', content: 'Manager', x: 319, y: 760, fontSize: 30, fill: primaryColor, align: 'center', offsetX: 60, draggable: true },
+        { type: 'text', content: 'ID: 12345678', x: 319, y: 900, fontSize: 25, fill: '#666666', align: 'center', offsetX: 80, draggable: true },
       ].filter(Boolean)
     })
   };

@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Check, Layout, RefreshCw, Sparkles } from "lucide-react";
+import { Check, Layout, Loader2, Sparkles } from "lucide-react";
 import { motion } from "framer-motion";
 import { LogoConcept, LogoVariation } from "../types";
 
@@ -16,8 +16,9 @@ interface Step5Props {
   lastBrandId: string | null;
   setEditingAsset: (val: any) => void;
   finalizeBrandLogo: (brandId: string, assetId: string) => Promise<any>;
-  saveFinalBrand: (brandData: any, concept: any) => Promise<any>;
+  saveFinalBrand: (data: any) => Promise<any>;
   setLastBrandId: (id: string) => void;
+  brandData: any;
   router: any;
   toast: any;
 }
@@ -33,6 +34,7 @@ export function Step5Results({
   finalizeBrandLogo,
   saveFinalBrand,
   setLastBrandId,
+  brandData,
   router,
   toast
 }: Step5Props) {
@@ -66,105 +68,62 @@ export function Step5Results({
             transition={{ duration: 0.4, delay: idx * 0.05 }}
             className="overflow-hidden rounded-3xl border bg-white shadow-lg relative group/card"
           >
-            <div className="flex flex-col min-h-[300px]">
-              <div className="w-full bg-stone-50 p-8 flex flex-col relative">
+            <div className="flex flex-col md:flex-row min-h-[400px]">
+              <div className="w-full md:w-3/5 p-8 flex flex-col items-center justify-center relative border-b md:border-b-0 md:border-r border-border/50 transition-colors">
                 <div className="absolute top-4 left-6 z-10">
-                  <span className="text-[9px] font-black uppercase tracking-[0.2em] bg-primary/10 text-primary px-3 py-1 rounded-full border border-primary/10">Concept 0{idx + 1}</span>
+                  <span className="text-[9px] font-black uppercase tracking-[0.2em] bg-white/50 backdrop-blur text-primary px-3 py-1 rounded-full border border-primary/10">Concept 0{idx + 1}</span>
                 </div>
-                <div className="space-y-6 flex-1">
-                  <div>
-                    <div className="flex items-center justify-between mb-4">
-                      <h3 className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/60">Brand Ecosystem</h3>
-                      <div className="h-px flex-1 bg-border mx-3" />
-                    </div>
-                    <div className="space-y-4">
-                      <div className="bg-white rounded-2xl p-6 border shadow-sm group relative overflow-hidden flex items-center justify-center min-h-[100px] transition-all hover:shadow-md">
-                        <div className="flex items-center gap-6">
-                          <img src={concept.iconUrl} className="w-10 h-10" alt="icon" />
-                          <span style={{
-                            fontWeight: 900,
-                            fontSize: '1.25rem',
-                            color: concept.colors[0],
-                            fontFamily: concept.fontFamily
-                          }}>
-                            {companyName}
-                          </span>
-                        </div>
-                        <div className="absolute top-2 right-4 text-[8px] font-black tracking-widest text-muted-foreground/30">HORIZONTAL</div>
-                      </div>
+                {/* Updated: Display full AI generated image, no overlay text */}
+                <img src={concept.iconUrl} className="w-full h-full object-contain" alt="Full brand logo" />
 
-                      <div className="grid grid-cols-2 gap-4">
-                        <div className="bg-white rounded-2xl p-4 border shadow-sm flex flex-col items-center justify-center min-h-[120px] relative transition-all hover:shadow-md group">
-                          <img src={concept.iconUrl} className="w-12 h-12 mb-3 drop-shadow-lg group-hover:scale-105 transition-transform" alt="icon" />
-                          <span style={{
-                            fontWeight: 800,
-                            fontSize: '0.75rem',
-                            color: concept.colors[0],
-                            fontFamily: concept.fontFamily
-                          }}>
-                            {companyName}
-                          </span>
-                          <div className="absolute top-2 right-4 text-[8px] font-black tracking-widest text-muted-foreground/30">VERTICAL</div>
-                        </div>
-                        <div className="bg-white rounded-2xl p-4 border shadow-sm flex items-center justify-center min-h-[120px] relative transition-all hover:shadow-md">
-                          <span style={{
-                            fontWeight: 900,
-                            fontSize: '1.25rem',
-                            color: concept.colors[0],
-                            fontFamily: concept.fontFamily
-                          }}>
-                            {companyName}
-                          </span>
-                          <div className="absolute top-2 right-4 text-[8px] font-black tracking-widest text-muted-foreground/30">WORDMARK</div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
+                <div className="absolute bottom-4 right-6 text-[10px] font-black tracking-widest text-muted-foreground/20">PRIMARY LOGO</div>
+              </div>
 
-                  <div className="pt-4 border-t space-y-3">
-                    <div className="flex items-center justify-between">
-                      <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/60">Font</span>
-                      <code className="text-[10px] font-bold bg-white px-2 py-1 rounded-full border border-black/5">{concept.fontFamily}</code>
+              <div className="w-full md:w-2/5 p-8 flex flex-col justify-between relative bg-stone-50">
+                <div className="space-y-8">
+                  <p className="text-sm text-muted-foreground">{concept.rationale}</p>
+
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/60 block">Typography</span>
+                      <code className="text-xs font-bold bg-stone-50 px-3 py-1.5 rounded-lg border inline-block">{concept.fontFamily}</code>
                     </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/60">Colors</span>
-                      <div className="flex gap-2">
+
+                    <div className="space-y-2">
+                      <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/60 block">Color Palette</span>
+                      <div className="flex gap-3">
                         {concept.colors.map((c: string) => (
                           <div key={c} className="group relative">
-                            <div className="w-6 h-6 rounded-lg border-2 border-white shadow-md transition-transform hover:scale-110" style={{ backgroundColor: c }} />
-                            <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-black text-white text-[9px] px-1.5 py-0.5 rounded opacity-0 group-hover:opacity-100 transition-opacity font-bold">{c.toUpperCase()}</span>
+                            <div className="w-10 h-10 rounded-xl border-2 border-white shadow-sm transition-transform hover:scale-110 cursor-pointer" style={{ backgroundColor: c }} />
+                            <span className="absolute -bottom-8 left-1/2 -translate-x-1/2 bg-black text-white text-[9px] px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity font-bold whitespace-nowrap z-20 pointer-events-none">{c.toUpperCase()}</span>
                           </div>
                         ))}
                       </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            </div>
 
-            <div className="p-6 bg-white border-t flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="flex -space-x-2">
-                  {concept.colors.map((c: string) => (
-                    <div key={c} className="w-4 h-4 rounded-full border border-white" style={{ backgroundColor: c }} />
-                  ))}
+                <div className="pt-8 mt-4">
+                  <Button
+                    onClick={async () => {
+                      const result = await saveFinalBrand({
+                        brandData,
+                        concepts: generatedConcepts,
+                        selectedConceptIndex: idx
+                      });
+                      if (result.success) {
+                        const brandId = result.brandId;
+                        setLastBrandId(brandId);
+                        toast({ title: "Logo Selected!", description: `The "${concept.name}" logo set is now your official brand identity.` });
+                        router.push(`/dashboard/my-brands/${brandId}`);
+                      }
+                    }}
+                    className="w-full bg-black hover:bg-black/90 text-white rounded-xl h-12 font-bold text-xs uppercase tracking-widest shadow-xl shadow-black/5 transition-all hover:scale-[1.02] active:scale-[0.98]"
+                  >
+                    Select This Design
+                  </Button>
                 </div>
-                <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">{concept.fontFamily}</span>
               </div>
-              <Button
-                onClick={async () => {
-                  const result = await saveFinalBrand(concept, concept);
-                  if (result.success) {
-                    const brandId = result.brandId;
-                    setLastBrandId(brandId);
-                    toast({ title: "Logo Selected!", description: `The "${concept.name}" logo set is now your official brand identity.` });
-                    router.push(`/dashboard/my-brands/${brandId}`);
-                  }
-                }}
-                className="bg-black hover:bg-black/90 text-white rounded-full px-8 font-black text-[10px] uppercase tracking-widest h-10 shadow-xl shadow-black/10 transition-all hover:scale-[1.02] active:scale-[0.98]"
-              >
-                Select Logo Set
-              </Button>
             </div>
           </motion.div>
         ))}
@@ -176,7 +135,7 @@ export function Step5Results({
             className="rounded-full h-14 px-8 bg-primary border-primary transition-all group"
           >
             <div className="flex items-center gap-3">
-              <RefreshCw className={`w-4 h-4 text-white group-hover:rotate-180 transition-transform ${loading ? 'animate-spin' : ''}`} />
+              <Loader2 className={`w-4 h-4 text-white group-hover:rotate-180 transition-transform ${loading ? 'animate-spin' : ''}`} />
               <div className="text-left">
                 <p className="text-sm font-black tracking-widest text-white uppercase">Generate More</p>
                 <p className="text-xs font-medium text-white">-1 credit</p>

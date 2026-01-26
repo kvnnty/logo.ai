@@ -5,24 +5,28 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import { ChevronLeft, ImageIcon, Loader2, Sparkles, Upload } from "lucide-react";
+import { Check, ChevronLeft, ImageIcon, Loader2, PaintBucket, Sparkles, Upload } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 export function UploadFlow({ onBack }: { onBack: () => void }) {
   const [file, setFile] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
   const [companyName, setCompanyName] = useState("");
-  const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
   const [detectedColors, setDetectedColors] = useState<{ primary: string; secondary: string }>({
     primary: "#000000",
     secondary: "#ffffff",
   });
+  const [suggestedColors, setSuggestedColors] = useState<string[]>([]);
+  const [isPickingColor, setIsPickingColor] = useState(false);
+  const [selectedColorType, setSelectedColorType] = useState<'primary' | 'secondary' | null>(null);
 
   const { toast } = useToast();
   const router = useRouter();
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const imageRef = useRef<HTMLImageElement>(null);
+  const colorPickerCanvasRef = useRef<HTMLCanvasElement>(null);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0];
@@ -38,47 +42,168 @@ export function UploadFlow({ onBack }: { onBack: () => void }) {
     const img = new Image();
     img.crossOrigin = "Anonymous";
     img.src = imgUrl;
+
     img.onload = () => {
       const canvas = canvasRef.current;
       if (!canvas) return;
+
       const ctx = canvas.getContext("2d");
       if (!ctx) return;
 
-      // Draw image to small canvas for sampling
-      canvas.width = 100;
-      canvas.height = 100;
-      ctx.drawImage(img, 0, 0, 100, 100);
+      canvas.width = 120;
+      canvas.height = 120;
+      ctx.drawImage(img, 0, 0, 120, 120);
 
-      const imageData = ctx.getImageData(0, 0, 100, 100).data;
-      const colorCounts: Record<string, number> = {};
+      const data = ctx.getImageData(0, 0, 120, 120).data;
 
-      for (let i = 0; i < imageData.length; i += 4 * 10) { // Sample every 10 pixels
-        const r = imageData[i];
-        const g = imageData[i + 1];
-        const b = imageData[i + 2];
-        const alpha = imageData[i + 3];
+      const vibrant: Record<string, number> = {};
+      const light: Record<string, number> = {};
+      const allColors: Record<string, number> = {};
 
-        if (alpha < 128) continue; // Skip transparent pixels
+      for (let i = 0; i < data.length; i += 16) {
+        const r = data[i];
+        const g = data[i + 1];
+        const b = data[i + 2];
+        const a = data[i + 3];
 
+        if (a < 150) continue;
+
+        const { s, l } = rgbToHsl(r, g, b);
         const hex = rgbToHex(r, g, b);
-        // Exclude extreme white/black if possibly background
-        if (hex === "#ffffff" || hex === "#000000") continue;
 
-        colorCounts[hex] = (colorCounts[hex] || 0) + 1;
+        // Count all colors for suggestions
+        allColors[hex] = (allColors[hex] || 0) + 1;
+
+        // Skip near-gray junk
+        if (s < 0.15) continue;
+
+        // Vibrant / brand color
+        if (s > 0.45 && l < 0.75) {
+          vibrant[hex] = (vibrant[hex] || 0) + 1;
+        }
+
+        // Light / background / contrast color
+        if (l > 0.8) {
+          light[hex] = (light[hex] || 0) + 1;
+        }
       }
 
-      // Sort colors by frequency
-      const sortedColors = Object.entries(colorCounts).sort((a, b) => b[1] - a[1]);
+      const pick = (bucket: Record<string, number>, fallback: string) =>
+        Object.entries(bucket).sort((a, b) => b[1] - a[1])[0]?.[0] || fallback;
 
-      const primary = sortedColors[0]?.[0] || "#2563EB";
-      const secondary = sortedColors[1]?.[0] || "#000000";
+      const primary = pick(vibrant, "#2563EB");
+      const secondary = pick(light, "#FFFFFF");
 
       setDetectedColors({ primary, secondary });
+
+      // Generate suggested colors (top 6 excluding current primary and secondary)
+      const sortedColors = Object.entries(allColors)
+        .sort((a, b) => b[1] - a[1])
+        .filter(([hex]) => hex !== primary && hex !== secondary)
+        .slice(0, 6)
+        .map(([hex]) => hex);
+
+      setSuggestedColors(sortedColors);
     };
+  };
+
+  const rgbToHsl = (r: number, g: number, b: number) => {
+    r /= 255;
+    g /= 255;
+    b /= 255;
+
+    const max = Math.max(r, g, b);
+    const min = Math.min(r, g, b);
+    let h = 0, s = 0;
+    const l = (max + min) / 2;
+
+    if (max !== min) {
+      const d = max - min;
+      s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+      switch (max) {
+        case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+        case g: h = (b - r) / d + 2; break;
+        case b: h = (r - g) / d + 4; break;
+      }
+      h /= 6;
+    }
+
+    return { h, s, l };
   };
 
   const rgbToHex = (r: number, g: number, b: number) => {
     return "#" + [r, g, b].map(x => x.toString(16).padStart(2, '0')).join('');
+  };
+
+  const handleImageClick = (e: React.MouseEvent<HTMLImageElement>) => {
+    if (!isPickingColor || !selectedColorType || !preview) return;
+
+    const img = imageRef.current;
+    const canvas = colorPickerCanvasRef.current;
+    if (!img || !canvas) return;
+
+    const rect = img.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+
+    // Calculate scale factors
+    const scaleX = img.naturalWidth / rect.width;
+    const scaleY = img.naturalHeight / rect.height;
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    // Set canvas to match image natural dimensions
+    canvas.width = img.naturalWidth;
+    canvas.height = img.naturalHeight;
+    ctx.drawImage(img, 0, 0);
+
+    const pixel = ctx.getImageData(x * scaleX, y * scaleY, 1, 1).data;
+    const hex = rgbToHex(pixel[0], pixel[1], pixel[2]);
+
+    setDetectedColors(prev => ({
+      ...prev,
+      [selectedColorType]: hex
+    }));
+
+    setIsPickingColor(false);
+    setSelectedColorType(null);
+
+    toast({
+      title: "Color Picked",
+      description: `${selectedColorType === 'primary' ? 'Primary' : 'Secondary'} color updated`,
+    });
+  };
+
+  const handleColorPickStart = (type: 'primary' | 'secondary') => {
+    if (!preview) {
+      toast({
+        title: "No Image",
+        description: "Please upload an image first",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setIsPickingColor(true);
+    setSelectedColorType(type);
+
+    toast({
+      title: "Color Picker Active",
+      description: `Click on the logo to pick a ${type} color. Click anywhere else to cancel.`,
+    });
+  };
+
+  const handleSuggestedColorClick = (color: string, type: 'primary' | 'secondary') => {
+    setDetectedColors(prev => ({
+      ...prev,
+      [type]: color
+    }));
+
+    toast({
+      title: "Color Updated",
+      description: `${type === 'primary' ? 'Primary' : 'Secondary'} color changed to ${color}`,
+    });
   };
 
   const handleGenerateBrandKit = async () => {
@@ -89,15 +214,11 @@ export function UploadFlow({ onBack }: { onBack: () => void }) {
 
     setIsGenerating(true);
     try {
-      // In a real app, you'd upload the file to S3/Blob storage first.
-      // For this demo, we'll use the local preview URL or simulate the upload.
-      // Since it's a client component, we'll just pass the colors and name.
-
       toast({ title: "Analysis Started", description: "Extracting brand DNA from your logo..." });
 
       const result = await createBrandFromUpload({
         companyName,
-        logoUrl: preview!, // This should be a permanent URL in production
+        logoUrl: preview!,
         primaryColor: detectedColors.primary,
         secondaryColor: detectedColors.secondary,
       });
@@ -115,9 +236,26 @@ export function UploadFlow({ onBack }: { onBack: () => void }) {
     }
   };
 
+  // Cancel color picker when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (isPickingColor && selectedColorType) {
+        const target = e.target as HTMLElement;
+        if (!target.closest('.color-picker-target')) {
+          setIsPickingColor(false);
+          setSelectedColorType(null);
+        }
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [isPickingColor, selectedColorType]);
+
   return (
-    <div className="max-w-6xl mx-auto space-y-8">
+    <div className="space-y-8">
       <canvas ref={canvasRef} className="hidden" />
+      <canvas ref={colorPickerCanvasRef} className="hidden" />
 
       <div className="flex items-center gap-4">
         <Button
@@ -134,20 +272,28 @@ export function UploadFlow({ onBack }: { onBack: () => void }) {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
         <div className="space-y-6">
-          <Card className="border shadow-sm overflow-hidden">
+          <Card className="border overflow-hidden">
             <CardContent className="space-y-3">
               <div className="space-y-2">
                 <label className="text-sm font-medium">Upload Logo</label>
                 <div
-                  className={`border-2 border-dashed rounded-xl p-8 text-center transition-all ${preview ? "border-primary/20 bg-primary/5" : "border-muted-foreground/20 hover:border-primary/50"
+                  className={`border-2 border-gray-200 rounded-xl p-8 text-center transition-all ${preview ? "border-primary/20 bg-primary/5" : "border-muted-foreground/20 hover:border-primary/50"
                     }`}
                 >
                   {preview ? (
                     <div className="space-y-4">
-                      <div className="relative aspect-video max-w-[240px] mx-auto overflow-hidden rounded-lg bg-white shadow-inner flex items-center justify-center border">
-                        <img src={preview} alt="Logo" className="max-w-full max-h-full object-contain p-4" />
+                      <div className={`relative aspect-video overflow-hidden rounded-lg bg-white flex items-center justify-center border ${isPickingColor ? 'cursor-crosshair ring-2 ring-primary ring-offset-2' : ''}`}>
+                        <img
+                          ref={imageRef}
+                          src={preview}
+                          alt="Logo"
+                          className="max-w-full max-h-full object-contain p-4 color-picker-target"
+                          onClick={handleImageClick}
+                        />
                       </div>
-                      <Button variant="outline" size="sm" onClick={() => setPreview(null)}>Change Image</Button>
+                      <div className="flex gap-2 justify-center">
+                        <Button variant="outline" size="sm" onClick={() => setPreview(null)}>Change Image</Button>
+                      </div>
                     </div>
                   ) : (
                     <label className="flex flex-col items-center gap-4 cursor-pointer">
@@ -180,29 +326,119 @@ export function UploadFlow({ onBack }: { onBack: () => void }) {
           </Card>
 
           {preview && (
-            <Card className="border shadow-sm">
-              <CardContent className="p-8 space-y-4">
+            <Card className="border">
+              <CardContent className="py-0 px-6 space-y-6">
                 <h3 className="font-semibold text-lg flex items-center gap-2">
                   <Sparkles className="w-5 h-5 text-primary" />
-                  Detected Brand Colors
+                  Brand Colors
                 </h3>
+
                 <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <p className="text-xs text-muted-foreground uppercase font-bold tracking-wider">Primary</p>
+                  {/* Primary Color Section */}
+                  <div className="space-y-3">
+                    <p className="text-xs text-muted-foreground uppercase font-bold tracking-wider">Primary Color</p>
+
                     <div className="flex items-center gap-3 p-3 rounded-lg border bg-muted/30">
-                      <div className="w-10 h-10 rounded-full shadow-sm border" style={{ backgroundColor: detectedColors.primary }} />
-                      <span className="font-mono text-sm uppercase">{detectedColors.primary}</span>
+                      <div className="w-12 h-12 rounded-full shadow-sm border" style={{ backgroundColor: detectedColors.primary }} />
+                      <div className="flex-1">
+                        <span className="font-mono text-sm uppercase block">{detectedColors.primary}</span>
+                        <p className="text-xs text-muted-foreground">Main brand color</p>
+                      </div>
                     </div>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-8 gap-2 text-xs"
+                      onClick={() => handleColorPickStart('primary')}
+                      disabled={isPickingColor}
+                    >
+                      <PaintBucket className="w-3 h-3" />
+                      Pick from image
+                    </Button>
+
+                    {/* Suggested Primary Colors */}
+                    {suggestedColors.length > 0 && (
+                      <div className="space-y-2">
+                        <p className="text-xs text-muted-foreground">Suggested primary colors:</p>
+                        <div className="flex flex-wrap gap-2">
+                          {suggestedColors.slice(0, 3).map((color, index) => (
+                            <button
+                              key={index}
+                              className={`w-8 h-8 rounded-full border shadow-sm hover:scale-110 transition-transform ${detectedColors.primary === color ? 'ring-2 ring-offset-2 ring-primary' : ''}`}
+                              style={{ backgroundColor: color }}
+                              onClick={() => handleSuggestedColorClick(color, 'primary')}
+                              title={color}
+                            >
+                              {detectedColors.primary === color && (
+                                <Check className="w-4 h-4 text-white mx-auto" />
+                              )}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    )}
                   </div>
-                  <div className="space-y-2">
-                    <p className="text-xs text-muted-foreground uppercase font-bold tracking-wider">Secondary</p>
+
+                  {/* Secondary Color Section */}
+                  <div className="space-y-3">
+                    <p className="text-xs text-muted-foreground uppercase font-bold tracking-wider">Secondary Color</p>
                     <div className="flex items-center gap-3 p-3 rounded-lg border bg-muted/30">
-                      <div className="w-10 h-10 rounded-full shadow-sm border" style={{ backgroundColor: detectedColors.secondary }} />
-                      <span className="font-mono text-sm uppercase">{detectedColors.secondary}</span>
+                      <div className="w-12 h-12 rounded-full shadow-sm border" style={{ backgroundColor: detectedColors.secondary }} />
+                      <div className="flex-1">
+                        <span className="font-mono text-sm uppercase block">{detectedColors.secondary}</span>
+                        <p className="text-xs text-muted-foreground">Background/contrast color</p>
+                      </div>
                     </div>
+
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-8 gap-2 text-xs"
+                      onClick={() => handleColorPickStart('secondary')}
+                      disabled={isPickingColor}
+                    >
+                      <PaintBucket className="w-3 h-3" />
+                      Pick from image
+                    </Button>
+
+                    {/* Suggested Secondary Colors */}
+                    {suggestedColors.length > 3 && (
+                      <div className="space-y-2">
+                        <p className="text-xs text-muted-foreground">Suggested secondary colors:</p>
+                        <div className="flex flex-wrap gap-2">
+                          {suggestedColors.slice(3, 6).map((color, index) => (
+                            <button
+                              key={index}
+                              className={`w-8 h-8 rounded-full border shadow-sm hover:scale-110 transition-transform ${detectedColors.secondary === color ? 'ring-2 ring-offset-2 ring-primary' : ''}`}
+                              style={{ backgroundColor: color }}
+                              onClick={() => handleSuggestedColorClick(color, 'secondary')}
+                              title={color}
+                            >
+                              {detectedColors.secondary === color && (
+                                <Check className="w-4 h-4 text-white mx-auto" />
+                              )}
+                            </button>
+                          ))}
+                          {/* Add white as a common secondary option */}
+                          <button
+                            className={`w-8 h-8 rounded-full border shadow-sm hover:scale-110 transition-transform ${detectedColors.secondary === '#FFFFFF' ? 'ring-2 ring-offset-2 ring-primary' : ''}`}
+                            style={{ backgroundColor: '#FFFFFF' }}
+                            onClick={() => handleSuggestedColorClick('#FFFFFF', 'secondary')}
+                            title="#FFFFFF"
+                          >
+                            {detectedColors.secondary === '#FFFFFF' && (
+                              <Check className="w-4 h-4 text-black mx-auto" />
+                            )}
+                          </button>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </div>
-                <p className="text-xs text-muted-foreground">We will use these colors to generate your matching brand assets.</p>
+
+                <p className="text-xs text-muted-foreground pt-2 border-t">
+                  We will use these colors to generate your matching brand assets. Click "Pick from image" to select colors directly from your logo.
+                </p>
               </CardContent>
             </Card>
           )}
@@ -215,12 +451,12 @@ export function UploadFlow({ onBack }: { onBack: () => void }) {
           >
             {isGenerating ? (
               <>
-                <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                <Loader2 className="h-5 w-5 animate-spin" />
                 Expanding Your Brand...
               </>
             ) : (
               <>
-                <Sparkles className="mr-2 h-5 w-5" />
+                <Sparkles className="h-5 w-5" />
                 Generate Brand Kit
               </>
             )}
@@ -228,9 +464,9 @@ export function UploadFlow({ onBack }: { onBack: () => void }) {
         </div>
 
         <div className="lg:sticky lg:top-8 space-y-6">
-          <Card className="border bg-gradient-to-br from-primary/5 to-purple-500/5 min-h-[500px] flex flex-col items-center justify-center p-8 text-center border-dashed">
-            <div className="max-w-sm space-y-6">
-              <div className="w-24 h-24 rounded-3xl bg-white shadow-xl flex items-center justify-center mx-auto -rotate-6 border">
+          <Card className="border bg-gradient-to-br from-primary/5 to-purple-500/5 min-h-[500px] flex flex-col items-center justify-center p-8 text-center border-gray-200">
+            <div className="space-y-6">
+              <div className="w-24 h-24 rounded-3xl bg-white flex items-center justify-center mx-auto border">
                 {preview ? <img src={preview} className="w-16 h-16 object-contain" /> : <ImageIcon className="w-12 h-12 text-muted-foreground" />}
               </div>
               <div className="space-y-2">
@@ -239,12 +475,12 @@ export function UploadFlow({ onBack }: { onBack: () => void }) {
                   Upload your logo and we'll automatically generate:
                 </p>
               </div>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="flex flex-row flex-wrap justify-center gap-3">
                 {[
                   "Social Posts", "Marketing Flyers", "Business Cards", "Letterheads",
                   "Ad Creatives", "Email Headers", "PowerPoint Templates", "Stickers"
                 ].map(item => (
-                  <div key={item} className="bg-white/80 backdrop-blur-sm px-4 py-2 rounded-full text-xs font-semibold shadow-sm border border-black/5">
+                  <div key={item} className="bg-white/80 backdrop-blur-sm px-4 py-2 rounded-full text-xs font-semibold border border-black/5">
                     {item}
                   </div>
                 ))}
@@ -257,4 +493,3 @@ export function UploadFlow({ onBack }: { onBack: () => void }) {
     </div>
   );
 }
-

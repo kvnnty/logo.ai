@@ -4,10 +4,10 @@ import OpenAI from 'openai';
 import { z } from 'zod';
 import dedent from 'dedent';
 import { clerkClient, currentUser } from "@clerk/nextjs/server";
-import { ensureDbConnected, Logo, Brand } from '@/db';
-import type { IBrand, ILogo, IBrandAsset } from '@/db';
-import { BRAND_SYSTEM_PROMPT, LOGO_CONCEPT_PROMPT, LOGO_SET_VARIANTS, LOGO_MULTIPLE_CONCEPTS_PROMPT } from '@/lib/prompts';
-import { GET_TEMPLATE, AssetCategory } from '@/lib/templates/brand-kit-templates';
+import { ensureDbConnected, Logo, Brand, Template } from '@/db';
+import type { IBrand, ILogo, IBrandAsset, ITemplate } from '@/db';
+import { BRAND_SYSTEM_PROMPT, LOGO_MULTIPLE_CONCEPTS_PROMPT, LOGO_SET_VARIANTS } from '@/lib/prompts';
+import { AssetCategory } from '@/lib/templates/brand-kit-templates';
 import Stripe from 'stripe';
 
 const apiKey = process.env.NEBIUS_API_KEY || '';
@@ -65,7 +65,46 @@ const styleLookup: { [key: string]: string } = {
   minimal: "minimal, simple, timeless, versatile, single color logo, use negative space, flat design with minimal details, Light, soft, and subtle.",
 };
 
+
+function hydrateTemplate(template: any, brand: any, primaryLogo: any) {
+  const placeholders: Record<string, string> = {
+    '{{brandName}}': brand.name,
+    '{{primaryColor}}': brand.identity?.primary_color || '#000000',
+    '{{secondaryColor}}': brand.identity?.secondary_color || '#ffffff',
+    '{{logoUrl}}': primaryLogo?.imageUrl || '',
+    '{{website}}': brand.contactInfo?.website || 'www.example.com',
+    '{{email}}': brand.contactInfo?.email || 'hello@example.com',
+    '{{phone}}': brand.contactInfo?.phone || '+1 234 567 890',
+    '{{address}}': brand.contactInfo?.address || 'City, Country',
+  };
+
+  const hydrateElement = (element: any): any => {
+    const newEl = { ...element };
+    for (const key in newEl) {
+      if (typeof newEl[key] === 'string') {
+        if (placeholders[newEl[key]]) {
+          newEl[key] = placeholders[newEl[key]];
+        } else if (Object.keys(placeholders).some(ph => newEl[key].includes(ph))) {
+          let val = newEl[key];
+          for (const [ph, replacement] of Object.entries(placeholders)) {
+            val = val.replace(ph, replacement);
+          }
+          newEl[key] = val;
+        }
+      }
+    }
+    return newEl;
+  };
+
+  return {
+    width: template.dimensions.width,
+    height: template.dimensions.height,
+    elements: template.elements.map(hydrateElement)
+  };
+}
+
 function hexToColorName(hex: string): string {
+
   const colorMap: Record<string, string> = {
     '#2563eb': 'blue',
     '#dc2626': 'red',
@@ -165,6 +204,7 @@ export async function generateBrandIdentity(data: {
   }
 }
 
+
 export async function generateInteractiveAsset(brandId: string, category: string, subType: string, templateIndex: number = 0) {
   'use server';
   try {
@@ -177,18 +217,14 @@ export async function generateInteractiveAsset(brandId: string, category: string
 
     const primaryLogo = brand.assets?.find((a: any) => a.category === 'logo' || a.subType === 'primary_logo');
 
-    const sceneData = GET_TEMPLATE(category as AssetCategory, templateIndex, {
-      brandName: brand.name,
-      primaryColor: brand.identity?.primary_color || '#000000',
-      secondaryColor: brand.identity?.secondary_color || '#ffffff',
-      logoUrl: primaryLogo?.imageUrl || '',
-      website: brand.contactInfo?.website || 'www.example.com',
-      email: brand.contactInfo?.email || 'hello@example.com',
-      phone: brand.contactInfo?.phone || '+1 234 567 890',
-      address: brand.contactInfo?.address || 'City, Country',
-    });
+    // 1. Fetch Template from DB
+    const templates = await Template.find({ category }).sort({ createdAt: 1 });
+    const selectedTemplate = templates[templateIndex % templates.length]; // Cycle if index > length
 
-    if (!sceneData) throw new Error(`No template for ${category}`);
+    if (!selectedTemplate) throw new Error(`No template found for ${category}`);
+
+    // 2. Hydrate Template (Replace Placeholders)
+    const sceneData = hydrateTemplate(selectedTemplate, brand, primaryLogo);
 
     brand.assets.push({
       category,
@@ -204,6 +240,7 @@ export async function generateInteractiveAsset(brandId: string, category: string
     return { success: false, error: 'Failed' };
   }
 }
+
 
 export async function generateLogos(brandData: { name: string, description: string, identity: any }, model: string = 'black-forest-labs/flux-schnell') {
   'use server';
@@ -239,9 +276,11 @@ export async function generateLogos(brandData: { name: string, description: stri
     for (const concept of concepts) {
       // Create a specific prompt for this icon using its unique colors
       const colorString = concept.colors.join(', ');
-      const symbolPrompt = `A single minimalist logo icon: ${concept.symbolPrompt}. 
-      CRITICAL: Use these colors: ${colorString}. 
-      Simple clean white background. High contrast. professional vector style.`;
+      const symbolPrompt = `A professional logo design for brand "${brandData.name}". 
+      Concept: ${concept.symbolPrompt}.
+      CRITICAL: The logo MUST include the text "${brandData.name}" clearly and legibly.
+      Use these colors: ${colorString}. 
+      Clean white background. High quality vector style.`;
 
       const imgResponse = await client.images.generate({
         model: model,
@@ -254,10 +293,38 @@ export async function generateLogos(brandData: { name: string, description: stri
 
       const conceptId = `concept_${Math.random().toString(36).substring(2, 9)}`;
       const variations = [
-        { label: 'Icon Only', subType: 'logo_icon', sceneData: { width: 1024, height: 1024, elements: [{ type: 'image', src: iconUrl, x: 256, y: 256, width: 512, height: 512 }] } },
-        { label: 'Text Only', subType: 'logo_text', sceneData: { width: 1024, height: 1024, elements: [{ type: 'text', content: brandData.name, x: 512, y: 512, fontSize: 100, fontStyle: concept.fontFamily, fill: concept.colors[0], align: 'center' }] } },
-        { label: 'Horizontal', subType: 'logo_horizontal', sceneData: { width: 1024, height: 300, elements: [{ type: 'image', src: iconUrl, x: 50, y: 50, width: 200, height: 200 }, { type: 'text', content: brandData.name, x: 300, y: 100, fontSize: 80, fontStyle: concept.fontFamily, fill: concept.colors[0] }] } },
-        { label: 'Vertical', subType: 'logo_vertical', sceneData: { width: 600, height: 800, elements: [{ type: 'image', src: iconUrl, x: 150, y: 100, width: 300, height: 300 }, { type: 'text', content: brandData.name, x: 300, y: 500, fontSize: 70, fontStyle: concept.fontFamily, fill: concept.colors[0], align: 'center' }] } },
+        {
+          label: LOGO_SET_VARIANTS.icon.label,
+          subType: LOGO_SET_VARIANTS.icon.subType,
+          sceneData: { width: 1024, height: 1024, elements: [{ type: 'image', src: iconUrl, x: 256, y: 256, width: 512, height: 512 }] }
+        },
+        {
+          label: LOGO_SET_VARIANTS.text.label,
+          subType: LOGO_SET_VARIANTS.text.subType,
+          sceneData: { width: 1024, height: 1024, elements: [{ type: 'text', content: brandData.name, x: 512, y: 512, fontSize: 100, fontStyle: concept.fontFamily, fill: concept.colors[0], align: 'center' }] }
+        },
+        {
+          label: LOGO_SET_VARIANTS.horizontal.label,
+          subType: LOGO_SET_VARIANTS.horizontal.subType,
+          sceneData: { width: 1024, height: 300, elements: [{ type: 'image', src: iconUrl, x: 50, y: 50, width: 200, height: 200 }, { type: 'text', content: brandData.name, x: 300, y: 100, fontSize: 80, fontStyle: concept.fontFamily, fill: concept.colors[0] }] }
+        },
+        {
+          label: LOGO_SET_VARIANTS.vertical.label,
+          subType: LOGO_SET_VARIANTS.vertical.subType,
+          sceneData: { width: 600, height: 800, elements: [{ type: 'image', src: iconUrl, x: 150, y: 100, width: 300, height: 300 }, { type: 'text', content: brandData.name, x: 300, y: 500, fontSize: 70, fontStyle: concept.fontFamily, fill: concept.colors[0], align: 'center' }] }
+        },
+        {
+          label: 'Primary Logo',
+          subType: 'primary_logo',
+          sceneData: {
+            width: 1024,
+            height: 1024,
+            elements: [
+              { type: 'image', src: iconUrl, x: 512, y: 350, width: 400, height: 400, align: 'center' },
+              { type: 'text', content: brandData.name, x: 512, y: 750, fontSize: 120, fontStyle: concept.fontFamily, fill: concept.colors[0], align: 'center' }
+            ]
+          }
+        },
       ];
 
       finalConcepts.push({ ...concept, iconUrl, variations: variations });
@@ -323,6 +390,37 @@ export async function saveFinalBrand(data: {
           conceptId,
           conceptColors: concept.colors,
           createdAt: new Date(),
+        });
+      }
+    }
+
+    // Generate Starter Kit (Zoviz-style auto-generation)
+    const starterCategories = ['business_card', 'social_post', 'letterhead', 'email_signature', 'social_cover'];
+    const templates = await Template.find({ category: { $in: starterCategories } });
+
+    // Group templates by category
+    const templatesByCategory: Record<string, any[]> = {};
+    templates.forEach(t => {
+      if (!templatesByCategory[t.category]) templatesByCategory[t.category] = [];
+      templatesByCategory[t.category].push(t);
+    });
+
+    const primaryLogo = newBrand.assets.find((a: any) => a.subType === 'primary_logo');
+    const primaryLogoObj = primaryLogo ? { imageUrl: primaryLogo.imageUrl } : null;
+
+    for (const category of starterCategories) {
+      const categoryTemplates = templatesByCategory[category] || [];
+      // Generate up to 3 variations per category
+      for (let i = 0; i < Math.min(3, categoryTemplates.length); i++) {
+        const template = categoryTemplates[i];
+        const sceneData = hydrateTemplate(template, newBrand, primaryLogoObj);
+
+        newBrand.assets.push({
+          category: category,
+          subType: `Starter ${i + 1}`,
+          sceneData: sceneData,
+          createdAt: new Date(),
+          prompt: `Auto-generated ${category}`
         });
       }
     }

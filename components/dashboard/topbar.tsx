@@ -3,7 +3,7 @@
 import { IconSparkles, IconMenu2, IconBrandAsana } from "@tabler/icons-react";
 import Link from "next/link";
 import { useState, useEffect } from "react";
-import { RefreshCw } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { getCredits } from "@/app/actions/actions";
 import { Button } from "../ui/button";
 
@@ -63,7 +63,7 @@ export default function DashboardTopbar({ onMenuClick }: DashboardTopbarProps) {
             </Button>
           </Link>
           <Link href="/dashboard/my-brands">
-            <Button variant="secondary">
+            <Button variant="outline">
               <IconBrandAsana className="h-4 w-4" />
               <span>My brands</span>
             </Button>
@@ -81,7 +81,7 @@ export default function DashboardTopbar({ onMenuClick }: DashboardTopbarProps) {
               className="p-1 hover:bg-primary/20 rounded transition-colors disabled:opacity-50"
               title="Refresh credits"
             >
-              <RefreshCw className={`h-3 w-3 text-primary ${isRefreshing ? 'animate-spin' : ''}`} />
+              <Loader2 className={`h-3 w-3 text-primary ${isRefreshing ? 'animate-spin' : ''}`} />
             </button>
           </div>
         </div>

@@ -9,7 +9,7 @@ export default function FlyersPage() {
   return (
     <AssetCategoryView
       brandId={brandId as string}
-      category="marketing"
+      category="marketing_flyer"
       title="Marketing Flyers"
       description="5 professional flyer designs for your brand's promotional needs."
       aspectRatio="portrait"

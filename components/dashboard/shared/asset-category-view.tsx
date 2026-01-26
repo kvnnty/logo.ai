@@ -5,7 +5,7 @@ import { useState, useEffect, useCallback } from "react";
 import { PageHeader } from "./page-header";
 import { AssetCard } from "./asset-card";
 import { Button } from "@/components/ui/button";
-import { Sparkles, RefreshCw, Plus } from "lucide-react";
+import { Sparkles, Loader2, Plus } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "@/hooks/use-toast";
 import { getBrandById, generateInteractiveAsset, downloadImage } from "@/app/actions/actions";
@@ -141,7 +141,7 @@ export function AssetCategoryView({
           className="bg-primary hover:bg-primary/90 shadow-lg"
         >
           {isGenerating ? (
-            <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
+            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
           ) : (
             <Plus className="w-4 h-4 mr-2" />
           )}
