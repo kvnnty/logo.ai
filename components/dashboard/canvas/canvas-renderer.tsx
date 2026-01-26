@@ -1,7 +1,7 @@
 "use client";
 
 import React from 'react';
-import { Stage, Layer, Text, Rect, Image as KonvaImage, Transformer } from 'react-konva';
+import { Stage, Layer, Text, Rect, Circle, Image as KonvaImage, Transformer } from 'react-konva';
 import useImage from 'use-image';
 
 interface ElementProps {
@@ -81,6 +81,74 @@ const TextElement = ({ element, isSelected, onSelect, onChange }: ElementProps) 
     }
   }, [isSelected]);
 
+  const handleTextDblClick = (e: any) => {
+    // Hide text and transformer while editing
+    const textNode = shapeRef.current;
+    const stage = textNode.getStage();
+    const textPosition = textNode.absolutePosition();
+    const areaPosition = {
+      x: stage.container().offsetLeft + textPosition.x,
+      y: stage.container().offsetTop + textPosition.y,
+    };
+
+    const textarea = document.createElement('textarea');
+    document.body.appendChild(textarea);
+
+    textarea.value = textNode.text();
+    textarea.style.position = 'absolute';
+    textarea.style.top = areaPosition.y + 'px';
+    textarea.style.left = areaPosition.x + 'px';
+    textarea.style.width = textNode.width() * textNode.getAbsoluteScale().x + 'px';
+    textarea.style.height = textNode.height() * textNode.getAbsoluteScale().y + 20 + 'px';
+    textarea.style.fontSize = textNode.fontSize() * textNode.getAbsoluteScale().y + 'px';
+    textarea.style.border = 'none';
+    textarea.style.padding = '0px';
+    textarea.style.margin = '0px';
+    textarea.style.overflow = 'hidden';
+    textarea.style.background = 'none';
+    textarea.style.outline = 'none';
+    textarea.style.resize = 'none';
+    textarea.style.lineHeight = textNode.lineHeight();
+    textarea.style.fontFamily = textNode.fontFamily();
+    textarea.style.transformOrigin = 'left top';
+    textarea.style.textAlign = textNode.align();
+    textarea.style.color = textNode.fill();
+
+    textarea.focus();
+
+    const removeTextarea = () => {
+      window.removeEventListener('click', handleOutsideClick);
+      if (textarea.parentNode) {
+        textarea.parentNode.removeChild(textarea);
+      }
+      textNode.show();
+      if (trRef.current) trRef.current.show();
+    };
+
+    const handleOutsideClick = (e: any) => {
+      if (e.target !== textarea) {
+        onChange({ ...element, content: textarea.value });
+        removeTextarea();
+      }
+    };
+
+    textarea.addEventListener('keydown', (e) => {
+      if (e.keyCode === 13 && !e.shiftKey) {
+        onChange({ ...element, content: textarea.value });
+        removeTextarea();
+      }
+      if (e.keyCode === 27) {
+        removeTextarea();
+      }
+    });
+
+    textNode.hide();
+    if (trRef.current) trRef.current.hide();
+    setTimeout(() => {
+      window.addEventListener('click', handleOutsideClick);
+    });
+  };
+
   return (
     <React.Fragment>
       <Text
@@ -108,12 +176,8 @@ const TextElement = ({ element, isSelected, onSelect, onChange }: ElementProps) 
             rotation: node.rotation(),
           });
         }}
-        onDblClick={() => {
-          const newText = prompt("Edit text:", element.content);
-          if (newText !== null) {
-            onChange({ ...element, content: newText });
-          }
-        }}
+        onDblClick={handleTextDblClick}
+        onDblTap={handleTextDblClick}
         text={element.content}
       />
       {isSelected && (
@@ -141,43 +205,73 @@ const ShapeElement = ({ element, isSelected, onSelect, onChange }: ElementProps)
     }
   }, [isSelected]);
 
-  if (element.type === 'rect') {
-    return (
-      <React.Fragment>
-        <Rect
-          onClick={onSelect}
-          onTap={onSelect}
-          ref={shapeRef}
-          {...element}
-          draggable
+  const commonProps = {
+    ...element,
+    onClick: onSelect,
+    onTap: onSelect,
+    ref: shapeRef,
+    draggable: true,
+    onDragEnd: (e: any) => {
+      onChange({
+        ...element,
+        x: e.target.x(),
+        y: e.target.y(),
+      });
+    },
+    onTransformEnd: (e: any) => {
+      const node = shapeRef.current;
+      const scaleX = node.scaleX();
+      const scaleY = node.scaleY();
+      node.scaleX(1);
+      node.scaleY(1);
+
+      const updates: any = {
+        x: node.x(),
+        y: node.y(),
+        rotation: node.rotation(),
+      };
+
+      if (element.type === 'circle') {
+        updates.radius = Math.max(5, (node.width() * scaleX) / 2);
+      } else {
+        updates.width = Math.max(5, node.width() * scaleX);
+        updates.height = Math.max(5, node.height() * scaleY);
+      }
+
+      onChange({
+        ...element,
+        ...updates
+      });
+    }
+  };
+
+  return (
+    <React.Fragment>
+      {element.type === 'rect' && <Rect {...commonProps} />}
+      {element.type === 'circle' && (
+        <Circle
+          {...commonProps}
+          radius={element.radius || 50}
+          x={commonProps.x + (element.radius || 50)}
+          y={commonProps.y + (element.radius || 50)}
           onDragEnd={(e) => {
             onChange({
               ...element,
-              x: e.target.x(),
-              y: e.target.y(),
-            });
-          }}
-          onTransformEnd={(e) => {
-            const node = shapeRef.current;
-            const scaleX = node.scaleX();
-            const scaleY = node.scaleY();
-            node.scaleX(1);
-            node.scaleY(1);
-            onChange({
-              ...element,
-              x: node.x(),
-              y: node.y(),
-              width: Math.max(5, node.width() * scaleX),
-              height: Math.max(5, node.height() * scaleY),
-              rotation: node.rotation(),
+              x: e.target.x() - (element.radius || 50),
+              y: e.target.y() - (element.radius || 50),
             });
           }}
         />
-        {isSelected && <Transformer ref={trRef} />}
-      </React.Fragment>
-    );
-  }
-  return null;
+      )}
+      {isSelected && (
+        <Transformer
+          ref={trRef}
+          keepRatio={element.type === 'circle'}
+          enabledAnchors={element.type === 'circle' ? ['top-left', 'top-right', 'bottom-left', 'bottom-right'] : undefined}
+        />
+      )}
+    </React.Fragment>
+  );
 };
 
 interface CanvasRendererProps {
@@ -185,17 +279,18 @@ interface CanvasRendererProps {
   selectedId: any;
   onSelect: (id: any) => void;
   onUpdateElement: (id: any, newAttrs: any) => void;
+  scale?: number;
 }
 
-export const CanvasRenderer = React.forwardRef(({ sceneData, selectedId, onSelect, onUpdateElement }: CanvasRendererProps, ref: any) => {
+export const CanvasRenderer = React.forwardRef(({ sceneData, selectedId, onSelect, onUpdateElement, scale = 0.5 }: CanvasRendererProps, ref: any) => {
   if (!sceneData) return null;
 
   return (
     <Stage
-      width={sceneData.width}
-      height={sceneData.height}
-      scaleX={0.5} // Preview scale
-      scaleY={0.5}
+      width={sceneData.width * scale}
+      height={sceneData.height * scale}
+      scaleX={scale}
+      scaleY={scale}
       ref={ref}
       onMouseDown={(e) => {
         const clickedOnEmpty = e.target === e.target.getStage();

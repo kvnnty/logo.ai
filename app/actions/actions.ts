@@ -7,8 +7,10 @@ import { clerkClient, currentUser } from "@clerk/nextjs/server";
 import { ensureDbConnected, Logo, Brand, Template } from '@/db';
 import type { IBrand, ILogo, IBrandAsset, ITemplate } from '@/db';
 import { BRAND_SYSTEM_PROMPT, LOGO_MULTIPLE_CONCEPTS_PROMPT, LOGO_SET_VARIANTS } from '@/lib/prompts';
-import { AssetCategory } from '@/lib/templates/brand-kit-templates';
+import { AssetCategory, hydrateTemplate } from '@/lib/templates/brand-kit-templates';
 import Stripe from 'stripe';
+
+const DEFAULT_STARTING_CREDITS = 10;
 
 const apiKey = process.env.NEBIUS_API_KEY || '';
 const { HELICONE_API_KEY } = process.env;
@@ -66,42 +68,7 @@ const styleLookup: { [key: string]: string } = {
 };
 
 
-function hydrateTemplate(template: any, brand: any, primaryLogo: any) {
-  const placeholders: Record<string, string> = {
-    '{{brandName}}': brand.name,
-    '{{primaryColor}}': brand.identity?.primary_color || '#000000',
-    '{{secondaryColor}}': brand.identity?.secondary_color || '#ffffff',
-    '{{logoUrl}}': primaryLogo?.imageUrl || '',
-    '{{website}}': brand.contactInfo?.website || 'www.example.com',
-    '{{email}}': brand.contactInfo?.email || 'hello@example.com',
-    '{{phone}}': brand.contactInfo?.phone || '+1 234 567 890',
-    '{{address}}': brand.contactInfo?.address || 'City, Country',
-  };
-
-  const hydrateElement = (element: any): any => {
-    const newEl = { ...element };
-    for (const key in newEl) {
-      if (typeof newEl[key] === 'string') {
-        if (placeholders[newEl[key]]) {
-          newEl[key] = placeholders[newEl[key]];
-        } else if (Object.keys(placeholders).some(ph => newEl[key].includes(ph))) {
-          let val = newEl[key];
-          for (const [ph, replacement] of Object.entries(placeholders)) {
-            val = val.replace(ph, replacement);
-          }
-          newEl[key] = val;
-        }
-      }
-    }
-    return newEl;
-  };
-
-  return {
-    width: template.dimensions.width,
-    height: template.dimensions.height,
-    elements: template.elements.map(hydrateElement)
-  };
-}
+// Moved to lib/templates/brand-kit-templates.ts to avoid server action export issues
 
 function hexToColorName(hex: string): string {
 
@@ -120,16 +87,23 @@ function hexToColorName(hex: string): string {
 export async function generateLogo(formData: z.infer<typeof FormSchema>) {
   'use server';
   try {
+    if (!apiKey) return { success: false, error: 'Missing NEBIUS_API_KEY' };
     const user = await currentUser();
     if (!user) return { success: false, error: 'User not authenticated' };
+    const clerk = await clerkClient();
 
-    const currentRemaining = (user.unsafeMetadata?.remaining as number) || 0;
+    const rawRemaining = (user.unsafeMetadata as any)?.remaining;
+    const currentRemaining =
+      typeof rawRemaining === 'number' ? rawRemaining : DEFAULT_STARTING_CREDITS;
+
+    // Initialize credits once for new users (don't overwrite a real 0)
+    if (typeof rawRemaining !== 'number') {
+      await clerk.users.updateUserMetadata(user.id, {
+        unsafeMetadata: { ...(user.unsafeMetadata as any), remaining: currentRemaining },
+      });
+    }
+
     if (currentRemaining <= 0) return { success: false, error: "No credits left" };
-
-    const newRemaining = currentRemaining - 1;
-    await (await clerkClient()).users.updateUserMetadata(user.id, {
-      unsafeMetadata: { remaining: newRemaining },
-    });
 
     const validatedData = FormSchema.parse(formData);
     const primaryColorName = hexToColorName(validatedData.primaryColor);
@@ -144,6 +118,8 @@ export async function generateLogo(formData: z.infer<typeof FormSchema>) {
     });
 
     const imageUrl = response.data?.[0]?.url || "";
+    if (!imageUrl) return { success: false, error: "Failed to generate image" };
+
     await ensureDbConnected();
     await Logo.create({
       image_url: imageUrl,
@@ -154,7 +130,12 @@ export async function generateLogo(formData: z.infer<typeof FormSchema>) {
       brandId: (formData as any).brandId
     });
 
-    return { success: true, url: imageUrl };
+    const newRemaining = currentRemaining - 1;
+    await clerk.users.updateUserMetadata(user.id, {
+      unsafeMetadata: { ...(user.unsafeMetadata as any), remaining: newRemaining },
+    });
+
+    return { success: true, url: imageUrl, remainingCredits: newRemaining };
   } catch (error) {
     console.error('Error generating logo:', error);
     return { success: false, error: 'Failed' };
@@ -166,17 +147,36 @@ export async function generateBrandIdentity(data: {
   description: string;
   style: string;
   model: string;
+  industries?: string[];
+  colorSchemes?: string[];
+  logoStyles?: string[];
 }) {
   'use server';
   try {
+    if (!apiKey) return { success: false, error: 'Missing NEBIUS_API_KEY' };
     const user = await currentUser();
     if (!user) return { success: false, error: 'Not authenticated' };
 
-    await ensureDbConnected();
-    const prompt = BRAND_SYSTEM_PROMPT
+    let prompt = BRAND_SYSTEM_PROMPT
       .replace('{{name}}', data.companyName)
       .replace('{{description}}', data.description)
       .replace('{{style}}', data.style);
+
+    // Add optional context if provided
+    const additionalContext: string[] = [];
+    if (data.industries && data.industries.length > 0) {
+      additionalContext.push(`INDUSTRIES: ${data.industries.join(', ')}`);
+    }
+    if (data.colorSchemes && data.colorSchemes.length > 0) {
+      additionalContext.push(`COLOR SCHEMES: ${data.colorSchemes.join(', ')}`);
+    }
+    if (data.logoStyles && data.logoStyles.length > 0) {
+      additionalContext.push(`LOGO STYLES: ${data.logoStyles.join(', ')}`);
+    }
+
+    if (additionalContext.length > 0) {
+      prompt += '\n\nADDITIONAL CONTEXT:\n' + additionalContext.join('\n');
+    }
 
     const completion = await client.chat.completions.create({
       model: "meta-llama/Llama-3.3-70B-Instruct",
@@ -245,16 +245,23 @@ export async function generateInteractiveAsset(brandId: string, category: string
 export async function generateLogos(brandData: { name: string, description: string, identity: any }, model: string = 'black-forest-labs/flux-schnell') {
   'use server';
   try {
+    if (!apiKey) return { success: false, error: 'Missing NEBIUS_API_KEY' };
     const user = await currentUser();
     if (!user) return { success: false, error: 'Not authenticated' };
+    const clerk = await clerkClient();
 
-    const currentRemaining = (user.unsafeMetadata?.remaining as number) || 0;
+    const rawRemaining = (user.unsafeMetadata as any)?.remaining;
+    const currentRemaining =
+      typeof rawRemaining === 'number' ? rawRemaining : DEFAULT_STARTING_CREDITS;
+
+    // Initialize credits once for new users (don't overwrite a real 0)
+    if (typeof rawRemaining !== 'number') {
+      await clerk.users.updateUserMetadata(user.id, {
+        unsafeMetadata: { ...(user.unsafeMetadata as any), remaining: currentRemaining },
+      });
+    }
+
     if (currentRemaining <= 0) return { success: false, error: "No credits" };
-
-    const newRemaining = currentRemaining - 1;
-    await (await clerkClient()).users.updateUserMetadata(user.id, {
-      unsafeMetadata: { remaining: newRemaining },
-    });
 
     const conceptPrompt = LOGO_MULTIPLE_CONCEPTS_PROMPT
       .replace('{{name}}', brandData.name)
@@ -329,6 +336,11 @@ export async function generateLogos(brandData: { name: string, description: stri
 
       finalConcepts.push({ ...concept, iconUrl, variations: variations });
     }
+
+    const newRemaining = currentRemaining - 1;
+    await clerk.users.updateUserMetadata(user.id, {
+      unsafeMetadata: { ...(user.unsafeMetadata as any), remaining: newRemaining },
+    });
 
     return { success: true, concepts: finalConcepts, remainingCredits: newRemaining };
   } catch (error) {
@@ -518,7 +530,15 @@ export async function getCredits() {
   try {
     const user = await currentUser();
     if (!user) return { remaining: 0 };
-    return { remaining: (user.unsafeMetadata?.remaining as number) || 0 };
+    const rawRemaining = (user.unsafeMetadata as any)?.remaining;
+    if (typeof rawRemaining === 'number') return { remaining: rawRemaining };
+
+    // Initialize once for new users
+    const clerk = await clerkClient();
+    await clerk.users.updateUserMetadata(user.id, {
+      unsafeMetadata: { ...(user.unsafeMetadata as any), remaining: DEFAULT_STARTING_CREDITS },
+    });
+    return { remaining: DEFAULT_STARTING_CREDITS };
   } catch (error) {
     return { remaining: 0 };
   }
@@ -534,6 +554,256 @@ export async function downloadImage(url: string) {
     return { success: true, data: `data:${contentType};base64,${base64}` };
   } catch (error) {
     return { success: false };
+  }
+}
+
+export async function createBrand(data: {
+  name: string;
+  slogan?: string;
+  industry?: string;
+  vibeKeywords?: string[];
+}) {
+  'use server';
+  try {
+    const user = await currentUser();
+    if (!user) return { success: false, error: 'Not authenticated' };
+
+    const { name, slogan, industry, vibeKeywords } = data;
+    if (!name?.trim()) return { success: false, error: 'Missing brand name' };
+
+    await ensureDbConnected();
+    const brand = await Brand.create({
+      userId: user.id,
+      name: name.trim(),
+      slogan: slogan?.trim() || '',
+      industry: industry?.trim() || '',
+      vibeKeywords: Array.isArray(vibeKeywords) ? vibeKeywords.filter(Boolean).slice(0, 12) : [],
+      status: 'draft',
+      assets: [],
+      logoCandidates: [],
+    });
+
+    return { success: true, brandId: brand._id.toString() };
+  } catch (error) {
+    console.error('Create brand error:', error);
+    return { success: false, error: error instanceof Error ? error.message : 'Failed to create brand' };
+  }
+}
+
+export async function generateLogoCandidates(brandId: string, model: string = 'black-forest-labs/flux-schnell', count: number = 8) {
+  'use server';
+  try {
+    const user = await currentUser();
+    if (!user) return { success: false, error: 'Not authenticated' };
+
+    if (!process.env.NEBIUS_API_KEY) {
+      return { success: false, error: 'Missing NEBIUS_API_KEY' };
+    }
+
+    await ensureDbConnected();
+    const brand = await Brand.findOne({ _id: brandId, userId: user.id });
+    if (!brand) return { success: false, error: 'Brand not found' };
+
+    function makeCandidateId() {
+      return `cand_${Math.random().toString(36).slice(2, 10)}_${Date.now().toString(36)}`;
+    }
+
+    function buildPrompts(input: {
+      name: string;
+      slogan?: string;
+      industry?: string;
+      vibeKeywords?: string[];
+      style?: string;
+    }) {
+      const base = [
+        `Brand name: "${input.name}"`,
+        input.slogan ? `Slogan: "${input.slogan}"` : '',
+        input.industry ? `Industry: ${input.industry}` : '',
+        input.vibeKeywords?.length ? `Vibe keywords: ${input.vibeKeywords.join(', ')}` : '',
+      ].filter(Boolean).join('. ');
+
+      const archetypes = [
+        'minimal geometric icon + clean wordmark',
+        'bold typographic wordmark with custom letterforms',
+        'monogram / lettermark inside a simple shape',
+        'abstract symbol that suggests the brand concept',
+        'modern tech-style mark with sharp lines',
+        'friendly rounded mascot-like simple mark (still professional)',
+        'luxury elegant mark with refined typography',
+        'flat icon mark optimized for favicon readability',
+      ];
+
+      return archetypes.map((a) =>
+        [
+          'Create a professional logo on a clean white background.',
+          'CRITICAL: include the brand name text clearly and legibly.',
+          'Avoid mockups. No 3D renders. No gradients unless subtle.',
+          `Direction: ${a}.`,
+          base,
+        ].join(' ')
+      );
+    }
+
+    const prompts = buildPrompts({
+      name: brand.name,
+      slogan: (brand as any).slogan,
+      industry: brand.industry,
+      vibeKeywords: (brand as any).vibeKeywords,
+    });
+
+    const limit = Math.min(count, prompts.length);
+    const selectedPrompts = prompts.slice(0, limit);
+
+    const created: any[] = [];
+    for (const prompt of selectedPrompts) {
+      const image = await client.images.generate({
+        model: model as any,
+        prompt,
+        size: '1024x1024',
+      });
+      const imageUrl = image.data?.[0]?.url || '';
+      if (!imageUrl) continue;
+
+      const candidateId = makeCandidateId();
+      created.push({
+        candidateId,
+        imageUrl,
+        prompt,
+        model,
+        createdAt: new Date(),
+      });
+    }
+
+    (brand as any).logoCandidates = Array.isArray((brand as any).logoCandidates)
+      ? [...(brand as any).logoCandidates, ...created]
+      : created;
+    brand.markModified('logoCandidates');
+    await brand.save();
+
+    return { success: true, candidates: created };
+  } catch (error) {
+    console.error('Generate candidates error:', error);
+    return { success: false, error: error instanceof Error ? error.message : 'Failed to generate candidates' };
+  }
+}
+
+export async function getLogoCandidates(brandId: string) {
+  'use server';
+  try {
+    const user = await currentUser();
+    if (!user) return { success: false, error: 'Not authenticated' };
+
+    await ensureDbConnected();
+    const brand = await Brand.findOne({ _id: brandId, userId: user.id }).lean() as any;
+    if (!brand) return { success: false, error: 'Brand not found' };
+
+    return { success: true, candidates: brand.logoCandidates || [] };
+  } catch (error) {
+    console.error('List candidates error:', error);
+    return { success: false, error: error instanceof Error ? error.message : 'Failed to list candidates' };
+  }
+}
+
+export async function applyLogo(brandId: string, candidateId: string) {
+  'use server';
+  try {
+    const user = await currentUser();
+    if (!user) return { success: false, error: 'Not authenticated' };
+
+    if (!candidateId?.trim()) {
+      return { success: false, error: 'Missing candidateId' };
+    }
+
+    await ensureDbConnected();
+    const brand = await Brand.findOne({ _id: brandId, userId: user.id });
+    if (!brand) return { success: false, error: 'Brand not found' };
+
+    const candidates = Array.isArray((brand as any).logoCandidates) ? (brand as any).logoCandidates : [];
+    const selectedCandidate = candidates.find((c: any) => c.candidateId === candidateId);
+
+    if (!selectedCandidate) {
+      return { success: false, error: 'Candidate not found' };
+    }
+
+    // Set active logo candidate
+    (brand as any).activeLogoCandidateId = candidateId;
+    brand.status = 'active';
+
+    // Initialize brand identity if missing
+    if (!brand.identity) {
+      brand.identity = {
+        primary_color: '#2563eb',
+        secondary_color: '#ffffff',
+        visual_style: (brand as any).vibeKeywords?.[0] || 'modern',
+      };
+    }
+
+    // Create primary logo asset from selected candidate
+    const primaryLogoAsset = {
+      category: 'logo',
+      subType: 'primary_logo',
+      imageUrl: selectedCandidate.imageUrl,
+      prompt: selectedCandidate.prompt || 'Selected logo candidate',
+      createdAt: new Date(),
+    };
+
+    // Initialize assets array if needed
+    if (!Array.isArray(brand.assets)) {
+      (brand as any).assets = [];
+    }
+
+    // Add primary logo
+    brand.assets.push(primaryLogoAsset as any);
+
+    // Generate starter kit assets
+    const starterCategories = [
+      'business_card',
+      'social_post',
+      'letterhead',
+      'email_signature',
+      'social_cover',
+    ];
+
+    const templates = await Template.find({
+      category: { $in: starterCategories },
+    }).sort({ createdAt: 1 });
+
+    const templatesByCategory: Record<string, any[]> = {};
+    templates.forEach((t) => {
+      if (!templatesByCategory[t.category]) templatesByCategory[t.category] = [];
+      templatesByCategory[t.category].push(t);
+    });
+
+    const primaryLogoObj = { imageUrl: selectedCandidate.imageUrl };
+
+    for (const category of starterCategories) {
+      const categoryTemplates = templatesByCategory[category] || [];
+      // Generate up to 3 variations per category
+      for (let i = 0; i < Math.min(3, categoryTemplates.length); i++) {
+        const template = categoryTemplates[i];
+        const sceneData = hydrateTemplate(template, brand, primaryLogoObj);
+
+        brand.assets.push({
+          category: category,
+          subType: `Starter ${i + 1}`,
+          sceneData: sceneData,
+          createdAt: new Date(),
+          prompt: `Auto-generated ${category}`,
+        } as any);
+      }
+    }
+
+    brand.markModified('assets');
+    await brand.save();
+
+    return {
+      success: true,
+      brandId: brand._id.toString(),
+      message: 'Logo applied and starter kit generated',
+    };
+  } catch (error) {
+    console.error('Apply logo error:', error);
+    return { success: false, error: error instanceof Error ? error.message : 'Failed to apply logo' };
   }
 }
 
@@ -722,5 +992,208 @@ export async function setPrimaryLogo(brandId: string, imageUrl: string) {
   } catch (error) {
     console.error('Error setting primary logo:', error);
     return { success: false, error: 'Failed' };
+  }
+}
+
+export async function exportBrandKit(brandId: string) {
+  'use server';
+  try {
+    const JSZip = (await import('jszip')).default;
+    const { renderSceneToPNG, renderSceneToSVG, renderSceneToPDF } = await import('@/lib/render/scene-renderer');
+    const { clerkClient } = await import('@clerk/nextjs/server');
+
+    const user = await currentUser();
+    if (!user) return { success: false, error: 'Not authenticated' };
+
+    const EXPORT_COST_CREDITS = 1;
+    const DEFAULT_STARTING_CREDITS = 10;
+
+    const clerk = await clerkClient();
+    const rawRemaining = (user.unsafeMetadata as any)?.remaining;
+    const currentRemaining =
+      typeof rawRemaining === 'number' ? rawRemaining : DEFAULT_STARTING_CREDITS;
+
+    // Initialize credits once for new users (don't overwrite real 0)
+    if (typeof rawRemaining !== 'number') {
+      await clerk.users.updateUserMetadata(user.id, {
+        unsafeMetadata: { ...(user.unsafeMetadata as any), remaining: currentRemaining },
+      });
+    }
+
+    if (currentRemaining < EXPORT_COST_CREDITS) {
+      return { success: false, error: 'Not enough credits to export' };
+    }
+
+    await ensureDbConnected();
+    const brand = await Brand.findOne({ _id: brandId, userId: user.id }).lean() as any;
+    if (!brand) return { success: false, error: 'Brand not found' };
+
+    function safeFileName(input: string) {
+      return input
+        .trim()
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-+|-+$/g, '')
+        .slice(0, 60) || 'brand';
+    }
+
+    function guessExtFromContentType(contentType: string | null) {
+      if (!contentType) return 'bin';
+      if (contentType.includes('image/png')) return 'png';
+      if (contentType.includes('image/jpeg')) return 'jpg';
+      if (contentType.includes('image/webp')) return 'webp';
+      if (contentType.includes('image/svg+xml')) return 'svg';
+      if (contentType.includes('application/pdf')) return 'pdf';
+      if (contentType.includes('application/json')) return 'json';
+      return 'bin';
+    }
+
+    function parseDataUrl(dataUrl: string): { mime: string; data: Buffer } | null {
+      const match = /^data:([^;,]+)?(;base64)?,(.*)$/i.exec(dataUrl);
+      if (!match) return null;
+      const mime = match[1] || 'application/octet-stream';
+      const isBase64 = Boolean(match[2]);
+      const payload = match[3] || '';
+      const data = isBase64 ? Buffer.from(payload, 'base64') : Buffer.from(decodeURIComponent(payload), 'utf8');
+      return { mime, data };
+    }
+
+    async function fetchAsBuffer(url: string) {
+      const res = await fetch(url);
+      if (!res.ok) throw new Error(`Failed to fetch asset: ${res.status} ${res.statusText}`);
+      const contentType = res.headers.get('content-type');
+      const arr = await res.arrayBuffer();
+      return { contentType, buffer: Buffer.from(arr) };
+    }
+
+    const zip = new JSZip();
+    const base = safeFileName(brand.name || 'brand');
+
+    // Metadata
+    zip.file(`${base}/brand.json`, JSON.stringify({
+      _id: brand._id?.toString?.() || brandId,
+      name: brand.name,
+      description: brand.description,
+      industry: brand.industry,
+      identity: brand.identity,
+      strategy: brand.strategy,
+      contactInfo: brand.contactInfo,
+      exportedAt: new Date().toISOString(),
+    }, null, 2));
+
+    const assets: any[] = Array.isArray(brand.assets) ? brand.assets : [];
+    const imagesFolder = zip.folder(`${base}/images`);
+    const scenesFolder = zip.folder(`${base}/scenes`);
+    const renderedFolder = zip.folder(`${base}/rendered`);
+    if (!imagesFolder || !scenesFolder || !renderedFolder) {
+      throw new Error('Failed to initialize zip folders');
+    }
+
+    let imageCount = 0;
+    let sceneCount = 0;
+    let renderedCount = 0;
+
+    for (const asset of assets) {
+      const id = asset?._id?.toString?.() || `${Date.now()}_${Math.random().toString(16).slice(2)}`;
+      const category = String(asset?.category || 'asset');
+      const subType = String(asset?.subType || 'variant');
+      const baseFileName = `${category}__${subType}__${id}`.replace(/[^a-zA-Z0-9_.-]+/g, '_');
+
+      // Always include sceneData if present
+      if (asset?.sceneData) {
+        // Save JSON
+        scenesFolder.file(
+          `${baseFileName}.json`,
+          JSON.stringify(asset.sceneData, null, 2)
+        );
+        sceneCount += 1;
+
+        // Render to PNG, SVG, and PDF
+        try {
+          const sceneData = asset.sceneData;
+          
+          // Render PNG (high-res, 2x scale)
+          const pngBuffer = await renderSceneToPNG(sceneData, 2);
+          renderedFolder.file(`${baseFileName}.png`, pngBuffer);
+          renderedCount += 1;
+
+          // Render SVG
+          const svgString = renderSceneToSVG(sceneData);
+          renderedFolder.file(`${baseFileName}.svg`, svgString);
+          renderedCount += 1;
+
+          // Render PDF
+          const pdfBuffer = await renderSceneToPDF(sceneData);
+          renderedFolder.file(`${baseFileName}.pdf`, pdfBuffer);
+          renderedCount += 1;
+        } catch (renderError) {
+          console.error(`Failed to render sceneData for ${baseFileName}:`, renderError);
+          // Continue with other assets even if one fails
+        }
+      }
+
+      // Include imageUrl if present and fetchable
+      const imageUrl = asset?.imageUrl;
+      if (typeof imageUrl === 'string' && imageUrl.length > 0) {
+        if (imageUrl.startsWith('data:')) {
+          const parsed = parseDataUrl(imageUrl);
+          if (parsed) {
+            const ext = guessExtFromContentType(parsed.mime);
+            imagesFolder.file(
+              `${baseFileName}.${ext}`,
+              parsed.data
+            );
+            imageCount += 1;
+          }
+        } else if (imageUrl.startsWith('http://') || imageUrl.startsWith('https://')) {
+          const { contentType, buffer } = await fetchAsBuffer(imageUrl);
+          const ext = guessExtFromContentType(contentType);
+          imagesFolder.file(
+            `${baseFileName}.${ext}`,
+            buffer
+          );
+          imageCount += 1;
+        }
+      }
+    }
+
+    zip.file(`${base}/manifest.json`, JSON.stringify({
+      brandId: brand._id?.toString?.() || brandId,
+      imageCount,
+      sceneCount,
+      renderedCount,
+      notes: [
+        'This ZIP contains:',
+        '- images/: Original uploaded images',
+        '- scenes/: Editable scene JSON files',
+        '- rendered/: Pre-rendered PNG, SVG, and PDF exports of all sceneData assets'
+      ]
+    }, null, 2));
+
+    const out = await zip.generateAsync({ type: 'nodebuffer' });
+
+    // Consume credits ONLY on successful bundle creation
+    const newRemaining = currentRemaining - EXPORT_COST_CREDITS;
+    await clerk.users.updateUserMetadata(user.id, {
+      unsafeMetadata: { ...(user.unsafeMetadata as any), remaining: newRemaining },
+    });
+
+    // Convert buffer to base64 for server action response
+    const base64 = out.toString('base64');
+    const fileName = `${base}-brand-kit.zip`;
+
+    return {
+      success: true,
+      data: base64,
+      fileName,
+      mimeType: 'application/zip',
+      remainingCredits: newRemaining,
+    };
+  } catch (error) {
+    console.error('Export error:', error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Export failed',
+    };
   }
 }

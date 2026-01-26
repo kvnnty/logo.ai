@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { motion } from "framer-motion";
 import { ArrowRight, Loader2, Plus, Sparkles, Trash2 } from "lucide-react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
@@ -64,7 +65,7 @@ export default function BrandsPage() {
   return (
     <div className="container mx-auto py-8 px-4 max-w-6xl">
       <div className="mb-10">
-        <Logo/>
+        <Logo />
       </div>
 
       <div className="flex items-center justify-between mb-8">
@@ -74,12 +75,12 @@ export default function BrandsPage() {
             Select a brand to manage, or create a new one.
           </p>
         </div>
-        <Button
-          onClick={() => router.push("/dashboard/my-brands/create")}
-        >
-          <Plus className="h-4 w-4" />
-          Create New Brand
-        </Button>
+        <Link href="/dashboard/my-brands/create">
+          <Button>
+            <Plus className="h-4 w-4" />
+            Create New Brand
+          </Button>
+        </Link>
       </div>
 
       {brands.length === 0 ? (
@@ -95,10 +96,12 @@ export default function BrandsPage() {
             <p className="text-muted-foreground mb-6 max-w-md">
               Create your first brand to get started with AI-powered brand identity generation.
             </p>
-            <Button onClick={() => router.push("/dashboard/my-brands/create")}>
-              <Plus className="h-5 w-5" />
-              Create Your First Brand
-            </Button>
+            <Link href="/dashboard/my-brands/create">
+              <Button>
+                <Plus className="h-5 w-5" />
+                Create Your First Brand
+              </Button>
+            </Link>
           </CardContent>
         </Card>
       ) : (

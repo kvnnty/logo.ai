@@ -8,12 +8,15 @@ import { useToast } from "@/hooks/use-toast";
 import { Check, ChevronLeft, ImageIcon, Loader2, PaintBucket, Sparkles, Upload } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
+import { GenerationLoadingModal } from "./components/loading-modal";
 
 export function UploadFlow({ onBack }: { onBack: () => void }) {
   const [file, setFile] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
   const [companyName, setCompanyName] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
+  const [loadingPhase, setLoadingPhase] = useState("");
+  const [progress, setProgress] = useState(0);
   const [detectedColors, setDetectedColors] = useState<{ primary: string; secondary: string }>({
     primary: "#000000",
     secondary: "#ffffff",
@@ -21,6 +24,7 @@ export function UploadFlow({ onBack }: { onBack: () => void }) {
   const [suggestedColors, setSuggestedColors] = useState<string[]>([]);
   const [isPickingColor, setIsPickingColor] = useState(false);
   const [selectedColorType, setSelectedColorType] = useState<'primary' | 'secondary' | null>(null);
+  const [zoomPreview, setZoomPreview] = useState<{ x: number; y: number; color: string; dataUrl: string } | null>(null);
 
   const { toast } = useToast();
   const router = useRouter();
@@ -71,11 +75,11 @@ export function UploadFlow({ onBack }: { onBack: () => void }) {
         const { s, l } = rgbToHsl(r, g, b);
         const hex = rgbToHex(r, g, b);
 
-        // Count all colors for suggestions
-        allColors[hex] = (allColors[hex] || 0) + 1;
-
         // Skip near-gray junk
         if (s < 0.15) continue;
+
+        // Only count colors with sufficient saturation for suggestions
+        allColors[hex] = (allColors[hex] || 0) + 1;
 
         // Vibrant / brand color
         if (s > 0.45 && l < 0.75) {
@@ -97,9 +101,44 @@ export function UploadFlow({ onBack }: { onBack: () => void }) {
       setDetectedColors({ primary, secondary });
 
       // Generate suggested colors (top 6 excluding current primary and secondary)
+      // Also filter out near-duplicates (colors that are very similar)
       const sortedColors = Object.entries(allColors)
         .sort((a, b) => b[1] - a[1])
-        .filter(([hex]) => hex !== primary && hex !== secondary)
+        .filter(([hex]) => {
+          // Exclude primary and secondary
+          if (hex === primary || hex === secondary) return false;
+          
+          // Filter out colors that are too similar to primary or secondary
+          const hexToRgb = (h: string) => {
+            const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(h);
+            return result ? {
+              r: parseInt(result[1], 16),
+              g: parseInt(result[2], 16),
+              b: parseInt(result[3], 16)
+            } : null;
+          };
+          
+          const colorRgb = hexToRgb(hex);
+          const primaryRgb = hexToRgb(primary);
+          const secondaryRgb = hexToRgb(secondary);
+          
+          if (!colorRgb) return false;
+          
+          // Calculate color distance (Euclidean distance in RGB space)
+          const distance = (c1: { r: number; g: number; b: number }, c2: { r: number; g: number; b: number }) => {
+            return Math.sqrt(
+              Math.pow(c1.r - c2.r, 2) +
+              Math.pow(c1.g - c2.g, 2) +
+              Math.pow(c1.b - c2.b, 2)
+            );
+          };
+          
+          // Exclude colors that are too similar (within 30 RGB units)
+          if (primaryRgb && distance(colorRgb, primaryRgb) < 30) return false;
+          if (secondaryRgb && distance(colorRgb, secondaryRgb) < 30) return false;
+          
+          return true;
+        })
         .slice(0, 6)
         .map(([hex]) => hex);
 
@@ -135,6 +174,119 @@ export function UploadFlow({ onBack }: { onBack: () => void }) {
     return "#" + [r, g, b].map(x => x.toString(16).padStart(2, '0')).join('');
   };
 
+  const handleImageMouseMove = (e: React.MouseEvent<HTMLImageElement>) => {
+    if (!isPickingColor || !selectedColorType || !preview) {
+      setZoomPreview(null);
+      return;
+    }
+
+    const img = imageRef.current;
+    const canvas = colorPickerCanvasRef.current;
+    if (!img || !canvas) return;
+
+    const rect = img.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+
+    // Check if mouse is within image bounds
+    if (x < 0 || y < 0 || x > rect.width || y > rect.height) {
+      setZoomPreview(null);
+      return;
+    }
+
+    // Calculate scale factors
+    const scaleX = img.naturalWidth / rect.width;
+    const scaleY = img.naturalHeight / rect.height;
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    // Set canvas to match image natural dimensions
+    canvas.width = img.naturalWidth;
+    canvas.height = img.naturalHeight;
+    ctx.drawImage(img, 0, 0);
+
+    const pixelX = Math.floor(x * scaleX);
+    const pixelY = Math.floor(y * scaleY);
+
+    // Get the pixel color
+    const pixel = ctx.getImageData(pixelX, pixelY, 1, 1).data;
+    const hex = rgbToHex(pixel[0], pixel[1], pixel[2]);
+
+    // Create zoom preview (9x9 pixel area, magnified 8x)
+    const zoomSize = 9;
+    const zoomScale = 8;
+    const zoomCanvasSize = zoomSize * zoomScale;
+
+    // Create a temporary canvas for the zoom preview
+    const zoomCanvas = document.createElement('canvas');
+    zoomCanvas.width = zoomCanvasSize;
+    zoomCanvas.height = zoomCanvasSize;
+    const zoomCtx = zoomCanvas.getContext('2d');
+    if (!zoomCtx) return;
+
+    // Draw zoomed pixels
+    const sourceX = Math.max(0, pixelX - Math.floor(zoomSize / 2));
+    const sourceY = Math.max(0, pixelY - Math.floor(zoomSize / 2));
+    const sourceWidth = Math.min(zoomSize, img.naturalWidth - sourceX);
+    const sourceHeight = Math.min(zoomSize, img.naturalHeight - sourceY);
+
+    const sourceData = ctx.getImageData(sourceX, sourceY, sourceWidth, sourceHeight);
+    const zoomData = zoomCtx.createImageData(zoomCanvasSize, zoomCanvasSize);
+
+    for (let sy = 0; sy < sourceHeight; sy++) {
+      for (let sx = 0; sx < sourceWidth; sx++) {
+        const srcIdx = (sy * sourceWidth + sx) * 4;
+        const r = sourceData.data[srcIdx];
+        const g = sourceData.data[srcIdx + 1];
+        const b = sourceData.data[srcIdx + 2];
+        const a = sourceData.data[srcIdx + 3];
+
+        // Draw each source pixel as an 8x8 block in the zoom canvas
+        for (let zy = 0; zy < zoomScale; zy++) {
+          for (let zx = 0; zx < zoomScale; zx++) {
+            const zoomX = sx * zoomScale + zx;
+            const zoomY = sy * zoomScale + zy;
+            const zoomIdx = (zoomY * zoomCanvasSize + zoomX) * 4;
+            zoomData.data[zoomIdx] = r;
+            zoomData.data[zoomIdx + 1] = g;
+            zoomData.data[zoomIdx + 2] = b;
+            zoomData.data[zoomIdx + 3] = a;
+          }
+        }
+      }
+    }
+
+    zoomCtx.putImageData(zoomData, 0, 0);
+
+    // Draw center crosshair on zoom preview
+    zoomCtx.strokeStyle = '#fff';
+    zoomCtx.lineWidth = 2;
+    const center = Math.floor(zoomCanvasSize / 2);
+    zoomCtx.beginPath();
+    zoomCtx.moveTo(center - zoomScale, center);
+    zoomCtx.lineTo(center + zoomScale, center);
+    zoomCtx.moveTo(center, center - zoomScale);
+    zoomCtx.lineTo(center, center + zoomScale);
+    zoomCtx.stroke();
+
+    zoomCtx.strokeStyle = '#000';
+    zoomCtx.lineWidth = 1;
+    zoomCtx.beginPath();
+    zoomCtx.moveTo(center - zoomScale, center);
+    zoomCtx.lineTo(center + zoomScale, center);
+    zoomCtx.moveTo(center, center - zoomScale);
+    zoomCtx.lineTo(center, center + zoomScale);
+    zoomCtx.stroke();
+
+    setZoomPreview({
+      x: e.clientX,
+      y: e.clientY,
+      color: hex,
+      dataUrl: zoomCanvas.toDataURL()
+    });
+  };
+
   const handleImageClick = (e: React.MouseEvent<HTMLImageElement>) => {
     if (!isPickingColor || !selectedColorType || !preview) return;
 
@@ -168,6 +320,7 @@ export function UploadFlow({ onBack }: { onBack: () => void }) {
 
     setIsPickingColor(false);
     setSelectedColorType(null);
+    setZoomPreview(null);
 
     toast({
       title: "Color Picked",
@@ -213,8 +366,18 @@ export function UploadFlow({ onBack }: { onBack: () => void }) {
     }
 
     setIsGenerating(true);
+    setProgress(10);
+    setLoadingPhase("Analyzing your logo and extracting brand DNA...");
+    
     try {
-      toast({ title: "Analysis Started", description: "Extracting brand DNA from your logo..." });
+      // Simulate progress updates
+      await new Promise(resolve => setTimeout(resolve, 400));
+      setProgress(30);
+      setLoadingPhase("Processing brand colors and visual identity...");
+
+      await new Promise(resolve => setTimeout(resolve, 400));
+      setProgress(50);
+      setLoadingPhase("Crafting your brand strategy...");
 
       const result = await createBrandFromUpload({
         companyName,
@@ -223,16 +386,24 @@ export function UploadFlow({ onBack }: { onBack: () => void }) {
         secondaryColor: detectedColors.secondary,
       });
 
+      setProgress(80);
+      setLoadingPhase("Generating your brand assets...");
+
       if (result.success && result.brandId) {
-        toast({ title: "Success!", description: "Your brand kit is being generated.", variant: "success" });
+        setProgress(100);
+        setLoadingPhase("Almost there! Finalizing your brand kit...");
+        
+        // Brief delay to show 100% completion
+        await new Promise(resolve => setTimeout(resolve, 600));
+        
         router.push(`/dashboard/my-brands/${result.brandId}`);
       } else {
         throw new Error(result.error || "Failed to create brand kit");
       }
-    } catch (error: any) {
-      toast({ title: "Generation Failed", description: error.message, variant: "destructive" });
-    } finally {
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Failed to create brand kit";
       setIsGenerating(false);
+      toast({ title: "Generation Failed", description: message, variant: "destructive" });
     }
   };
 
@@ -282,14 +453,41 @@ export function UploadFlow({ onBack }: { onBack: () => void }) {
                 >
                   {preview ? (
                     <div className="space-y-4">
-                      <div className={`relative aspect-video overflow-hidden rounded-lg bg-white flex items-center justify-center border ${isPickingColor ? 'cursor-crosshair ring-2 ring-primary ring-offset-2' : ''}`}>
+                      <div className={`relative aspect-video overflow-visible rounded-lg bg-white flex items-center justify-center border ${isPickingColor ? 'cursor-crosshair ring-2 ring-primary ring-offset-2' : ''}`}>
                         <img
                           ref={imageRef}
                           src={preview}
                           alt="Logo"
                           className="max-w-full max-h-full object-contain p-4 color-picker-target"
                           onClick={handleImageClick}
+                          onMouseMove={handleImageMouseMove}
+                          onMouseLeave={() => setZoomPreview(null)}
                         />
+                        {isPickingColor && zoomPreview && (
+                          <div
+                            className="fixed pointer-events-none z-50"
+                            style={{
+                              left: `${Math.min(zoomPreview.x + 20, window.innerWidth - 180)}px`,
+                              top: `${Math.max(20, zoomPreview.y - 180)}px`,
+                            }}
+                          >
+                            <div className="bg-white border-2 border-gray-800 rounded-lg shadow-2xl p-2">
+                              <img
+                                src={zoomPreview.dataUrl}
+                                alt="Zoom preview"
+                                className="block"
+                                style={{ width: '144px', height: '144px', imageRendering: 'pixelated' }}
+                              />
+                              <div className="mt-2 text-center">
+                                <div
+                                  className="w-8 h-8 rounded border-2 border-gray-300 mx-auto mb-1"
+                                  style={{ backgroundColor: zoomPreview.color }}
+                                />
+                                <p className="text-xs font-mono font-semibold">{zoomPreview.color}</p>
+                              </div>
+                            </div>
+                          </div>
+                        )}
                       </div>
                       <div className="flex gap-2 justify-center">
                         <Button variant="outline" size="sm" onClick={() => setPreview(null)}>Change Image</Button>
@@ -490,6 +688,13 @@ export function UploadFlow({ onBack }: { onBack: () => void }) {
           </Card>
         </div>
       </div>
+
+      <GenerationLoadingModal
+        isOpen={isGenerating}
+        phase={loadingPhase || "Setting things in motion and preparing something amazing..."}
+        progress={progress}
+        title="Sparking Up the Magic ✨"
+      />
     </div>
   );
 }

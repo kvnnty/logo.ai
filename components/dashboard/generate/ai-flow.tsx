@@ -15,9 +15,13 @@ import { Stepper } from "./components/stepper";
 import { StepWrapper } from "./components/step-wrapper";
 import { Step1Name } from "./components/step1-name";
 import { Step2About } from "./components/step2-about";
+import { StepIndustry } from "./components/step-industry";
+import { StepColorSchemes } from "./components/step-color-schemes";
+import { StepLogoStyle } from "./components/step-logo-style";
 import { Step3Style } from "./components/step3-style";
 import { Step4Preferences } from "./components/step4-preferences";
 import { Step5Results } from "./components/step5-results";
+import { GenerationLoadingModal } from "./components/loading-modal";
 
 export function AIFlow({ onBack }: { onBack: () => void }) {
   const [currentStep, setCurrentStep] = useState(1);
@@ -35,6 +39,9 @@ export function AIFlow({ onBack }: { onBack: () => void }) {
   } | null>(null);
   const [lastBrandId, setLastBrandId] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [loadingPhase, setLoadingPhase] = useState("");
+  const [progress, setProgress] = useState(0);
+  const [isGeneratingMore, setIsGeneratingMore] = useState(false);
   const { toast } = useToast();
   const router = useRouter();
 
@@ -48,9 +55,12 @@ export function AIFlow({ onBack }: { onBack: () => void }) {
     switch (currentStep) {
       case 1: return companyName.trim().length > 0;
       case 2: return true; // Description is optional
-      case 3: return selectedStyle !== "";
-      case 4: return !!selectedModel && !!selectedSize && !!selectedQuality;
-      case 5: return generatedConcepts.length > 0;
+      case 3: return true; // Industry is optional
+      case 4: return true; // Color schemes are optional
+      case 5: return true; // Logo styles are optional
+      case 6: return selectedStyle !== ""; // Visual style
+      case 7: return !!selectedModel && !!selectedSize && !!selectedQuality;
+      case 8: return generatedConcepts.length > 0;
       default: return false;
     }
   }, [currentStep, companyName, selectedStyle, selectedModel, selectedSize, selectedQuality, generatedConcepts]);
@@ -64,37 +74,51 @@ export function AIFlow({ onBack }: { onBack: () => void }) {
   const handleGenerate = useCallback(async () => {
     if (!isFormValid) return;
     setLoading(true);
+    setProgress(10);
+    setLoadingPhase("Analyzing requirements...");
     try {
       const credits = await getCredits();
       setRemainingCredits(credits.remaining);
+      setProgress(20);
 
       let currentBrandData = brandData;
       if (!currentBrandData) {
-        toast({ title: "Phase 1/2", description: "Crafting your brand strategy..." });
+        setLoadingPhase("Phase 1: Crafting your brand strategy...");
+        setProgress(30);
         const identityResult = await generateBrandIdentity({
           companyName,
           description: additionalInfo,
           style: selectedStyle,
           model: selectedModel,
+          industries: selectedIndustries,
+          colorSchemes: selectedColorSchemes,
+          logoStyles: selectedLogoStyles,
         });
         if (!identityResult.success || !identityResult.brandData) {
           throw new Error(identityResult.error || "Failed to generate brand identity");
         }
         currentBrandData = identityResult.brandData;
         setBrandData(currentBrandData);
+        setProgress(60);
+      } else {
+        setProgress(50);
       }
 
-      toast({ title: "Phase 2/2", description: "Generating unique logos..." });
+      setLoadingPhase("Phase 2: Generating unique logo concepts...");
       const logoResult = await generateLogos(currentBrandData, selectedModel);
       if (!logoResult.success || !logoResult.concepts) {
         throw new Error(logoResult.error || "Failed to generate logos");
       }
 
+      setProgress(90);
       setGeneratedConcepts(prev => [...prev, ...logoResult.concepts]);
       setRemainingCredits(logoResult.remainingCredits);
       window.dispatchEvent(new CustomEvent('refreshCredits'));
-      toast({ title: "Ready!", description: "Choose your favorite logo to complete your brand." });
-      setCurrentStep(5);
+
+      setProgress(100);
+      // Brief delay to show 100% completion
+      await new Promise(resolve => setTimeout(resolve, 500));
+      setCurrentStep(8);
     } catch (error) {
       toast({
         title: "Error",
@@ -104,7 +128,35 @@ export function AIFlow({ onBack }: { onBack: () => void }) {
     } finally {
       setLoading(false);
     }
-  }, [companyName, selectedStyle, selectedModel, additionalInfo, isFormValid, toast, brandData]);
+  }, [companyName, selectedStyle, selectedModel, additionalInfo, selectedIndustries, selectedColorSchemes, selectedLogoStyles, isFormValid, toast, brandData]);
+
+  const handleGenerateMore = useCallback(async () => {
+    if (!brandData) return;
+    setIsGeneratingMore(true);
+    try {
+      const logoResult = await generateLogos(brandData, selectedModel);
+      if (!logoResult.success || !logoResult.concepts) {
+        throw new Error(logoResult.error || "Failed to generate logos");
+      }
+
+      setGeneratedConcepts(prev => [...prev, ...logoResult.concepts]);
+      setRemainingCredits(logoResult.remainingCredits);
+      window.dispatchEvent(new CustomEvent('refreshCredits'));
+      
+      toast({
+        title: "Success!",
+        description: `Generated ${logoResult.concepts.length} new logo concepts`,
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: error instanceof Error ? error.message : "An unexpected error occurred",
+        variant: "destructive",
+      });
+    } finally {
+      setIsGeneratingMore(false);
+    }
+  }, [brandData, selectedModel, toast]);
 
   const renderStepContent = () => {
     switch (currentStep) {
@@ -113,8 +165,32 @@ export function AIFlow({ onBack }: { onBack: () => void }) {
       case 2:
         return <Step2About additionalInfo={additionalInfo} setAdditionalInfo={setAdditionalInfo} />;
       case 3:
-        return <Step3Style selectedStyle={selectedStyle} setSelectedStyle={setSelectedStyle} />;
+        return (
+          <StepIndustry
+            selectedIndustries={selectedIndustries}
+            setSelectedIndustries={setSelectedIndustries}
+            onSkip={nextStep}
+          />
+        );
       case 4:
+        return (
+          <StepColorSchemes
+            selectedColorSchemes={selectedColorSchemes}
+            setSelectedColorSchemes={setSelectedColorSchemes}
+            onSkip={nextStep}
+          />
+        );
+      case 5:
+        return (
+          <StepLogoStyle
+            selectedStyles={selectedLogoStyles}
+            setSelectedStyles={setSelectedLogoStyles}
+            onSkip={nextStep}
+          />
+        );
+      case 6:
+        return <Step3Style selectedStyle={selectedStyle} setSelectedStyle={setSelectedStyle} />;
+      case 7:
         return (
           <Step4Preferences
             selectedModel={selectedModel} setSelectedModel={setSelectedModel}
@@ -122,7 +198,7 @@ export function AIFlow({ onBack }: { onBack: () => void }) {
             selectedQuality={selectedQuality} setSelectedQuality={setSelectedQuality}
           />
         );
-      case 5:
+      case 8:
         return (
           <Step5Results
             generatedConcepts={generatedConcepts}
@@ -130,8 +206,8 @@ export function AIFlow({ onBack }: { onBack: () => void }) {
             selectedConceptIndex={selectedConceptIndex}
             setSelectedConceptIndex={setSelectedConceptIndex}
             remainingCredits={remainingCredits}
-            loading={loading}
-            handleGenerate={handleGenerate}
+            loading={isGeneratingMore}
+            handleGenerate={handleGenerateMore}
             lastBrandId={lastBrandId}
             setEditingAsset={setEditingAsset}
             finalizeBrandLogo={finalizeBrandLogo}
@@ -153,21 +229,21 @@ export function AIFlow({ onBack }: { onBack: () => void }) {
         brandId={editingAsset.brandId!}
         assetId={editingAsset.assetId}
         initialScene={editingAsset.initialScene}
-        onBack={() => setEditingAsset(null)}
+        onClose={() => setEditingAsset(null)}
       />
     );
   }
 
   return (
-    <div className={`${currentStep < 5 && generatedConcepts.length === 0 ? "max-w-2xl mx-auto" : ""}`}>
+    <div className="max-w-5xl mx-auto">
       <Stepper currentStep={currentStep} steps={STEPS} totalSteps={TOTAL_STEPS} />
 
-      <div className={currentStep === 5 ? "w-full" : "pt-8"}>
+      <div className={currentStep === 8 ? "w-full" : "pt-8"}>
         <StepWrapper
           currentStep={currentStep}
           prevStep={prevStep}
-          nextStep={nextStep}
-          handleGenerate={handleGenerate}
+          nextStep={currentStep < 7 ? nextStep : undefined}
+          handleGenerate={currentStep === 7 ? handleGenerate : undefined}
           canProceedToNextStep={canProceedToNextStep}
           isFormValid={isFormValid}
           loading={loading}
@@ -175,6 +251,12 @@ export function AIFlow({ onBack }: { onBack: () => void }) {
           {renderStepContent()}
         </StepWrapper>
       </div>
+
+      <GenerationLoadingModal
+        isOpen={loading && currentStep === 7}
+        phase={loadingPhase}
+        progress={progress}
+      />
     </div>
   );
 }

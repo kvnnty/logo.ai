@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Check, Layout, Loader2, Sparkles } from "lucide-react";
+import { Check, Layout, Loader2, RefreshCcw, Sparkles } from "lucide-react";
 import { motion } from "framer-motion";
 import { LogoConcept, LogoVariation } from "../types";
 
@@ -128,20 +128,32 @@ export function Step5Results({
           </motion.div>
         ))}
 
-        <div className="flex justify-center pt-8">
+        <div className="flex flex-col items-center gap-4 pt-8">
           <Button
             onClick={handleGenerate}
             disabled={loading || (remainingCredits !== null && remainingCredits <= 0)}
             className="rounded-full h-14 px-8 bg-primary border-primary transition-all group"
           >
             <div className="flex items-center gap-3">
-              <Loader2 className={`w-4 h-4 text-white group-hover:rotate-180 transition-transform ${loading ? 'animate-spin' : ''}`} />
+              <RefreshCcw className={`w-4 h-4 text-white group-hover:rotate-180 transition-transform ${loading ? 'animate-spin' : ''}`} />
               <div className="text-left">
                 <p className="text-sm font-black tracking-widest text-white uppercase">Generate More</p>
                 <p className="text-xs font-medium text-white">-1 credit</p>
               </div>
             </div>
           </Button>
+          
+          {loading && (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0 }}
+              className="flex items-center gap-3 px-6 py-3 bg-primary/5 border border-primary/20 rounded-full"
+            >
+              <Loader2 className="w-4 h-4 animate-spin text-primary" />
+              <span className="text-sm font-medium text-primary">Generating more logo concepts...</span>
+            </motion.div>
+          )}
         </div>
       </div>
     </motion.div>

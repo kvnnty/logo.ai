@@ -227,3 +227,41 @@ export const GET_TEMPLATE = (category: AssetCategory, index: number, params: Tem
 
   return result;
 };
+
+// Hydrate template placeholders with brand data
+export function hydrateTemplate(template: any, brand: any, primaryLogo: any) {
+  const placeholders: Record<string, string> = {
+    '{{brandName}}': brand.name,
+    '{{primaryColor}}': brand.identity?.primary_color || '#000000',
+    '{{secondaryColor}}': brand.identity?.secondary_color || '#ffffff',
+    '{{logoUrl}}': primaryLogo?.imageUrl || '',
+    '{{website}}': brand.contactInfo?.website || 'www.example.com',
+    '{{email}}': brand.contactInfo?.email || 'hello@example.com',
+    '{{phone}}': brand.contactInfo?.phone || '+1 234 567 890',
+    '{{address}}': brand.contactInfo?.address || 'City, Country',
+  };
+
+  const hydrateElement = (element: any): any => {
+    const newEl = { ...element };
+    for (const key in newEl) {
+      if (typeof newEl[key] === 'string') {
+        if (placeholders[newEl[key]]) {
+          newEl[key] = placeholders[newEl[key]];
+        } else if (Object.keys(placeholders).some(ph => newEl[key].includes(ph))) {
+          let val = newEl[key];
+          for (const [ph, replacement] of Object.entries(placeholders)) {
+            val = val.replace(ph, replacement);
+          }
+          newEl[key] = val;
+        }
+      }
+    }
+    return newEl;
+  };
+
+  return {
+    width: template.dimensions.width,
+    height: template.dimensions.height,
+    elements: template.elements.map(hydrateElement)
+  };
+}
