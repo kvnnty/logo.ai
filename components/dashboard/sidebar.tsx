@@ -9,6 +9,7 @@ import {
   IconCreditCard,
   IconHome,
   IconHome2,
+  IconLink,
   IconMessageCircle,
   IconPalette,
   IconSparkles,
@@ -39,6 +40,11 @@ function getNavItems(brandId?: string): NavItem[] {
       title: "My Designs",
       href: `${brandPrefix}/my-designs`,
       icon: IconPalette,
+    },
+    {
+      title: "Link in Bio",
+      href: brandId ? `${brandPrefix}/link-in-bio` : undefined,
+      icon: IconLink,
     },
     {
       title: "Branding",
@@ -201,10 +207,15 @@ export default function DashboardSidebar({ isOpen = false, onClose, brandId, bra
                 );
               }
 
+              // Skip items without href (like Link in Bio when no brandId)
+              if (!item.href) {
+                return null;
+              }
+
               return (
                 <Link
                   key={item.href}
-                  href={item.href!}
+                  href={item.href}
                   onClick={handleNavClick}
                   className={cn(
                     "group flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm font-medium transition-all duration-200 mb-1",

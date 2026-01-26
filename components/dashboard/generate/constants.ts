@@ -71,12 +71,15 @@ export const BACKGROUND_OPTIONS = [
   { id: "#F0FFF4", name: "Light Green" },
 ];
 
-export const TOTAL_STEPS = 5;
+export const TOTAL_STEPS = 8;
 
 export const STEPS = [
   { number: 1, label: "Company" },
   { number: 2, label: "About" },
-  { number: 3, label: "Style" },
-  { number: 4, label: "Configs" },
-  { number: 5, label: "Selection" },
+  { number: 3, label: "Industry" },
+  { number: 4, label: "Colors" },
+  { number: 5, label: "Logo Style" },
+  { number: 6, label: "Visual Style" },
+  { number: 7, label: "Configs" },
+  { number: 8, label: "Selection" },
 ];

@@ -4,7 +4,6 @@ import { currentUser } from "@clerk/nextjs/server";
 import { ensureDbConnected, Brand } from '@/db';
 import OpenAI from 'openai';
 import dedent from 'dedent';
-import { generateInteractiveAsset } from "./actions";
 
 const apiKey = process.env.NEBIUS_API_KEY;
 const client = new OpenAI({
@@ -23,6 +22,8 @@ export async function createBrandFromUpload(data: {
   try {
     const user = await currentUser();
     if (!user) return { success: false, error: 'User not authenticated' };
+
+    if (!apiKey) return { success: false, error: 'Missing NEBIUS_API_KEY' };
 
     await ensureDbConnected();
 
@@ -79,20 +80,6 @@ export async function createBrandFromUpload(data: {
     });
 
     const brandId = newBrand._id.toString();
-
-    // 3. Generate Interactive Assets (Background)
-    const starterCategories = [
-      'social_post', 'social_story', 'youtube_thumbnail',
-      'marketing_flyer', 'ads',
-      'business_card', 'letterhead', 'email_signature'
-    ];
-
-    starterCategories.forEach(cat => {
-      // Generate 5 of each matching the existing logo theme
-      [1, 2, 3, 4, 5].forEach(i => {
-        generateInteractiveAsset(brandId, cat, `Design ${i}`);
-      });
-    });
 
     return { success: true, brandId };
   } catch (error) {

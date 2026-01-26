@@ -1,6 +1,5 @@
 
-import mongoose from 'mongoose';
-import { Template, ensureDbConnected } from '@/db';
+import { Template, ensureDbConnected } from '../db/index';
 
 const COLORS = {
   primary: '{{primaryColor}}',

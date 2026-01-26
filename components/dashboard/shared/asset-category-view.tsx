@@ -4,6 +4,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { PageHeader } from "./page-header";
 import { AssetCard } from "./asset-card";
+import { TemplatePreviewCard } from "./template-preview-card";
 import { Button } from "@/components/ui/button";
 import { Sparkles, Loader2, Plus } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -26,7 +27,7 @@ export function AssetCategoryView({
   description,
   aspectRatio = "square"
 }: AssetCategoryViewProps) {
-  const [brand, setBrand] = useState<any>(null);
+  const [brandData, setBrandData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [isGenerating, setIsGenerating] = useState(false);
   const [downloading, setDownloading] = useState<string | null>(null);
@@ -36,7 +37,7 @@ export function AssetCategoryView({
     try {
       const result = await getBrandById(brandId);
       if (result.success) {
-        setBrand(result.brand);
+        setBrandData(result.brand);
       }
     } catch (error) {
       console.error("Failed to fetch brand data", error);
@@ -119,10 +120,12 @@ export function AssetCategoryView({
     );
   }
 
-  if (!brand) return <div className="p-8 text-center">Brand not found.</div>;
+  if (!brandData) return <div className="p-8 text-center">Brand not found.</div>;
+
+  const primaryColor = brandData.identity?.primary_color || "#2563eb";
 
   // Find generated assets for this category
-  const categoryAssets = (Array.isArray(brand.assets) ? brand.assets : [])
+  const categoryAssets = (Array.isArray(brandData.assets) ? brandData.assets : [])
     .filter((a: any) => {
       // Loose matching for categories
       const catMatch = a.category?.toLowerCase() === category.toLowerCase() ||
@@ -150,20 +153,40 @@ export function AssetCategoryView({
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-8">
-        {categoryAssets.map((asset: any) => (
-          <AssetCard
-            key={asset._id}
-            title={asset.subType?.replace("_", " ") || "Brand Asset"}
-            description={asset.prompt}
-            imageUrl={asset.imageUrl || "/placeholder-asset.png"}
-            aspectRatio={aspectRatio}
-            onDownload={() => handleDownload(asset.imageUrl, asset._id)}
-            onEdit={() => handleOpenEditor(asset)}
-            onAction={() => handleOpenEditor(asset)}
-            actionLabel="Customize"
-            downloading={downloading === asset._id}
-          />
-        ))}
+        {/* Show template previews first if no assets exist */}
+        {categoryAssets.length === 0 && (
+          <>
+            {[0, 1, 2].map((i) => (
+              <TemplatePreviewCard
+                key={`template-${i}`}
+                category={category}
+                primaryColor={primaryColor}
+                onClick={handleGenerate}
+              />
+            ))}
+          </>
+        )}
+        
+        {categoryAssets.map((asset: any) => {
+          // If asset has sceneData but no imageUrl, we need to render it
+          // For now, show a placeholder or generate preview
+          const displayImageUrl = asset.imageUrl || (asset.sceneData ? null : "/placeholder-asset.png");
+          
+          return (
+            <AssetCard
+              key={asset._id}
+              title={asset.subType?.replace("_", " ") || "Brand Asset"}
+              description={asset.prompt}
+              imageUrl={displayImageUrl}
+              aspectRatio={aspectRatio}
+              onDownload={() => handleDownload(asset.imageUrl, asset._id)}
+              onEdit={() => handleOpenEditor(asset)}
+              onAction={() => handleOpenEditor(asset)}
+              actionLabel="Customize"
+              downloading={downloading === asset._id}
+            />
+          );
+        })}
 
         {categoryAssets.length === 0 && !isGenerating && (
           <div className="col-span-full border-2 border-dashed rounded-3xl p-20 text-center bg-muted/20">

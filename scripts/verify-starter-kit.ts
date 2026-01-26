@@ -1,6 +1,5 @@
 
-import { saveFinalBrand } from '@/app/actions/actions';
-import { Brand, ensureDbConnected } from '@/db';
+import { ensureDbConnected } from '../db/index';
 
 // Mock Data
 const MOCK_DATA = {
@@ -26,7 +25,7 @@ const MOCK_DATA = {
 // Instead, I'll just check if the TEMPLATES are in DB, which confirms the Generator worked.
 // The Logic verification relies on code review + user testing.
 
-import { Template } from '@/db';
+import { Template } from '../db/index';
 
 async function verify() {
   await ensureDbConnected();

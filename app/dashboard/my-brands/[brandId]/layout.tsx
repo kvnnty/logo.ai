@@ -20,7 +20,7 @@ export default async function BrandLayout({
 
   return (
     <BrandProvider brand={result.brand}>
-      <div className="flex-1 flex flex-col overflow-hidden">
+      <div className="h-screen flex-1 flex flex-col overflow-hidden">
         <DashboardSidebar brandId={brandId} brandName={result.brand.name} />
         <div className="flex-1 lg:ml-72 flex flex-col p-4 overflow-hidden">
           <div className="flex-1 flex flex-col border border-border/50 rounded-xl sm:rounded-2xl bg-card overflow-hidden">

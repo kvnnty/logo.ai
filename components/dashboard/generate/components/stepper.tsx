@@ -16,7 +16,7 @@ interface StepperProps {
 
 export function Stepper({ currentStep, steps, totalSteps }: StepperProps) {
   return (
-    <div className="mb-12">
+    <div className="mb-12 max-w-3xl mx-auto">
       <div className="flex items-center justify-between mb-4">
         {steps.map((step, index) => (
           <div key={step.number} className="flex items-center flex-1">

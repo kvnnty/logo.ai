@@ -1,5 +1,5 @@
 
-import { Template, ensureDbConnected } from '@/db';
+import { Template, ensureDbConnected } from '../db/index';
 
 async function verify() {
   console.log('Connecting to DB...');

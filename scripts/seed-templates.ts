@@ -1,7 +1,6 @@
 
-import mongoose from 'mongoose';
-import { Template, ensureDbConnected } from '@/db';
-import { GET_TEMPLATE, AssetCategory } from '@/lib/templates/brand-kit-templates';
+import { Template, ensureDbConnected } from '../db/index';
+import { GET_TEMPLATE, AssetCategory } from '../lib/templates/brand-kit-templates';
 
 // Mock params to generate the "Skeleton" of the template
 // We use placeholders that the Engine will replace later

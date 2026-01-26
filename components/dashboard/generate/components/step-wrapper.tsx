@@ -44,7 +44,7 @@ export function StepWrapper({
             {currentStep === 1 ? "Back" : "Previous"}
           </Button>
 
-          {currentStep < 4 && nextStep ? (
+          {nextStep ? (
             <Button
               onClick={nextStep}
               size="sm"
@@ -54,7 +54,7 @@ export function StepWrapper({
               Next
               <ChevronRight className="w-4 h-4" />
             </Button>
-          ) : currentStep === 4 && handleGenerate ? (
+          ) : handleGenerate ? (
             <Button
               onClick={handleGenerate}
               size="sm"
