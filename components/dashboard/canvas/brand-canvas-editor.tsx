@@ -181,8 +181,8 @@ export function BrandCanvasEditor({ initialScene, brandId, assetId, onClose }: a
     } else {
       // For SVG and PDF, call server action
       try {
-        const { downloadLogoComponent } = await import('@/app/actions/logo-actions');
-        const result = await downloadLogoComponent(brandId, assetId, format);
+        const logoActions = await import('../../../app/actions/logo-actions.js');
+        const result = await logoActions.downloadLogoComponent(brandId, assetId, format);
         
         if (result.success && result.data) {
           // Convert base64 to blob

@@ -371,7 +371,7 @@ export function UploadFlow({ onBack }: { onBack: () => void }) {
     setLoadingPhase("Uploading logo to storage...");
     
     try {
-      // Upload file to S3
+      // Upload file to MongoDB GridFS
       const uploadResult = await uploadFile(file, {
         folder: 'logos',
       });

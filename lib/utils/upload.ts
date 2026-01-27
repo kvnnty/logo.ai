@@ -1,5 +1,5 @@
 /**
- * Client-side utility for uploading files to S3 via the API route
+ * Client-side utility for uploading files to MongoDB GridFS via the API route
  */
 
 export interface UploadFileResponse {
@@ -10,7 +10,7 @@ export interface UploadFileResponse {
 }
 
 /**
- * Upload a file to S3
+ * Upload a file to MongoDB GridFS
  */
 export async function uploadFile(
   file: File,
@@ -51,7 +51,7 @@ export async function uploadFile(
 }
 
 /**
- * Upload multiple files to S3
+ * Upload multiple files to MongoDB GridFS
  */
 export async function uploadFiles(
   files: File[],
@@ -66,7 +66,7 @@ export async function uploadFiles(
 }
 
 /**
- * Delete a file from S3
+ * Delete a file from MongoDB GridFS
  */
 export async function deleteFile(key: string): Promise<UploadFileResponse> {
   try {
