@@ -1,19 +1,17 @@
 "use client";
 
-import React, { useState } from 'react';
+import { updateAssetScene } from '@/app/actions/actions';
+import * as logoActions from '@/app/actions/logo-actions';
 import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Slider } from '@/components/ui/slider';
-import { X, Save, Type, Image as ImageIcon, Box, Trash2, Download, Circle, AlignCenter, AlignLeft, AlignRight, AlignVerticalJustifyCenter, AlignVerticalJustifyEnd, AlignVerticalJustifyStart, Layers, Settings, ZoomIn, ZoomOut, Search } from 'lucide-react';
-import { CanvasRenderer } from './canvas-renderer';
-import { updateAssetScene } from '@/app/actions/actions';
-import { useToast } from "@/hooks/use-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-
-// Remove internal dynamic import
+import { useToast } from "@/hooks/use-toast";
+import { AlignCenter, AlignLeft, AlignRight, AlignVerticalJustifyCenter, AlignVerticalJustifyEnd, AlignVerticalJustifyStart, Box, Circle, Download, Image as ImageIcon, Layers, Save, Search, Settings, Trash2, Type, X, ZoomIn, ZoomOut } from 'lucide-react';
+import React, { useState } from 'react';
+import { CanvasRenderer } from './canvas-renderer';
 
 export function BrandCanvasEditor({ initialScene, brandId, assetId, onClose }: any) {
   const [scene, setScene] = useState(initialScene || { elements: [], width: 1080, height: 1080 });
@@ -181,7 +179,6 @@ export function BrandCanvasEditor({ initialScene, brandId, assetId, onClose }: a
     } else {
       // For SVG and PDF, call server action
       try {
-        const logoActions = await import('../../../app/actions/logo-actions.js');
         const result = await logoActions.downloadLogoComponent(brandId, assetId, format);
         
         if (result.success && result.data) {

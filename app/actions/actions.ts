@@ -8,6 +8,7 @@ import { ensureDbConnected, Logo, Brand, Template } from '@/db';
 import type { IBrand, ILogo, IBrandAsset, ITemplate } from '@/db';
 import { BRAND_SYSTEM_PROMPT, LOGO_MULTIPLE_CONCEPTS_PROMPT, LOGO_SET_VARIANTS } from '@/lib/prompts';
 import { AssetCategory, hydrateTemplate } from '@/lib/templates/brand-kit-templates';
+import { renderSceneToPNG, renderSceneToSVG, renderSceneToPDF } from '@/lib/render/scene-renderer';
 import Stripe from 'stripe';
 
 const DEFAULT_STARTING_CREDITS = 10;
@@ -1067,8 +1068,6 @@ export async function exportBrandKit(brandId: string) {
   'use server';
   try {
     const JSZip = (await import('jszip')).default;
-    const { renderSceneToPNG, renderSceneToSVG, renderSceneToPDF } = await import('@/lib/render/scene-renderer.js');
-    const { clerkClient } = await import('@clerk/nextjs/server');
 
     const user = await currentUser();
     if (!user) return { success: false, error: 'Not authenticated' };

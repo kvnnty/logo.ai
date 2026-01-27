@@ -2,6 +2,7 @@
 
 import { currentUser } from "@clerk/nextjs/server";
 import { ensureDbConnected, Brand } from '@/db';
+import { renderSceneToPNG, renderSceneToSVG, renderSceneToPDF } from '@/lib/render/scene-renderer';
 
 /**
  * Generate logo using API route (separates heavy AI calls from Server Actions)
@@ -164,8 +165,6 @@ export async function downloadLogoComponent(brandId: string, assetId: string, fo
     }
 
     // Render scene to requested format
-    const { renderSceneToPNG, renderSceneToSVG, renderSceneToPDF } = await import('@/lib/render/scene-renderer.js');
-    
     let buffer: Buffer;
     let mimeType: string;
     let extension: string;

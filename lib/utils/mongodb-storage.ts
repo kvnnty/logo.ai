@@ -4,21 +4,24 @@
  */
 
 import mongoose from 'mongoose';
-import { GridFSBucket } from 'mongodb';
 import { ensureDbConnected } from '@/db';
 
-let gridFSBucket: GridFSBucket | null = null;
+// Use mongoose's GridFSBucket which is compatible with mongoose's mongodb driver version
+let gridFSBucket: any = null;
 
 /**
- * Initialize GridFS bucket
+ * Initialize GridFS bucket using mongoose's connection
  */
-function getGridFSBucket(): GridFSBucket {
+function getGridFSBucket() {
   if (!gridFSBucket) {
     const db = mongoose.connection.db;
     if (!db) {
       throw new Error('Database not connected');
     }
-    gridFSBucket = new GridFSBucket(db, { bucketName: 'files' });
+    // Use GridFSBucket from mongodb package
+    // Cast db to any to avoid version mismatch type errors between mongoose's mongodb and installed mongodb
+    const { GridFSBucket } = require('mongodb');
+    gridFSBucket = new GridFSBucket(db as any, { bucketName: 'files' });
   }
   return gridFSBucket;
 }
@@ -178,7 +181,7 @@ export async function deleteByKey(key: string): Promise<void> {
   const bucket = getGridFSBucket();
 
   return new Promise((resolve, reject) => {
-    bucket.find({ filename: key }).toArray().then((files) => {
+    bucket.find({ filename: key }).toArray().then((files: any[]) => {
       if (files.length === 0) {
         resolve(); // File doesn't exist, consider it deleted
         return;
