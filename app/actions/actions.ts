@@ -304,9 +304,9 @@ export async function generateLogos(
     });
 
     const { concepts } = JSON.parse(conceptResponse.choices[0].message.content || '{"concepts":[]}');
-    const finalConcepts = [];
-
-    for (const concept of concepts) {
+    
+    // Generate all logos in parallel for near-instant results
+    const logoPromises = concepts.map(async (concept: any) => {
       // Create a specific prompt for this icon using its unique colors
       const colorString = concept.colors.join(', ');
       const symbolPrompt = `A professional logo design for brand "${brandData.name}". 
@@ -323,7 +323,7 @@ export async function generateLogos(
       });
 
       const iconUrl = imgResponse.data?.[0]?.url || "";
-      if (!iconUrl) continue;
+      if (!iconUrl) return null;
 
       const conceptId = `concept_${Math.random().toString(36).substring(2, 9)}`;
       const variations = [
@@ -361,8 +361,12 @@ export async function generateLogos(
         },
       ];
 
-      finalConcepts.push({ ...concept, iconUrl, variations: variations });
-    }
+      return { ...concept, iconUrl, variations: variations };
+    });
+
+    // Wait for all logos to generate in parallel
+    const results = await Promise.all(logoPromises);
+    const finalConcepts = results.filter((concept): concept is any => concept !== null);
 
     const newRemaining = currentRemaining - 1;
     await clerk.users.updateUserMetadata(user.id, {

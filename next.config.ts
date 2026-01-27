@@ -1,9 +1,28 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
   images: {
     remotePatterns: [
+      {
+        protocol: "http",
+        hostname: "localhost",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "logo-ai-gwgs.vercel.app",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "logoai-pro-envato.vercel.app",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "logoaipro.com",
+        pathname: "/**",
+      },
       {
         protocol: "https",
         hostname: "pictures-storage.storage.eu-north1.nebius.cloud",
@@ -11,13 +30,9 @@ const nextConfig: NextConfig = {
     ],
   },
   eslint: {
-    // Warning: This allows production builds to successfully complete even if
-    // your project has ESLint errors.
     ignoreDuringBuilds: true,
   },
   typescript: {
-    // Warning: This allows production builds to successfully complete even if
-    // your project has type errors.
     ignoreBuildErrors: false,
   },
 };

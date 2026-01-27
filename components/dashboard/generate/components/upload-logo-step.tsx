@@ -5,7 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Check, PaintBucket, Sparkles, Upload } from "lucide-react";
 import { motion } from "framer-motion";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, Dispatch, SetStateAction } from "react";
 
 interface UploadLogoStepProps {
   file: File | null;
@@ -13,7 +13,7 @@ interface UploadLogoStepProps {
   preview: string | null;
   setPreview: (preview: string | null) => void;
   detectedColors: { primary: string; secondary: string };
-  setDetectedColors: (colors: { primary: string; secondary: string }) => void;
+  setDetectedColors: Dispatch<SetStateAction<{ primary: string; secondary: string }>>;
   suggestedColors: string[];
   setSuggestedColors: (colors: string[]) => void;
 }
@@ -296,7 +296,7 @@ export function UploadLogoStep({
     const pixel = ctx.getImageData(x * scaleX, y * scaleY, 1, 1).data;
     const hex = rgbToHex(pixel[0], pixel[1], pixel[2]);
 
-    setDetectedColors(prev => ({
+    setDetectedColors((prev: { primary: string; secondary: string }) => ({
       ...prev,
       [selectedColorType]: hex
     }));
@@ -313,7 +313,7 @@ export function UploadLogoStep({
   };
 
   const handleSuggestedColorClick = (color: string, type: 'primary' | 'secondary') => {
-    setDetectedColors(prev => ({
+    setDetectedColors((prev: { primary: string; secondary: string }) => ({
       ...prev,
       [type]: color
     }));
@@ -352,8 +352,8 @@ export function UploadLogoStep({
         </p>
       </div>
 
-      <Card className="border overflow-hidden">
-        <CardContent className="space-y-4 p-6">
+      <Card className="border-none shadow-none p-0">
+        <CardContent className="space-y-4 p-0">
           <div
             className={`border-2 border-dashed rounded-xl p-8 text-center transition-all ${
               preview ? "border-primary/20 bg-primary/5" : "border-muted-foreground/20 hover:border-primary/50"

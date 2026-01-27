@@ -232,14 +232,14 @@ export function UploadFlow({ onBack }: { onBack: () => void }) {
               <div className="space-y-3">
                 <p className="text-xs text-muted-foreground uppercase font-bold tracking-wider">Your Logo</p>
                 {preview && (
-                  <div className="aspect-video bg-gradient-to-br from-primary/5 to-purple-500/5 rounded-xl border-2 border-primary/20 p-6 flex items-center justify-center shadow-lg">
-                    <img src={preview} alt="Logo" className="max-w-full max-h-full object-contain drop-shadow-lg" />
+                  <div className="aspect-video rounded-lg border-2 border-primary/20 p-6 flex items-center justify-center">
+                    <img src={preview} alt="Logo" className="max-w-full max-h-full object-contain" />
                   </div>
                 )}
               </div>
               
               {/* Details */}
-              <div className="space-y-4">
+              <div className="space-y-4 mt-8">
                 <div className="p-4 bg-muted/50 rounded-lg border">
                   <p className="text-xs text-muted-foreground uppercase font-bold tracking-wider mb-2">Company Name</p>
                   <p className="font-semibold text-lg">{companyName || "Not set"}</p>
@@ -269,12 +269,12 @@ export function UploadFlow({ onBack }: { onBack: () => void }) {
                   <p className="text-xs text-muted-foreground uppercase font-bold tracking-wider mb-3">Brand Colors</p>
                   <div className="flex gap-3">
                     <div className="flex-1">
-                      <div className="w-full h-12 rounded-lg border-2 border-white shadow-md mb-2" style={{ backgroundColor: detectedColors.primary }} />
+                      <div className="w-full h-12 rounded border-2 border-white mb-2" style={{ backgroundColor: detectedColors.primary }} />
                       <p className="text-xs font-mono text-center">{detectedColors.primary}</p>
                       <p className="text-xs text-muted-foreground text-center">Primary</p>
                     </div>
                     <div className="flex-1">
-                      <div className="w-full h-12 rounded-lg border-2 border-white shadow-md mb-2" style={{ backgroundColor: detectedColors.secondary }} />
+                      <div className="w-full h-12 rounded border-2 border-white mb-2" style={{ backgroundColor: detectedColors.secondary }} />
                       <p className="text-xs font-mono text-center">{detectedColors.secondary}</p>
                       <p className="text-xs text-muted-foreground text-center">Secondary</p>
                     </div>
@@ -302,7 +302,7 @@ export function UploadFlow({ onBack }: { onBack: () => void }) {
                 <Sparkles className="w-5 h-5 text-primary" />
                 What You'll Get
               </h3>
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              <div className="flex flex-wrap gap-2">
                 {["Social Posts", "Marketing Flyers", "Business Cards", "Letterheads", "Ad Creatives", "Email Headers", "PowerPoint Templates", "Stickers"].map((item) => (
                   <div key={item} className="bg-white/80 backdrop-blur-sm px-3 py-2 rounded-lg text-xs font-semibold border border-black/5 text-center">
                     {item}
