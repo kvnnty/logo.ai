@@ -4,6 +4,18 @@ import React from 'react';
 import { Stage, Layer, Text, Rect, Circle, Image as KonvaImage, Transformer } from 'react-konva';
 import useImage from 'use-image';
 
+// Suppress Konva multiple instance warning (common in Next.js due to HMR and development mode)
+if (typeof window !== 'undefined') {
+  const originalWarn = console.warn;
+  console.warn = (...args: any[]) => {
+    const message = String(args[0] || '');
+    if (message.includes('Several Konva instances detected')) {
+      return; // Suppress this specific warning
+    }
+    originalWarn.apply(console, args);
+  };
+}
+
 interface ElementProps {
   element: any;
   isSelected: boolean;

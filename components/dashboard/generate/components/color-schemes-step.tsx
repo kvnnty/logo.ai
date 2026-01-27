@@ -86,9 +86,10 @@ interface ColorSchemesStepProps {
   selectedColorSchemes: string[];
   setSelectedColorSchemes: (val: string[]) => void;
   onSkip?: () => void;
+  detectedColors?: { primary: string; secondary: string };
 }
 
-export function ColorSchemesStep({ selectedColorSchemes, setSelectedColorSchemes, onSkip }: ColorSchemesStepProps) {
+export function ColorSchemesStep({ selectedColorSchemes, setSelectedColorSchemes, onSkip, detectedColors }: ColorSchemesStepProps) {
   const toggleScheme = (schemeId: string) => {
     if (selectedColorSchemes.includes(schemeId)) {
       // Deselect just this scheme
@@ -113,6 +114,15 @@ export function ColorSchemesStep({ selectedColorSchemes, setSelectedColorSchemes
           <p className="text-sm text-muted-foreground">
             Pick one primary color family for your brand. You can skip if you are not sure yet.
           </p>
+          {detectedColors && (
+            <div className="flex items-center gap-2 mt-2 p-3 bg-primary/5 rounded-lg border border-primary/20">
+              <span className="text-xs text-muted-foreground">Detected from your logo:</span>
+              <div className="flex gap-2">
+                <div className="w-6 h-6 rounded-full border-2 border-white shadow-sm" style={{ backgroundColor: detectedColors.primary }} />
+                <div className="w-6 h-6 rounded-full border-2 border-white shadow-sm" style={{ backgroundColor: detectedColors.secondary }} />
+              </div>
+            </div>
+          )}
         </div>
         {/* Show Skip only while no color scheme has been selected */}
         {onSkip && selectedColorSchemes.length === 0 && (
