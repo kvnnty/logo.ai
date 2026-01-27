@@ -276,16 +276,17 @@ export default function PublicLinkInBioPage() {
               {linkInBioData.contentBlocks.filter((block: any) => block.visible !== false).map((block: any) => {
                 // Text Block
                 if (block.type === 'text') {
-                  const textStyles = {
+                  const textStyles: Record<string, string> = {
                     heading: 'text-xl font-bold',
                     body: 'text-sm',
                     bio: 'text-sm italic',
                     announcement: 'text-sm font-semibold',
                   };
+                  const styleKey = (block.style || 'body') as string;
                   return (
                     <div
                       key={block.id}
-                      className={textStyles[block.style || 'body']}
+                      className={textStyles[styleKey] || textStyles.body}
                       style={{
                         color: styles.fonts?.fontColor || '#0F2A35',
                         fontFamily: `${styles.fonts?.fontFamily || 'Inter'}, sans-serif`,
@@ -401,16 +402,17 @@ export default function PublicLinkInBioPage() {
 
                 // Text Block
                 if (block.type === 'text') {
-                  const textStyles = {
+                  const textStyles: Record<string, string> = {
                     heading: 'text-xl font-bold',
                     body: 'text-sm',
                     bio: 'text-sm italic',
                     announcement: 'text-sm font-semibold',
                   };
+                  const styleKey = (block.style || 'body') as string;
                   return (
                     <div
                       key={block.id}
-                      className={textStyles[block.style || 'body']}
+                      className={textStyles[styleKey] || textStyles.body}
                       style={{
                         color: styles.fonts?.fontColor || '#0F2A35',
                         fontFamily: `${styles.fonts?.fontFamily || 'Inter'}, sans-serif`,

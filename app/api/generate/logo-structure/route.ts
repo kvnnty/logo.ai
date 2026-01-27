@@ -111,7 +111,7 @@ Return JSON with structure: { icon: { present: boolean, description: string }, w
       const wordmarkResponse = await client.images.generate({
         model: 'black-forest-labs/flux-schnell',
         prompt: wordmarkPrompt,
-        size: '1024x300',
+        size: '1536x1024',
       });
 
       const wordmarkUrl = wordmarkResponse.data?.[0]?.url || '';
@@ -119,10 +119,10 @@ Return JSON with structure: { icon: { present: boolean, description: string }, w
         components.wordmark = {
           imageUrl: wordmarkUrl,
           sceneData: {
-            width: 1024,
-            height: 300,
+            width: 1536,
+            height: 1024,
             elements: [
-              { type: 'image', src: wordmarkUrl, x: 512, y: 150, width: 900, height: 200, align: 'center' }
+              { type: 'image', src: wordmarkUrl, x: 768, y: 512, width: 1400, height: 600, align: 'center' }
             ]
           }
         };

@@ -8,6 +8,7 @@ import { ensureDbConnected, Logo, Brand, Template } from '@/db';
 import type { IBrand, ILogo, IBrandAsset, ITemplate } from '@/db';
 import { BRAND_SYSTEM_PROMPT, LOGO_MULTIPLE_CONCEPTS_PROMPT, LOGO_SET_VARIANTS } from '@/lib/prompts';
 import { AssetCategory, hydrateTemplate } from '@/lib/templates/brand-kit-templates';
+import { renderSceneToPNG, renderSceneToSVG, renderSceneToPDF } from '@/lib/render/scene-renderer';
 import Stripe from 'stripe';
 
 const DEFAULT_STARTING_CREDITS = 10;
@@ -242,7 +243,15 @@ export async function generateInteractiveAsset(brandId: string, category: string
 }
 
 
-export async function generateLogos(brandData: { name: string, description: string, identity: any }, model: string = 'black-forest-labs/flux-schnell') {
+export async function generateLogos(
+  brandData: { name: string, description: string, identity: any },
+  model: string = 'black-forest-labs/flux-schnell',
+  industries?: string[],
+  colorSchemes?: string[],
+  logoStyles?: string[],
+  size: string = '1024x1024',
+  quality: string = 'standard'
+) {
   'use server';
   try {
     if (!apiKey) return { success: false, error: 'Missing NEBIUS_API_KEY' };
@@ -263,13 +272,30 @@ export async function generateLogos(brandData: { name: string, description: stri
 
     if (currentRemaining <= 0) return { success: false, error: "No credits" };
 
+    // Build industry string from selected industries
+    const industryString = industries && industries.length > 0 
+      ? industries.join(', ') 
+      : 'General';
+
+    // Build style string - combine visual style with logo styles if provided
+    let styleString = brandData.identity?.visual_style || 'modern';
+    if (logoStyles && logoStyles.length > 0) {
+      styleString += `, ${logoStyles.join(', ')}`;
+    }
+
+    // Build color context if color schemes provided
+    let colorContext = '';
+    if (colorSchemes && colorSchemes.length > 0) {
+      colorContext = `\n\nCOLOR PREFERENCES: The user prefers ${colorSchemes.join(', ')} color schemes. Consider these color families when generating the logo concepts.`;
+    }
+
     const conceptPrompt = LOGO_MULTIPLE_CONCEPTS_PROMPT
       .replace('{{name}}', brandData.name)
-      .replace('{{industry}}', 'General')
-      .replace('{{style}}', brandData.identity?.visual_style || 'modern')
+      .replace('{{industry}}', industryString)
+      .replace('{{style}}', styleString)
       .replace('{{description}}', brandData.description || '')
       .replace('{{primaryColor}}', brandData.identity?.primary_color || '#000000')
-      .replace('{{secondaryColor}}', brandData.identity?.secondary_color || '#ffffff');
+      .replace('{{secondaryColor}}', brandData.identity?.secondary_color || '#ffffff') + colorContext;
 
     const conceptResponse = await client.chat.completions.create({
       model: "meta-llama/Llama-3.3-70B-Instruct",
@@ -292,7 +318,8 @@ export async function generateLogos(brandData: { name: string, description: stri
       const imgResponse = await client.images.generate({
         model: model,
         prompt: symbolPrompt,
-        size: "1024x1024",
+        size: size as any,
+        ...(quality === 'hd' && { quality: 'hd' }),
       });
 
       const iconUrl = imgResponse.data?.[0]?.url || "";
@@ -393,10 +420,19 @@ export async function saveFinalBrand(data: {
           else subType = 'primary_variation';
         }
 
+        // Extract imageUrl from sceneData or use concept.iconUrl as fallback
+        let imageUrl = concept.iconUrl || "";
+        if (variant.sceneData?.elements) {
+          const imageElement = variant.sceneData.elements.find((el: any) => el.type === 'image');
+          if (imageElement?.src) {
+            imageUrl = imageElement.src;
+          }
+        }
+
         newBrand.assets.push({
           category: 'logo',
           subType: subType,
-          imageUrl: variant.subType === 'logo_icon' ? concept.iconUrl : "",
+          imageUrl: imageUrl,
           prompt: `Logo concept: ${concept.name}`,
           sceneData: variant.sceneData,
           conceptId,
@@ -474,16 +510,29 @@ export async function getUserBrands() {
     const brands = await Brand.find({ userId: user.id }).sort({ createdAt: -1 }).lean();
     return {
       success: true,
-      brands: (brands as any[]).map((b: any) => ({
-        _id: b._id.toString(),
-        name: b.name,
-        description: b.description,
-        createdAt: b.createdAt?.toISOString(),
-        updatedAt: b.updatedAt?.toISOString(),
-        assetCount: b.assets?.length || 0,
-        primaryLogoUrl: b.assets?.find((a: any) => a.subType === 'primary_logo')?.imageUrl || null,
-        industry: b.industry || '',
-      })),
+      brands: (brands as any[]).map((b: any) => {
+        const primaryLogo = b.assets?.find((a: any) => a.subType === 'primary_logo');
+        let primaryLogoUrl = primaryLogo?.imageUrl || null;
+        
+        // If imageUrl is missing, try to extract from sceneData
+        if (!primaryLogoUrl && primaryLogo?.sceneData?.elements) {
+          const imageElement = primaryLogo.sceneData.elements.find((el: any) => el.type === 'image');
+          if (imageElement?.src) {
+            primaryLogoUrl = imageElement.src;
+          }
+        }
+        
+        return {
+          _id: b._id.toString(),
+          name: b.name,
+          description: b.description,
+          createdAt: b.createdAt?.toISOString(),
+          updatedAt: b.updatedAt?.toISOString(),
+          assetCount: b.assets?.length || 0,
+          primaryLogoUrl,
+          industry: b.industry || '',
+        };
+      }),
     };
   } catch (error) {
     return { success: false, error: 'Failed', brands: [] };
@@ -879,8 +928,24 @@ export async function createStripeCheckoutSession(planId: string) {
 
     const plan = PLAN_MAPPING[planId];
     if (!plan || !plan.priceId) {
+      console.error('Invalid plan or price not configured', { planId, plan });
       return { success: false, error: 'Invalid plan or price not configured' };
     }
+
+    const metadata = {
+      userId: user.id,
+      credits: plan.credits.toString(),
+      type: 'credit_purchase',
+      planId: planId,
+    };
+
+    console.log('Creating Stripe checkout session', {
+      userId: user.id,
+      planId,
+      credits: plan.credits,
+      priceId: plan.priceId,
+      metadata,
+    });
 
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
@@ -893,16 +958,20 @@ export async function createStripeCheckoutSession(planId: string) {
       mode: 'payment',
       success_url: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard/credits?success=true`,
       cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard/credits?canceled=true`,
-      metadata: {
-        userId: user.id,
-        credits: plan.credits.toString(),
-      },
+      metadata: metadata,
+    });
+
+    console.log('Stripe checkout session created', {
+      sessionId: session.id,
+      url: session.url,
+      metadata: session.metadata,
     });
 
     return { success: true, url: session.url };
   } catch (error) {
     console.error('Stripe error:', error);
-    return { success: false, error: 'Failed' };
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    return { success: false, error: errorMessage };
   }
 }
 
@@ -999,8 +1068,6 @@ export async function exportBrandKit(brandId: string) {
   'use server';
   try {
     const JSZip = (await import('jszip')).default;
-    const { renderSceneToPNG, renderSceneToSVG, renderSceneToPDF } = await import('@/lib/render/scene-renderer');
-    const { clerkClient } = await import('@clerk/nextjs/server');
 
     const user = await currentUser();
     if (!user) return { success: false, error: 'Not authenticated' };

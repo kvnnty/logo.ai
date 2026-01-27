@@ -17,7 +17,20 @@ export function getPrimaryLogoUrl(assets?: BrandAsset[]): string | null {
   if (!assets || !Array.isArray(assets)) return null;
   
   const primaryLogo = assets.find((a: BrandAsset) => a.subType === 'primary_logo');
-  return primaryLogo?.imageUrl || null;
+  if (!primaryLogo) return null;
+  
+  // If imageUrl exists, use it
+  if (primaryLogo.imageUrl) return primaryLogo.imageUrl;
+  
+  // Otherwise, try to extract from sceneData
+  if (primaryLogo.sceneData?.elements) {
+    const imageElement = primaryLogo.sceneData.elements.find((el: any) => el.type === 'image');
+    if (imageElement?.src) {
+      return imageElement.src;
+    }
+  }
+  
+  return null;
 }
 
 /**

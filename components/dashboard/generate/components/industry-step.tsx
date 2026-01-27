@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
-import { ArrowRight, Building2, Dumbbell, ShoppingCart, Church, Home, Balloons, ChefHat, DollarSign, Heart, PaintRoller, BookOpen, Leaf, Car, PawPrint, MoreHorizontal, Globe, Gavel, Stethoscope, Gamepad2, Sparkles, Plane } from "lucide-react";
+import { ArrowRight, Building2, Dumbbell, ShoppingCart, Church, Home, PartyPopper, ChefHat, DollarSign, Heart, PaintRoller, BookOpen, Leaf, Car, PawPrint, MoreHorizontal, Globe, Gavel, Stethoscope, Gamepad2, Sparkles, PlaneTakeoff } from "lucide-react";
 
 interface Industry {
   id: string;
@@ -11,7 +11,7 @@ interface Industry {
 }
 
 const INDUSTRIES: Industry[] = [
-  { id: "travel", name: "Travel", icon: Plane },
+  { id: "travel", name: "Travel", icon: PlaneTakeoff },
   { id: "sports-fitness", name: "Sports Fitness", icon: Dumbbell },
   { id: "retail", name: "Retail", icon: ShoppingCart },
   { id: "religious", name: "Religious", icon: Church },
@@ -20,7 +20,7 @@ const INDUSTRIES: Industry[] = [
   { id: "internet", name: "Internet", icon: Globe },
   { id: "technology", name: "Technology", icon: Sparkles },
   { id: "home-family", name: "Home Family", icon: Home },
-  { id: "events", name: "Events", icon: Balloons },
+  { id: "events", name: "Events", icon: PartyPopper },
   { id: "medical-dental", name: "Medical Dental", icon: Stethoscope },
   { id: "restaurant", name: "Restaurant", icon: ChefHat },
   { id: "finance", name: "Finance", icon: DollarSign },
@@ -41,11 +41,13 @@ interface StepIndustryProps {
 }
 
 export function StepIndustry({ selectedIndustries, setSelectedIndustries, onSkip }: StepIndustryProps) {
+  // Single-select: user can choose at most one industry
   const toggleIndustry = (industryId: string) => {
     if (selectedIndustries.includes(industryId)) {
-      setSelectedIndustries(selectedIndustries.filter((id) => id !== industryId));
+      // Deselect if the same industry is clicked again
+      setSelectedIndustries([]);
     } else {
-      setSelectedIndustries([...selectedIndustries, industryId]);
+      setSelectedIndustries([industryId]);
     }
   };
 
@@ -62,7 +64,8 @@ export function StepIndustry({ selectedIndustries, setSelectedIndustries, onSkip
           <h2 className="text-xl font-bold">Please Select A Industry</h2>
           <p className="text-sm text-muted-foreground">This will help us find logo types and styles that fit your brand</p>
         </div>
-        {onSkip && (
+        {/* Show Skip only while no industry has been selected */}
+        {onSkip && selectedIndustries.length === 0 && (
           <Button
             variant="ghost"
             size="sm"

@@ -9,6 +9,7 @@ import { ArrowRight, Loader2, Plus, Sparkles, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { formatDistanceToNow } from "date-fns";
 
 interface BrandSummary {
   _id: string;
@@ -64,7 +65,7 @@ export default function BrandsPage() {
 
   return (
     <div className="container mx-auto py-8 px-4 max-w-6xl">
-      <div className="mb-10">
+      <div className="mb-5 pb-5 border-b border-border/40">
         <Logo />
       </div>
 
@@ -111,56 +112,93 @@ export default function BrandsPage() {
               key={brand._id}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.1 }}
+              transition={{ delay: index * 0.05 }}
             >
               <Card
-                className="cursor-pointer transition-all hover:border-primary/50 group"
+                className="group cursor-pointer h-full flex flex-col hover:border-border transition-colors"
                 onClick={() => router.push(`/dashboard/my-brands/${brand._id}`)}
               >
-                <CardHeader className="relative">
-                  {brand.primaryLogoUrl ? (
-                    <div className="w-full h-48 rounded-xl border bg-white p-2 flex items-center justify-center shadow-sm group-hover:border-primary/50 transition-colors">
-                      <img
-                        src={brand.primaryLogoUrl}
-                        alt={brand.name}
-                        className="max-w-full max-h-full object-cover"
-                      />
-                    </div>
-                  ) : (
-                    <div className="w-full h-48 rounded-xl bg-primary/5 border border-dashed flex items-center justify-center">
-                      <Sparkles className="h-6 w-6 text-primary/40" />
-                    </div>
-                  )}
-                  <div className="flex items-start justify-between mt-4">
-                    <div className="space-y-1">
-                      <CardTitle className="flex items-center justify-between w-full">
-                        <span className="flex items-center gap-2">
-                          {brand.name}
-                          <ArrowRight className="h-4 w-4 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
-                        </span>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-8 w-8 text-muted-foreground hover:text-destructive hover:bg-destructive/10 opacity-0 group-hover:opacity-100 transition-opacity"
-                          onClick={(e) => handleDelete(e, brand._id, brand.name)}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </CardTitle>
+                <CardHeader className="p-0">
+                  <div className="relative w-full h-48 bg-muted/30 overflow-hidden">
+                    {brand.primaryLogoUrl ? (
+                      <div className="absolute inset-0 p-6 flex items-center justify-center bg-white">
+                        <img
+                          src={brand.primaryLogoUrl}
+                          alt={brand.name}
+                          className="max-w-full max-h-full object-contain"
+                        />
+                      </div>
+                    ) : (
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <Sparkles className="h-8 w-8 text-muted-foreground" />
+                      </div>
+                    )}
+                    <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8"
+                        onClick={(e) => handleDelete(e, brand._id, brand.name)}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
                     </div>
                   </div>
                 </CardHeader>
-                <CardContent>
-                  <div className="flex items-center justify-between text-sm text-muted-foreground">
-                    <span>{brand.assetCount} assets</span>
-                    <span>
-                      {new Date(brand.createdAt).toLocaleDateString()}
-                    </span>
+
+                <CardContent className="px-5 py-0 flex-1 flex flex-col">
+                  <div className="flex-1 min-w-0 space-y-2 mb-5">
+                    <CardTitle className="text-base font-medium mb-1 truncate">
+                      {brand.name}
+                    </CardTitle>
+                    {brand.description && (
+                      <p className="text-sm text-muted-foreground line-clamp-2">
+                        {brand.description}
+                      </p>
+                    )}
+                  </div>
+                  <div className="mt-auto pt-5 border-t">
+                    <div className="flex items-center justify-end">
+                      <span className="text-xs text-muted-foreground">
+                        {formatDistanceToNow(new Date(brand.createdAt), { addSuffix: true })}
+                      </span>
+                    </div>
                   </div>
                 </CardContent>
               </Card>
             </motion.div>
           ))}
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: brands.length * 0.05 }}
+          >
+            <Link href="/dashboard/my-brands/create" className="block h-full">
+              <Card className="border-2 border-dashed cursor-pointer h-full flex flex-col hover:border-border transition-colors">
+                <CardHeader className="p-0 flex-1 flex flex-col justify-center">
+                  <div className="w-full h-48 flex flex-col items-center justify-center p-6">
+                    <div className="w-12 h-12 rounded-lg bg-muted flex items-center justify-center mb-3">
+                      <Plus className="h-6 w-6 text-muted-foreground" />
+                    </div>
+                    <p className="text-sm font-medium text-muted-foreground">
+                      Create New Brand
+                    </p>
+                  </div>
+                </CardHeader>
+
+                <CardContent className="px-5 py-0">
+                  <div className="pt-3 border-t">
+                    <div className="flex items-center justify-center">
+                      <span className="text-xs text-muted-foreground">
+                        Start building your brand
+                      </span>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </Link>
+          </motion.div>
         </div>
       )}
     </div>

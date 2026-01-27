@@ -58,7 +58,7 @@ export function GenerationLoadingModal({ isOpen, phase, progress, title = "Gener
             <div className="space-y-4">
               <div className="relative h-2 w-full overflow-hidden rounded-full bg-secondary/30">
                 <motion.div
-                  className="h-full relative bg-primary"
+                  className="h-full relative bg-primary rounded-full"
                   initial={{ width: 0 }}
                   animate={{ width: `${progress}%` }}
                   transition={{ duration: 0.5, ease: "easeOut" }}
