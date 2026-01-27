@@ -18,6 +18,13 @@ export async function createBrandFromUpload(data: {
   logoUrl: string;
   primaryColor: string;
   secondaryColor: string;
+  description?: string;
+  industries?: string[];
+  colorSchemes?: string[];
+  styles?: string[];
+  model?: string;
+  size?: string;
+  quality?: string;
 }) {
   try {
     const user = await currentUser();
@@ -27,6 +34,20 @@ export async function createBrandFromUpload(data: {
 
     await ensureDbConnected();
 
+    // Build context for brand analysis
+    const industryContext = data.industries && data.industries.length > 0 
+      ? `Industry: ${data.industries.join(", ")}` 
+      : "";
+    const styleContext = data.styles && data.styles.length > 0 
+      ? `Visual Style: ${data.styles.join(", ")}` 
+      : "";
+    const colorSchemeContext = data.colorSchemes && data.colorSchemes.length > 0 
+      ? `Color Palette Preferences: ${data.colorSchemes.join(", ")}` 
+      : "";
+    const descriptionContext = data.description 
+      ? `Company Description: ${data.description}` 
+      : "";
+
     // 1. Analyze Brand Identity from Logo (Simulated Vision or Smart Prompt)
     // Since we don't have a direct Vision API call enabled in the standard client easily for this specific platform,
     // we will use the name and colors to "imagine" the identity based on the uploaded asset context.
@@ -34,9 +55,13 @@ export async function createBrandFromUpload(data: {
       Analyze and create a brand strategy for a company that already has a logo.
       Company Name: ${data.companyName}
       Logo Colors: Primary ${data.primaryColor}, Secondary ${data.secondaryColor}
+      ${descriptionContext}
+      ${industryContext}
+      ${styleContext}
+      ${colorSchemeContext}
       
       Generate a brand strategy and identity JSON that matches this existing visual baseline.
-      Focus on maintaining consistency with the provided colors.
+      Focus on maintaining consistency with the provided colors and incorporating the provided context.
       
       OUTPUT FORMAT (JSON ONLY):
       {
@@ -68,11 +93,13 @@ export async function createBrandFromUpload(data: {
     const newBrand = await Brand.create({
       userId: user.id,
       name: data.companyName,
+      description: data.description || "",
+      industry: data.industries && data.industries.length > 0 ? data.industries[0] : undefined,
       strategy: brandData.strategy,
       identity: brandData.identity,
       assets: [{
         category: 'logo',
-        subType: 'original',
+        subType: 'primary_logo',
         imageUrl: data.logoUrl,
         prompt: 'Uploaded original logo',
         createdAt: new Date(),
