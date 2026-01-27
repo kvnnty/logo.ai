@@ -3,12 +3,12 @@
 import { Input } from "@/components/ui/input";
 import { motion } from "framer-motion";
 
-interface Step1Props {
+interface BrandNameStepProps {
   companyName: string;
   setCompanyName: (val: string) => void;
 }
 
-export function Step1Name({ companyName, setCompanyName }: Step1Props) {
+export function BrandNameStep({ companyName, setCompanyName }: BrandNameStepProps) {
   return (
     <motion.div
       key="step1"
@@ -17,7 +17,7 @@ export function Step1Name({ companyName, setCompanyName }: Step1Props) {
       exit={{ opacity: 0, x: -20 }}
       className="space-y-6"
     >
-      <div className="space-y-2">
+      <div className="space-y-4">
         <h2 className="text-xl font-bold">What's your company name?</h2>
         <p className="text-sm text-muted-foreground">This will be used as the primary text for your logo.</p>
         <Input

@@ -24,7 +24,7 @@ export function PageHeader({
 
   return (
     <div className={cn("flex items-center justify-between space-y-2 mb-8", className)}>
-      <div className="space-y-1">
+      <div className="space-y-2">
         {backButton && (
           <Button
             variant="ghost"
@@ -35,7 +35,7 @@ export function PageHeader({
             Back
           </Button>
         )}
-        <h2 className="text-3xl font-bold tracking-tight">{heading}</h2>
+        <h2 className="text-2xl font-bold tracking-tight">{heading}</h2>
         {description && (
           <p className="text-muted-foreground">
             {description}

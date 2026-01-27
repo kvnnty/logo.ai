@@ -3,12 +3,14 @@
 import { PageHeader } from "@/components/dashboard/shared/page-header";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Check, CreditCard, Sparkles, Zap } from "lucide-react";
+import { Check, CreditCard, Sparkles, Zap, ArrowLeft } from "lucide-react";
 import { useEffect, useState } from "react";
 import { getCredits, createStripeCheckoutSession } from "@/app/actions/actions";
 import { useToast } from "@/hooks/use-toast";
 import { useSearchParams } from "next/navigation";
+import Link from "next/link";
 import { Skeleton } from "@/components/ui/skeleton";
+import Logo from "@/components/shared/Logo";
 
 export default function CreditsPage() {
   const [credits, setCredits] = useState<number | null>(null);
@@ -100,20 +102,33 @@ export default function CreditsPage() {
 
   return (
     <div className="container mx-auto p-6 max-w-6xl">
+      <div className="mb-5 pb-5 border-b border-border/40">
+        <Logo />
+      </div>
       <PageHeader
         heading="Credits & Plans"
         description="Purchase credits to generate more brand assets."
-      />
+      >
+        <Button
+          asChild
+          className="flex items-center gap-2"
+        >
+          <Link href="/dashboard/my-brands">
+            <ArrowLeft className="w-4 h-4" />
+            Go back to dashboard
+          </Link>
+        </Button>
+      </PageHeader>
 
       {/* Current Balance */}
-      <Card className="mb-12 bg-primary/5 border-primary/20">
-        <CardContent className="flex items-center justify-between p-8">
+      <Card className="mb-12 bg-primary/5 border-primary/20 shadow-none">
+        <CardContent className="flex items-center justify-between">
           <div className="space-y-1">
-            <h3 className="text-lg font-medium text-muted-foreground">Current Balance</h3>
+            <h3 className="font-medium text-muted-foreground text-sm">Current Balance</h3>
             {loading ? (
               <Skeleton className="h-10 w-20" />
             ) : (
-              <div className="text-4xl font-bold text-primary">{credits} Credits</div>
+              <div className="text-2xl font-bold text-primary">{credits} Credits</div>
             )}
           </div>
           <Sparkles className="w-12 h-12 text-primary/40" />
