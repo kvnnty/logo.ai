@@ -1067,7 +1067,7 @@ export async function exportBrandKit(brandId: string) {
   'use server';
   try {
     const JSZip = (await import('jszip')).default;
-    const { renderSceneToPNG, renderSceneToSVG, renderSceneToPDF } = await import('@/lib/render/scene-renderer');
+    const { renderSceneToPNG, renderSceneToSVG, renderSceneToPDF } = await import('@/lib/render/scene-renderer.js');
     const { clerkClient } = await import('@clerk/nextjs/server');
 
     const user = await currentUser();

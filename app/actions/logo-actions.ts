@@ -164,7 +164,7 @@ export async function downloadLogoComponent(brandId: string, assetId: string, fo
     }
 
     // Render scene to requested format
-    const { renderSceneToPNG, renderSceneToSVG, renderSceneToPDF } = await import('@/lib/render/scene-renderer');
+    const { renderSceneToPNG, renderSceneToSVG, renderSceneToPDF } = await import('@/lib/render/scene-renderer.js');
     
     let buffer: Buffer;
     let mimeType: string;

@@ -1,6 +1,7 @@
 "use client";
 
 import { createBrandFromUpload } from "@/app/actions/upload-actions";
+import { uploadFile } from "@/lib/utils/upload";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -367,21 +368,28 @@ export function UploadFlow({ onBack }: { onBack: () => void }) {
 
     setIsGenerating(true);
     setProgress(10);
-    setLoadingPhase("Analyzing your logo and extracting brand DNA...");
+    setLoadingPhase("Uploading logo to storage...");
     
     try {
-      // Simulate progress updates
-      await new Promise(resolve => setTimeout(resolve, 400));
-      setProgress(30);
-      setLoadingPhase("Processing brand colors and visual identity...");
+      // Upload file to S3
+      const uploadResult = await uploadFile(file, {
+        folder: 'logos',
+      });
 
+      if (!uploadResult.success || !uploadResult.url) {
+        throw new Error(uploadResult.error || "Failed to upload logo");
+      }
+
+      setProgress(30);
+      setLoadingPhase("Analyzing your logo and extracting brand DNA...");
+      
       await new Promise(resolve => setTimeout(resolve, 400));
       setProgress(50);
       setLoadingPhase("Crafting your brand strategy...");
 
       const result = await createBrandFromUpload({
         companyName,
-        logoUrl: preview!,
+        logoUrl: uploadResult.url,
         primaryColor: detectedColors.primary,
         secondaryColor: detectedColors.secondary,
       });
