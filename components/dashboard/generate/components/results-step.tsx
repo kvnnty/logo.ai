@@ -16,7 +16,6 @@ interface ResultsStepProps {
   handleGenerate: () => void;
   lastBrandId: string | null;
   setEditingAsset: (val: any) => void;
-  finalizeBrandLogo: (brandId: string, assetId: string) => Promise<any>;
   saveFinalBrand: (data: any) => Promise<any>;
   setLastBrandId: (id: string) => void;
   brandData: any;
@@ -32,7 +31,6 @@ export function ResultsStep({
   handleGenerate,
   lastBrandId,
   setEditingAsset,
-  finalizeBrandLogo,
   saveFinalBrand,
   setLastBrandId,
   brandData,
@@ -103,7 +101,7 @@ export function ResultsStep({
                       loading="lazy"
                     />
                   </motion.div>
-                  
+
                   {/* Overlay on hover */}
                   <motion.div
                     initial={{ opacity: 0 }}
@@ -117,7 +115,7 @@ export function ResultsStep({
                   {concept.name && (
                     <h3 className="font-bold text-lg text-foreground">{concept.name}</h3>
                   )}
-                  
+
                   {concept.rationale && (
                     <p className="text-sm text-muted-foreground line-clamp-2 leading-relaxed">
                       {concept.rationale}
@@ -227,7 +225,7 @@ export function ResultsStep({
               </div>
             </div>
           </Button>
-          
+
           {loading && (
             <motion.div
               initial={{ opacity: 0, y: 10 }}

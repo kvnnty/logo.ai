@@ -1,13 +1,18 @@
 "use client";
 
-import { deleteBrand, getUserBrands } from "@/app/actions/actions";
+import { deleteBrand, getUserBrands } from "@/app/actions/brand-actions";
 import Logo from "@/components/shared/Logo";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { motion } from "framer-motion";
-import { ArrowRight, Loader2, Plus, Sparkles, Trash2 } from "lucide-react";
+import { Loader2, MoreVertical, Plus, Settings2, Sparkles, Trash2 } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { formatDistanceToNow } from "date-fns";
 
@@ -23,7 +28,6 @@ interface BrandSummary {
 export default function BrandsPage() {
   const [brands, setBrands] = useState<BrandSummary[]>([]);
   const [loading, setLoading] = useState(true);
-  const router = useRouter();
 
   async function fetchBrands() {
     setLoading(true);
@@ -114,58 +118,81 @@ export default function BrandsPage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.05 }}
             >
-              <Card
-                className="group cursor-pointer h-full flex flex-col hover:border-border transition-colors"
-                onClick={() => router.push(`/dashboard/my-brands/${brand._id}`)}
-              >
-                <CardHeader className="p-0">
-                  <div className="relative w-full h-48 bg-muted/30 overflow-hidden">
-                    {brand.primaryLogoUrl ? (
-                      <div className="absolute inset-0 p-6 flex items-center justify-center bg-white">
-                        <img
-                          src={brand.primaryLogoUrl}
-                          alt={brand.name}
-                          className="max-w-full max-h-full object-contain"
-                        />
-                      </div>
-                    ) : (
-                      <div className="absolute inset-0 flex items-center justify-center">
-                        <Sparkles className="h-8 w-8 text-muted-foreground" />
-                      </div>
-                    )}
-                    <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-8 w-8"
-                        onClick={(e) => handleDelete(e, brand._id, brand.name)}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
+              <Link href={`/dashboard/my-brands/${brand._id}`} className="block h-full">
+                <Card className="group cursor-pointer h-full flex flex-col hover:border-border transition-colors">
+                  <CardHeader className="p-0">
+                    <div className="relative w-full h-48 bg-muted/30 overflow-hidden">
+                      {brand.primaryLogoUrl ? (
+                        <div className="absolute inset-0 p-6 flex items-center justify-center bg-white">
+                          <img
+                            src={brand.primaryLogoUrl}
+                            alt={brand.name}
+                            className="max-w-full max-h-full object-contain"
+                          />
+                        </div>
+                      ) : (
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <Sparkles className="h-8 w-8 text-muted-foreground" />
+                        </div>
+                      )}
                     </div>
-                  </div>
-                </CardHeader>
+                  </CardHeader>
 
-                <CardContent className="px-5 py-0 flex-1 flex flex-col">
-                  <div className="flex-1 min-w-0 space-y-2 mb-5">
-                    <CardTitle className="text-base font-medium mb-1 truncate">
-                      {brand.name}
-                    </CardTitle>
-                    {brand.description && (
-                      <p className="text-sm text-muted-foreground line-clamp-2">
-                        {brand.description}
-                      </p>
-                    )}
-                  </div>
-                  <div className="mt-auto pt-5 border-t">
-                    <div className="flex items-center justify-end">
-                      <span className="text-xs text-muted-foreground">
-                        {formatDistanceToNow(new Date(brand.createdAt), { addSuffix: true })}
-                      </span>
+                  <CardContent className="px-5 py-0 flex-1 flex flex-col">
+                    <div className="flex-1 min-w-0 space-y-2 mb-5">
+                      <div className="flex items-center justify-between">
+
+                        <CardTitle className="text-base font-medium mb-1 truncate">
+                          {brand.name}
+                        </CardTitle>
+
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-8 w-8"
+                              onClick={(e) => e.stopPropagation()}
+                            >
+                              <MoreVertical className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuItem asChild onClick={(e) => e.stopPropagation()}>
+                              <Link href={`/dashboard/my-brands/${brand._id}/about-your-brand`}>
+                                <Settings2 className="h-4 w-4" />
+                                Brand Settings
+                              </Link>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              className="text-destructive focus:text-destructive"
+                              onSelect={(e) => {
+                                e.preventDefault();
+                                handleDelete(e as any, brand._id, brand.name);
+                              }}
+                            >
+                              <Trash2 className="h-4 w-4" />
+                              Delete brand
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </div>
+                      {brand.description && (
+                        <p className="text-sm text-muted-foreground line-clamp-2">
+                          {brand.description}
+                        </p>
+                      )}
                     </div>
-                  </div>
-                </CardContent>
-              </Card>
+                    <div className="mt-auto pt-5 border-t">
+                      <div className="flex items-center justify-end">
+                        <span className="text-xs text-muted-foreground">
+                          {formatDistanceToNow(new Date(brand.createdAt), { addSuffix: true })}
+                        </span>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </Link>
             </motion.div>
           ))}
 
@@ -200,7 +227,8 @@ export default function BrandsPage() {
             </Link>
           </motion.div>
         </div>
-      )}
-    </div>
+      )
+      }
+    </div >
   );
 }

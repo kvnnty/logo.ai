@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Sparkles, ArrowRight, ArrowLeft, Check, Info, Globe, Mail, Phone, MapPin, Smartphone, Facebook, Instagram, Twitter } from "lucide-react";
-import { updateBrandDetails } from "@/app/actions/actions";
+import { updateBrandDetails } from "@/app/actions/brand-actions";
 import { useToast } from "@/hooks/use-toast";
 
 interface BrandOnboardingDialogProps {

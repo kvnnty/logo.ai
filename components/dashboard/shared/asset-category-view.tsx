@@ -9,7 +9,8 @@ import { Button } from "@/components/ui/button";
 import { Sparkles, Loader2, Plus } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "@/hooks/use-toast";
-import { getBrandById, generateInteractiveAsset, downloadImage } from "@/app/actions/actions";
+import { getBrandById, generateInteractiveAsset } from "@/app/actions/brand-actions";
+import { downloadImage } from "@/app/actions/utils-actions";
 import { BrandCanvasEditor } from "../canvas/brand-canvas-editor";
 
 interface AssetCategoryViewProps {
@@ -166,12 +167,12 @@ export function AssetCategoryView({
             ))}
           </>
         )}
-        
+
         {categoryAssets.map((asset: any) => {
           // If asset has sceneData but no imageUrl, we need to render it
           // For now, show a placeholder or generate preview
           const displayImageUrl = asset.imageUrl || (asset.sceneData ? null : "/placeholder-asset.png");
-          
+
           return (
             <AssetCard
               key={asset._id}

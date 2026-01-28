@@ -1,6 +1,6 @@
 "use client";
 
-import { updateAssetScene } from '@/app/actions/actions';
+import { updateAssetScene } from '@/app/actions/brand-actions';
 import * as logoActions from '@/app/actions/logo-actions';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -180,7 +180,7 @@ export function BrandCanvasEditor({ initialScene, brandId, assetId, onClose }: a
       // For SVG and PDF, call server action
       try {
         const result = await logoActions.downloadLogoComponent(brandId, assetId, format);
-        
+
         if (result.success && result.data) {
           // Convert base64 to blob
           const byteCharacters = atob(result.data);
@@ -199,7 +199,7 @@ export function BrandCanvasEditor({ initialScene, brandId, assetId, onClose }: a
           link.click();
           document.body.removeChild(link);
           URL.revokeObjectURL(url);
-          
+
           toast({ title: "Success", description: `Design exported as ${format.toUpperCase()}` });
         } else {
           throw new Error(result.error || 'Export failed');

@@ -13,7 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { updateBrand } from "@/app/actions/actions";
+import { updateBrand } from "@/app/actions/brand-actions";
 import { useToast } from "@/hooks/use-toast";
 import { Palette, CheckCircle2 } from "lucide-react";
 import { motion } from "framer-motion";
@@ -152,8 +152,8 @@ export function EditBrandDialog({ brand, open, onOpenChange, onSuccess }: EditBr
                       setSecondaryColor(p.secondary);
                     }}
                     className={`group relative flex flex-col items-center gap-1.5 p-1 rounded-lg border transition-all hover:border-primary/50 ${primaryColor === p.primary && secondaryColor === p.secondary
-                        ? "border-primary bg-primary/5 ring-1 ring-primary"
-                        : "border-transparent"
+                      ? "border-primary bg-primary/5 ring-1 ring-primary"
+                      : "border-transparent"
                       }`}
                   >
                     <div className="flex w-full h-8 rounded-md overflow-hidden border shadow-sm group-hover:shadow-md transition-shadow">

@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Download } from "lucide-react";
 import { useState, useEffect } from "react";
-import { checkHistory } from "@/app/actions/actions";
+import { checkHistory } from "@/app/actions/brand-actions";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export default function BrandBookPage() {

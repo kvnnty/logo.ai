@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Check, CreditCard, Sparkles, Zap, ArrowLeft } from "lucide-react";
 import { useEffect, useState } from "react";
-import { getCredits, createStripeCheckoutSession } from "@/app/actions/actions";
+import { getCredits, createStripeCheckoutSession } from "@/app/actions/credits-actions";
 import { useToast } from "@/hooks/use-toast";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";

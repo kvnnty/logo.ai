@@ -27,7 +27,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "@/hooks/use-toast";
 import { saveLinkInBio, getLinkInBio, publishLinkInBio } from "@/app/actions/link-in-bio-actions";
-import { getCredits } from "@/app/actions/actions";
+import { getCredits } from "@/app/actions/credits-actions";
 import { Reorder } from "framer-motion";
 import { AddSectionModal } from "@/components/dashboard/link-in-bio/add-section-modal";
 import { MobilePreview } from "@/components/dashboard/link-in-bio/mobile-preview";
@@ -1442,8 +1442,8 @@ export default function LinkInBioPage() {
           </div>
 
           <div className="lg:col-span-1 sticky top-0">
-            <MobilePreview data={{ 
-              ...data, 
+            <MobilePreview data={{
+              ...data,
               profileImage: profileImageUrl,
               blocks: data.blocks || [
                 ...(data.links || []),

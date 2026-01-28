@@ -11,7 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useState, useEffect } from "react";
 import { toast } from "@/hooks/use-toast";
 import { useBrand } from "@/components/providers/brand-provider";
-import { updateBrandDetails } from "@/app/actions/actions";
+import { updateBrandDetails } from "@/app/actions/brand-actions";
 import { useRouter } from "next/navigation";
 import { Sparkles } from "lucide-react";
 

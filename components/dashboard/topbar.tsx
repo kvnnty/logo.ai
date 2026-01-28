@@ -4,7 +4,8 @@ import { IconSparkles, IconMenu2, IconBrandAsana } from "@tabler/icons-react";
 import Link from "next/link";
 import { useState, useEffect, useRef } from "react";
 import { ChevronLeft, ChevronRight, RefreshCcw, ChevronDown, Check } from "lucide-react";
-import { getCredits, getUserBrands } from "@/app/actions/actions";
+import { getCredits } from "@/app/actions/credits-actions";
+import { getUserBrands } from "@/app/actions/brand-actions";
 import { Button } from "../ui/button";
 import { useBrand } from "../providers/brand-provider";
 import { useRouter } from "next/navigation";
@@ -106,15 +107,15 @@ export default function DashboardTopbar({ onMenuClick }: DashboardTopbarProps) {
             </Link>
             <ChevronRight className="h-4 w-4 text-muted-foreground" />
             <div className="relative" ref={dropdownRef}>
-              <Button 
-                variant="ghost" 
+              <Button
+                variant="ghost"
                 className="gap-2"
                 onClick={() => setIsBrandDropdownOpen(!isBrandDropdownOpen)}
               >
                 <span>{brand.name}</span>
                 <ChevronDown className={`h-4 w-4 transition-transform ${isBrandDropdownOpen ? 'rotate-180' : ''}`} />
               </Button>
-              
+
               {isBrandDropdownOpen && (
                 <div className="absolute top-full left-0 mt-2 w-64 bg-card border border-border rounded-lg shadow-lg z-50 max-h-96 overflow-y-auto">
                   <div className="p-2">
@@ -127,13 +128,12 @@ export default function DashboardTopbar({ onMenuClick }: DashboardTopbarProps) {
                         <button
                           key={b._id}
                           onClick={() => handleBrandSwitch(b._id)}
-                          className={`w-full flex items-center gap-3 px-3 py-2 rounded-md hover:bg-accent transition-colors text-left ${
-                            b._id === brand._id ? 'bg-accent' : ''
-                          }`}
+                          className={`w-full flex items-center gap-3 px-3 py-2 rounded-md hover:bg-accent transition-colors text-left ${b._id === brand._id ? 'bg-accent' : ''
+                            }`}
                         >
                           {b.primaryLogoUrl ? (
-                            <img 
-                              src={b.primaryLogoUrl} 
+                            <img
+                              src={b.primaryLogoUrl}
                               alt={b.name}
                               className="w-8 h-8 rounded object-contain border"
                             />

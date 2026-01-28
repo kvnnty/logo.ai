@@ -1,4 +1,4 @@
-import { getBrandById } from "@/app/actions/actions";
+import { getBrandById } from "@/app/actions/brand-actions";
 import { BrandProvider } from "@/components/providers/brand-provider";
 import { notFound } from "next/navigation";
 import DashboardSidebar from "@/components/dashboard/sidebar";

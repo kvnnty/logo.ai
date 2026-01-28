@@ -3,7 +3,8 @@
 import { Button } from "@/components/ui/button";
 import { Sparkles, ArrowRight, Download } from "lucide-react";
 import { useState, useEffect } from "react";
-import { allLogos, downloadImage } from "../actions/actions";
+import { allLogos } from "@/app/actions/brand-actions";
+import { downloadImage } from "@/app/actions/utils-actions";
 import { SelectLogo } from "@/db/schema";
 import { useToast } from "@/hooks/use-toast";
 import Navbar from "@/components/landing/navbar";

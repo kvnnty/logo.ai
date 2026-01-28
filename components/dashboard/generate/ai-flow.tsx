@@ -1,6 +1,8 @@
 "use client";
 
-import { finalizeBrandLogo, generateBrandIdentity, generateLogos, getCredits, saveFinalBrand } from "@/app/actions/actions";
+import { generateBrandIdentity, generateLogos } from "@/app/actions/logo-generation-actions";
+import { getCredits } from "@/app/actions/credits-actions";
+import { saveFinalBrand } from "@/app/actions/brand-actions";
 import { useToast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
 import { useCallback, useMemo, useState } from "react";
@@ -234,7 +236,6 @@ export function AIFlow({ onBack }: { onBack: () => void }) {
             handleGenerate={handleGenerateMore}
             lastBrandId={lastBrandId}
             setEditingAsset={setEditingAsset}
-            finalizeBrandLogo={finalizeBrandLogo}
             saveFinalBrand={saveFinalBrand}
             setLastBrandId={setLastBrandId}
             brandData={brandData}

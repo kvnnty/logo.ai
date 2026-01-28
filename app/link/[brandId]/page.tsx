@@ -8,7 +8,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { getLinkInBio } from "@/app/actions/link-in-bio-actions";
-import { getBrandById } from "@/app/actions/actions";
+import { getBrandById } from "@/app/actions/brand-actions";
 import { Loader2 } from "lucide-react";
 import { SocialIcon, AppleAppStoreIcon, GooglePlayStoreIcon, WeiboIcon } from "@/components/dashboard/link-in-bio/social-icons";
 import { getPrimaryLogoUrl } from "@/lib/utils/brand-utils";

@@ -4,7 +4,7 @@ import { PageHeader } from "@/components/dashboard/shared/page-header";
 import { Button } from "@/components/ui/button";
 import { Download } from "lucide-react";
 import { useState, useEffect } from "react";
-import { checkHistory } from "@/app/actions/actions";
+import { checkHistory } from "@/app/actions/brand-actions";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export default function PostersPage() {

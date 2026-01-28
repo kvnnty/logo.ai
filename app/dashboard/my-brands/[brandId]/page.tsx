@@ -1,6 +1,6 @@
 "use client";
 
-import { getCredits } from "@/app/actions/actions";
+import { getCredits } from "@/app/actions/credits-actions";
 import { BrandOnboardingDialog } from "@/components/dashboard/brand-onboarding-dialog";
 import { BrandCanvasEditor } from "@/components/dashboard/canvas/brand-canvas-editor";
 import { EditBrandDialog } from "@/components/dashboard/shared/edit-brand-dialog";
@@ -97,7 +97,7 @@ export default function BrandDashboardPage() {
                 )}
                 <div className="flex items-center gap-4 pt-2">
                   <div className="flex items-center gap-2 text-sm">
-                    <div 
+                    <div
                       className="w-4 h-4 rounded-full border border-border/50 shadow-sm"
                       style={{ backgroundColor: primaryColor }}
                     />
@@ -139,33 +139,33 @@ export default function BrandDashboardPage() {
         {/* Progression Flow */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           {[
-            { 
-              step: 1, 
-              title: "Create", 
+            {
+              step: 1,
+              title: "Create",
               description: "Generate logos & assets",
               icon: Sparkles,
               href: `/dashboard/my-brands/${brand._id}/create`,
               count: assetCounts.logos
             },
-            { 
-              step: 2, 
-              title: "Customize", 
+            {
+              step: 2,
+              title: "Customize",
               description: "Edit in canvas",
               icon: Edit,
               href: `/dashboard/my-brands/${brand._id}/my-designs`,
               count: totalAssets
             },
-            { 
-              step: 3, 
-              title: "Export", 
+            {
+              step: 3,
+              title: "Export",
               description: "Download assets",
               icon: Download,
               href: `/dashboard/my-brands/${brand._id}/my-designs`,
               count: 0
             },
-            { 
-              step: 4, 
-              title: "Publish", 
+            {
+              step: 4,
+              title: "Publish",
               description: "Share & deploy",
               icon: LinkIcon,
               href: `/dashboard/my-brands/${brand._id}/link-in-bio`,
@@ -180,7 +180,7 @@ export default function BrandDashboardPage() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: idx * 0.1 }}
               >
-                <Card 
+                <Card
                   className="cursor-pointer hover:border-primary/50 transition-all group"
                   onClick={() => router.push(item.href)}
                 >
@@ -221,8 +221,8 @@ export default function BrandDashboardPage() {
                     <CardDescription>Your brand identity</CardDescription>
                   </div>
                 </div>
-                <Button 
-                  variant="ghost" 
+                <Button
+                  variant="ghost"
                   size="sm"
                   onClick={() => router.push(`/dashboard/my-brands/${brand._id}/my-designs`)}
                 >
@@ -244,9 +244,9 @@ export default function BrandDashboardPage() {
                         onClick={() => setActiveEditorAsset({ sceneData: asset.sceneData, assetId: asset._id })}
                       >
                         {asset.imageUrl ? (
-                          <img 
-                            src={asset.imageUrl} 
-                            alt={asset.subType} 
+                          <img
+                            src={asset.imageUrl}
+                            alt={asset.subType}
                             className="max-w-full max-h-full object-contain group-hover:scale-105 transition-transform"
                           />
                         ) : (
@@ -262,7 +262,7 @@ export default function BrandDashboardPage() {
                 <div className="text-center py-12">
                   <Sparkles className="h-12 w-12 mx-auto mb-4 text-muted-foreground/50" />
                   <p className="text-sm text-muted-foreground mb-4">No logos yet</p>
-                  <Button 
+                  <Button
                     size="sm"
                     onClick={() => router.push(`/dashboard/my-brands/${brand._id}/create`)}
                   >
@@ -287,8 +287,8 @@ export default function BrandDashboardPage() {
                     <CardDescription>160+ professional templates</CardDescription>
                   </div>
                 </div>
-                <Button 
-                  variant="ghost" 
+                <Button
+                  variant="ghost"
                   size="sm"
                   onClick={() => router.push(`/dashboard/my-brands/${brand._id}/my-designs`)}
                 >
@@ -312,9 +312,9 @@ export default function BrandDashboardPage() {
                       if (item.category === 'all') {
                         router.push(`/dashboard/my-brands/${brand._id}/my-designs`);
                       } else {
-                        toast({ 
-                          title: "Coming Soon", 
-                          description: `${item.title} templates will be available soon` 
+                        toast({
+                          title: "Coming Soon",
+                          description: `${item.title} templates will be available soon`
                         });
                       }
                     }}
