@@ -76,7 +76,7 @@ function getNavItems(brandId?: string): NavItem[] {
         { title: "Flyers", href: `${brandPrefix}/marketing/flyers` },
         { title: "Posters", href: `${brandPrefix}/marketing/posters` },
         { title: "Cards", href: `${brandPrefix}/marketing/cards` },
-        { title: "ID Cards", href: `${brandPrefix}/marketing/id-cards` },
+        { title: "Business Cards", href: `${brandPrefix}/marketing/id-cards` },
       ],
     },
     {

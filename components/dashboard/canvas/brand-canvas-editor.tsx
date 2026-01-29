@@ -1,6 +1,6 @@
 "use client";
 
-import { updateAssetScene } from '@/app/actions/brand-actions';
+import { updateAssetScene, createAssetFromScene } from '@/app/actions/brand-actions';
 import * as logoActions from '@/app/actions/logo-actions';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -13,7 +13,14 @@ import { AlignCenter, AlignLeft, AlignRight, AlignVerticalJustifyCenter, AlignVe
 import React, { useState } from 'react';
 import { CanvasRenderer } from './canvas-renderer';
 
-export function BrandCanvasEditor({ initialScene, brandId, assetId, onClose }: any) {
+export function BrandCanvasEditor({
+  initialScene,
+  brandId,
+  assetId,
+  onClose,
+  defaultCategory = "design",
+  defaultSubType = "New Design",
+}: any) {
   const [scene, setScene] = useState(initialScene || { elements: [], width: 1080, height: 1080 });
   const [selectedId, setSelectedId] = useState<number | null>(null);
   const [zoom, setZoom] = useState(0.5);
@@ -32,11 +39,21 @@ export function BrandCanvasEditor({ initialScene, brandId, assetId, onClose }: a
   const handleSave = async () => {
     setIsSaving(true);
     try {
-      const res = await updateAssetScene(brandId, assetId, scene);
-      if (res.success) {
-        toast({ title: "Success", description: "Design saved successfully!" });
+      if (assetId === "new" || !assetId) {
+        const res = await createAssetFromScene(brandId, scene, defaultCategory, defaultSubType);
+        if (res.success) {
+          toast({ title: "Success", description: "Design saved! It will appear in Your recent projects." });
+          onClose?.();
+        } else {
+          throw new Error(res.error);
+        }
       } else {
-        throw new Error(res.error);
+        const res = await updateAssetScene(brandId, assetId, scene);
+        if (res.success) {
+          toast({ title: "Success", description: "Design saved successfully!" });
+        } else {
+          throw new Error(res.error);
+        }
       }
     } catch (err: any) {
       toast({ title: "Error", description: err.message || "Failed to save design", variant: "destructive" });

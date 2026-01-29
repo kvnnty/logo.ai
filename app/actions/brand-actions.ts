@@ -1,15 +1,34 @@
 "use server";
 
-import { currentUser } from "@clerk/nextjs/server";
+import { currentUser, clerkClient } from "@clerk/nextjs/server";
 import { ensureDbConnected, Brand, Logo, Template } from "@/db";
-import { hydrateTemplate } from "@/lib/templates/brand-kit-templates";
+import { AssetCategory, GET_TEMPLATE, hydrateTemplate } from "@/lib/templates/brand-kit-templates";
 import { renderSceneToPNG, renderSceneToSVG, renderSceneToPDF } from "@/lib/render/scene-renderer";
 
-export async function generateInteractiveAsset(brandId: string, category: string, subType: string, templateIndex: number = 0) {
+const INTERACTIVE_DEFAULT_STARTING_CREDITS = 10;
+const INTERACTIVE_GENERATION_COST = 1;
+
+export async function generateInteractiveAsset(brandId: string, category: string, subType: string, templateIndex: number = 0, prompt?: string) {
   "use server";
   try {
     const user = await currentUser();
     if (!user) return { success: false, error: "Not authenticated" };
+
+    // Credits: check & initialize
+    const clerk = await clerkClient();
+    const rawRemaining = (user.unsafeMetadata as any)?.remaining;
+    const currentRemaining = typeof rawRemaining === "number" ? rawRemaining : INTERACTIVE_DEFAULT_STARTING_CREDITS;
+
+    // Initialize credits once for new users (don't overwrite a real 0)
+    if (typeof rawRemaining !== "number") {
+      await clerk.users.updateUserMetadata(user.id, {
+        unsafeMetadata: { ...(user.unsafeMetadata as any), remaining: currentRemaining },
+      });
+    }
+
+    if (currentRemaining < INTERACTIVE_GENERATION_COST) {
+      return { success: false, error: "No credits left" };
+    }
 
     await ensureDbConnected();
     const brand = await Brand.findOne({ _id: brandId, userId: user.id });
@@ -19,22 +38,139 @@ export async function generateInteractiveAsset(brandId: string, category: string
 
     // 1. Fetch Template from DB
     const templates = await Template.find({ category }).sort({ createdAt: 1 });
-    const selectedTemplate = templates[templateIndex % templates.length]; // Cycle if index > length
+    let sceneData: any;
 
-    if (!selectedTemplate) throw new Error(`No template found for ${category}`);
+    if (templates.length > 0) {
+      const selectedTemplate = templates[templateIndex % templates.length]; // Cycle if index > length
+      // 2a. Hydrate Template (Replace Placeholders)
+      sceneData = hydrateTemplate(selectedTemplate, brand, primaryLogo);
+    } else {
+      // 2b. Fallback to in-code template definitions when DB templates are missing
+      const params = {
+        brandName: brand.name,
+        primaryColor: brand.identity?.primary_color || "#2563EB",
+        secondaryColor: brand.identity?.secondary_color || "#FFFFFF",
+        logoUrl: primaryLogo?.imageUrl,
+        website: brand.contactInfo?.website,
+        email: brand.contactInfo?.email,
+        phone: brand.contactInfo?.phone,
+        address: brand.contactInfo?.address,
+      };
 
-    // 2. Hydrate Template (Replace Placeholders)
-    const sceneData = hydrateTemplate(selectedTemplate, brand, primaryLogo);
+      const fallback = GET_TEMPLATE(category as AssetCategory, templateIndex, params);
+      if (!fallback) {
+        throw new Error(`No template found for category ${category}`);
+      }
+      sceneData = fallback;
+    }
+
+    // Generate a preview image from the scene so the UI always has a thumbnail
+    let imageUrl: string | undefined;
+    try {
+      const pngBuffer = await renderSceneToPNG(sceneData, 2);
+      imageUrl = `data:image/png;base64,${pngBuffer.toString("base64")}`;
+    } catch (err) {
+      console.error("Failed to render scene preview:", err);
+    }
 
     brand.assets.push({
       category,
       subType,
+      prompt,
+      imageUrl,
       sceneData,
       createdAt: new Date(),
     } as any);
 
     await brand.save();
+
+    // Deduct credits after successful generation
+    const newRemaining = currentRemaining - INTERACTIVE_GENERATION_COST;
+    await clerk.users.updateUserMetadata(user.id, {
+      unsafeMetadata: { ...(user.unsafeMetadata as any), remaining: newRemaining },
+    });
+
+    const newAsset = brand.assets[brand.assets.length - 1] as any;
+    const assetId = newAsset?._id?.toString?.() ?? "";
+
+    return { success: true, sceneData, remainingCredits: newRemaining, assetId };
+  } catch (error) {
+    console.error("Error:", error);
+    return { success: false, error: "Failed" };
+  }
+}
+
+/** Returns default template sceneData for a category without saving or deducting credits. */
+export async function getDefaultTemplateScene(brandId: string, category: string, templateIndex: number = 0) {
+  "use server";
+  try {
+    const user = await currentUser();
+    if (!user) return { success: false, error: "Not authenticated" };
+    await ensureDbConnected();
+    const brand = await Brand.findOne({ _id: brandId, userId: user.id });
+    if (!brand) return { success: false, error: "Brand not found" };
+
+    const primaryLogo = brand.assets?.find((a: any) => a.category === "logo" || a.subType === "primary_logo");
+    const templates = await Template.find({ category }).sort({ createdAt: 1 });
+    let sceneData: any;
+
+    if (templates.length > 0) {
+      const selected = templates[templateIndex % templates.length];
+      sceneData = hydrateTemplate(selected, brand, primaryLogo);
+    } else {
+      const params = {
+        brandName: brand.name,
+        primaryColor: brand.identity?.primary_color || "#2563EB",
+        secondaryColor: brand.identity?.secondary_color || "#FFFFFF",
+        logoUrl: primaryLogo?.imageUrl,
+        website: brand.contactInfo?.website,
+        email: brand.contactInfo?.email,
+        phone: brand.contactInfo?.phone,
+        address: brand.contactInfo?.address,
+      };
+      const fallback = GET_TEMPLATE(category as AssetCategory, templateIndex, params);
+      if (!fallback) return { success: false, error: `No template for ${category}` };
+      sceneData = fallback;
+    }
+
     return { success: true, sceneData };
+  } catch (error) {
+    console.error("Error:", error);
+    return { success: false, error: "Failed" };
+  }
+}
+
+/** Create a new asset from sceneData (e.g. when saving from editor with assetId "new"). No credit deduction. */
+export async function createAssetFromScene(brandId: string, sceneData: any, category: string = "design", subType: string = "New Design") {
+  "use server";
+  try {
+    const user = await currentUser();
+    if (!user) return { success: false, error: "Not authenticated" };
+    await ensureDbConnected();
+    const brand = await Brand.findOne({ _id: brandId, userId: user.id });
+    if (!brand) return { success: false, error: "Brand not found" };
+
+    let imageUrl: string | undefined;
+    try {
+      const pngBuffer = await renderSceneToPNG(sceneData, 2);
+      imageUrl = `data:image/png;base64,${pngBuffer.toString("base64")}`;
+    } catch (err) {
+      console.error("Failed to render scene preview:", err);
+    }
+
+    brand.assets.push({
+      category,
+      subType,
+      prompt: undefined,
+      imageUrl,
+      sceneData,
+      createdAt: new Date(),
+    } as any);
+    await brand.save();
+
+    const newAsset = brand.assets[brand.assets.length - 1] as any;
+    const assetId = newAsset?._id?.toString?.() ?? "";
+    return { success: true, assetId };
   } catch (error) {
     console.error("Error:", error);
     return { success: false, error: "Failed" };

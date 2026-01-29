@@ -2,16 +2,24 @@
 
 
 import { useState, useEffect, useCallback } from "react";
-import { PageHeader } from "./page-header";
 import { AssetCard } from "./asset-card";
 import { TemplatePreviewCard } from "./template-preview-card";
 import { Button } from "@/components/ui/button";
-import { Sparkles, Loader2, Plus } from "lucide-react";
+import { Textarea } from "@/components/ui/textarea";
+import { Sparkles, Loader2, Plus, Paperclip, ArrowRight } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "@/hooks/use-toast";
 import { getBrandById, generateInteractiveAsset } from "@/app/actions/brand-actions";
 import { downloadImage } from "@/app/actions/utils-actions";
+import { getCredits } from "@/app/actions/credits-actions";
 import { BrandCanvasEditor } from "../canvas/brand-canvas-editor";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface AssetCategoryViewProps {
   brandId: string;
@@ -31,17 +39,27 @@ export function AssetCategoryView({
   const [brandData, setBrandData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [prompt, setPrompt] = useState("");
   const [downloading, setDownloading] = useState<string | null>(null);
   const [activeEditorAsset, setActiveEditorAsset] = useState<{ sceneData: any, assetId: string } | null>(null);
+  const [style, setStyle] = useState("minimal");
+  const [format, setFormat] = useState("standard");
+  const [credits, setCredits] = useState<number | null>(null);
 
   const fetchData = useCallback(async () => {
     try {
-      const result = await getBrandById(brandId);
-      if (result.success) {
-        setBrandData(result.brand);
+      const [brandResult, creditsResult] = await Promise.all([
+        getBrandById(brandId),
+        getCredits()
+      ]);
+      if (brandResult.success) {
+        setBrandData(brandResult.brand);
+      }
+      if (creditsResult.remaining !== undefined) {
+        setCredits(creditsResult.remaining);
       }
     } catch (error) {
-      console.error("Failed to fetch brand data", error);
+      console.error("Failed to fetch data", error);
     } finally {
       setLoading(false);
     }
@@ -52,17 +70,44 @@ export function AssetCategoryView({
   }, [fetchData]);
 
   const handleGenerate = async () => {
+    if (credits !== null && credits <= 0) {
+      toast({
+        title: "No credits left",
+        description: "You’re out of credits. Please top up on the Credits page before generating new assets.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setIsGenerating(true);
     try {
-      // For general generation, we just use a default subType or ask user. 
-      // For now, let's just use "New Design".
-      const subType = `New ${title.slice(0, -1)}`;
-      const result = await generateInteractiveAsset(brandId, category, subType);
+      const baseLabel = title.endsWith("s") ? title.slice(0, -1) : title;
+      const trimmedPrompt = prompt.trim();
+      // Include style and format in the prompt context
+      const enhancedPrompt = trimmedPrompt
+        ? `${trimmedPrompt} (Style: ${style}, Format: ${format})`
+        : undefined;
+      const subType = trimmedPrompt
+        ? `${baseLabel}: ${trimmedPrompt.slice(0, 60)}`
+        : `New ${baseLabel}`;
+
+      const result = await generateInteractiveAsset(
+        brandId,
+        category,
+        subType,
+        0,
+        enhancedPrompt || undefined,
+      );
       if (result.success && result.sceneData) {
         toast({ title: "Asset Generated!", description: `New design has been created.` });
-        fetchData();
-        // Auto-open in editor
-        setActiveEditorAsset({ sceneData: result.sceneData, assetId: "new" });
+        if (typeof (result as any).remainingCredits === "number") {
+          setCredits((result as any).remainingCredits);
+        } else {
+          fetchData();
+        }
+        // Auto-open in editor with real assetId so save works
+        const assetId = (result as any).assetId ?? "new";
+        setActiveEditorAsset({ sceneData: result.sceneData, assetId });
       } else {
         throw new Error(result.error);
       }
@@ -111,7 +156,18 @@ export function AssetCategoryView({
   if (loading) {
     return (
       <div className="space-y-6">
-        <PageHeader heading={title} description={description} />
+        <div className="text-center mb-8">
+          <Skeleton className="h-8 w-64 mx-auto mb-2" />
+        </div>
+        <div className="max-w-3xl mx-auto mb-6">
+          <div className="bg-card border rounded-2xl p-6 shadow-sm">
+            <Skeleton className="h-12 w-full mb-4" />
+            <div className="flex gap-3">
+              <Skeleton className="h-10 flex-1" />
+              <Skeleton className="h-10 flex-1" />
+            </div>
+          </div>
+        </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {[1, 2, 3, 4, 5, 6].map((i) => (
             <Skeleton key={i} className="aspect-square rounded-xl" />
@@ -135,22 +191,91 @@ export function AssetCategoryView({
       return catMatch;
     });
 
+  const brandName = brandData?.name || "your brand";
+
   return (
     <div className="pb-12">
-      <div className="flex items-end justify-between gap-4">
-        <PageHeader heading={title} description={description} className="flex-1" />
-        <Button
-          onClick={handleGenerate}
-          disabled={isGenerating}
-          className="bg-primary hover:bg-primary/90 shadow-lg"
-        >
-          {isGenerating ? (
-            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-          ) : (
-            <Plus className="w-4 h-4 mr-2" />
+      {/* Centered heading */}
+      <div className="text-center mb-8">
+        <h2 className="text-2xl font-bold mb-2">
+          What do you want to create for {brandName}?
+        </h2>
+      </div>
+
+      {/* Main prompt card - centered with max width */}
+      <div className="max-w-2xl mx-auto mb-6">
+        <div className="bg-card border rounded-2xl p-6 shadow-sm">
+          {/* Prompt textarea with Generate button */}
+          <div className="flex flex-col gap-3">
+            <div className="relative">
+              <Paperclip className="absolute left-3 top-3 w-5 h-5 text-muted-foreground" />
+              <Textarea
+                value={prompt}
+                onChange={(e) => setPrompt(e.target.value)}
+                placeholder="E.g. Ski jacket sale this weekend"
+                className="pl-10 pr-4 pt-3 pb-3 min-h-[80px] text-base rounded-lg border-2 resize-y"
+              />
+            </div>
+            <div className="flex justify-end">
+              <Button
+                onClick={handleGenerate}
+                disabled={isGenerating || !prompt.trim() || (credits !== null && credits <= 0)}
+                className="h-11 px-6 bg-primary hover:bg-primary/90 rounded-full shadow-md"
+              >
+                {isGenerating ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    Generating...
+                  </>
+                ) : (
+                  <>
+                    Generate
+                    <ArrowRight className="w-4 h-4 ml-2" />
+                  </>
+                )}
+              </Button>
+            </div>
+          </div>
+
+          {/* Style and Format dropdowns */}
+          <div className="flex gap-3">
+            <Select value={style} onValueChange={setStyle}>
+              <SelectTrigger className="w-full rounded-lg border-2 h-10">
+                <SelectValue placeholder="Style" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="minimal">Minimal</SelectItem>
+                <SelectItem value="modern">Modern</SelectItem>
+                <SelectItem value="classic">Classic</SelectItem>
+                <SelectItem value="bold">Bold</SelectItem>
+                <SelectItem value="elegant">Elegant</SelectItem>
+              </SelectContent>
+            </Select>
+
+            <Select value={format} onValueChange={setFormat}>
+              <SelectTrigger className="w-full rounded-lg border-2 h-10">
+                <SelectValue placeholder="Format" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="standard">Standard {title}</SelectItem>
+                <SelectItem value="instagram-post">Instagram Post</SelectItem>
+                <SelectItem value="facebook-post">Facebook Post</SelectItem>
+                <SelectItem value="twitter-post">Twitter Post</SelectItem>
+                <SelectItem value="linkedin-post">LinkedIn Post</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Credits display */}
+          {credits !== null && (
+            <div className="flex items-center justify-center gap-2 mt-4 pt-4 border-t">
+              <Sparkles className="w-4 h-4 text-primary" />
+              <span className="text-sm font-medium text-primary">
+                {credits} {credits === 1 ? "Credit" : "Credits"} Remaining
+              </span>
+            </div>
           )}
-          Generate New Variant
-        </Button>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-8">
