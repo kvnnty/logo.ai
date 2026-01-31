@@ -20,8 +20,8 @@
     --accent-foreground: 259 5% 15%;
     --destructive: 0 50% 50%;
     --destructive-foreground: 259 5% 100%;
-    --border: 259 20% 82%;
-    --input: 259 20% 50%;
+    --border: 259 0% 80%;
+    --input: 259, 0%, 80%;
     --ring: 26 92% 50%;
     --radius: 1rem;
   }
@@ -52,6 +52,7 @@ body {
 /* Custom Scrollbar */
 ::-webkit-scrollbar {
   width: 5px;
+  height: 4px;
 }
 
 ::-webkit-scrollbar-track {

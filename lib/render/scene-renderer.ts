@@ -45,9 +45,14 @@ export function renderSceneToSVG(sceneData: SceneData): string {
       const rx = el.cornerRadius || 0;
       const opacity = el.opacity !== undefined ? el.opacity : 1;
 
-      svgElements.push(
-        `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="${fill}" rx="${rx}" opacity="${opacity}" />`
-      );
+      svgElements.push(`<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="${fill}" rx="${rx}" opacity="${opacity}" />`);
+    } else if (el.type === "circle") {
+      const cx = (el.x || 0) + (el.radius || 50);
+      const cy = (el.y || 0) + (el.radius || 50);
+      const r = el.radius || 50;
+      const fill = el.fill || "#000000";
+      const opacity = el.opacity !== undefined ? el.opacity : 1;
+      svgElements.push(`<circle cx="${cx}" cy="${cy}" r="${r}" fill="${fill}" opacity="${opacity}" />`);
     } else if (el.type === "text") {
       const x = el.x || 0;
       const y = el.y || 0;
@@ -61,11 +66,11 @@ export function renderSceneToSVG(sceneData: SceneData): string {
       // Handle offsetX for center alignment
       let finalX = x;
       if (el.align === "center" && el.offsetX) {
-        finalX = x - (el.offsetX / 2);
+        finalX = x - el.offsetX / 2;
       }
 
       svgElements.push(
-        `<text x="${finalX}" y="${y + fontSize}" font-size="${fontSize}" font-weight="${fontWeight}" font-family="${fontFamily}" fill="${fill}" text-anchor="${textAnchor}">${escapeXml(content)}</text>`
+        `<text x="${finalX}" y="${y + fontSize}" font-size="${fontSize}" font-weight="${fontWeight}" font-family="${fontFamily}" fill="${fill}" text-anchor="${textAnchor}">${escapeXml(content)}</text>`,
       );
     } else if (el.type === "image" && el.src) {
       const x = el.x || 0;
@@ -75,9 +80,7 @@ export function renderSceneToSVG(sceneData: SceneData): string {
       const src = el.src;
 
       // Handle data URLs and remote URLs
-      svgElements.push(
-        `<image x="${x}" y="${y}" width="${w}" height="${h}" href="${src}" />`
-      );
+      svgElements.push(`<image x="${x}" y="${y}" width="${w}" height="${h}" href="${src}" />`);
     }
   }
 
@@ -173,6 +176,19 @@ export async function renderSceneToPDF(sceneData: SceneData): Promise<Buffer> {
             doc.fillColor(`rgb(${rgb.r}, ${rgb.g}, ${rgb.b})`);
             doc.fill();
             doc.restore();
+          } else if (el.type === "circle") {
+            const x = el.x || 0;
+            const y = el.y || 0;
+            const r = el.radius || 50;
+            const fill = el.fill || "#000000";
+            const opacity = el.opacity !== undefined ? el.opacity : 1;
+            const rgb = hexToRgb(fill);
+            doc.save();
+            doc.opacity(opacity);
+            doc.circle(x + r, y + r, r);
+            doc.fillColor(`rgb(${rgb.r}, ${rgb.g}, ${rgb.b})`);
+            doc.fill();
+            doc.restore();
           } else if (el.type === "text") {
             const x = el.x || 0;
             const y = el.y || 0;
@@ -193,7 +209,7 @@ export async function renderSceneToPDF(sceneData: SceneData): Promise<Buffer> {
               "Times, serif": "Times-Roman",
               serif: "Times-Roman",
               "Courier New": "Courier",
-              "monospace": "Courier",
+              monospace: "Courier",
             };
 
             fontFamily = fontMap[fontFamily] || fontFamily;
@@ -212,7 +228,7 @@ export async function renderSceneToPDF(sceneData: SceneData): Promise<Buffer> {
 
             let finalX = x;
             if (el.align === "center" && el.offsetX) {
-              finalX = x - (el.offsetX / 2);
+              finalX = x - el.offsetX / 2;
             }
 
             doc.text(content, finalX, y, {
@@ -243,10 +259,5 @@ export async function renderSceneToPDF(sceneData: SceneData): Promise<Buffer> {
 }
 
 function escapeXml(str: string): string {
-  return str
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&apos;");
+  return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&apos;");
 }

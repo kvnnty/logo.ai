@@ -26,7 +26,7 @@ interface GetStartedScrollProps {
 
 function GetStartedCard({ item }: { item: GetStartedItem }) {
   return (
-    <Card className="flex-shrink-0 w-[320px] overflow-hidden hover:shadow-lg transition-shadow flex flex-col">
+    <Card className="flex-shrink-0 w-[400px] overflow-hidden hover:shadow-lg transition-shadow flex flex-col">
       <CardHeader className="pb-2">
         <div className="flex items-center gap-3 mb-1">
           <div className="p-2 rounded-lg bg-primary/10 text-primary">{item.icon}</div>

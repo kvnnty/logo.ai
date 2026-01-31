@@ -2,6 +2,8 @@
 
 import { currentUser, clerkClient } from "@clerk/nextjs/server";
 import { ensureDbConnected, Brand, Logo, Template } from "@/db";
+import { getTemplateCategory } from "@/constants/template-categories";
+import { AI_TEMPLATE_SCENE_PROMPT } from "@/lib/prompts";
 import { AssetCategory, GET_TEMPLATE, hydrateTemplate } from "@/lib/templates/brand-kit-templates";
 import { renderSceneToPNG, renderSceneToSVG, renderSceneToPDF } from "@/lib/render/scene-renderer";
 
@@ -137,6 +139,149 @@ export async function getDefaultTemplateScene(brandId: string, category: string,
   } catch (error) {
     console.error("Error:", error);
     return { success: false, error: "Failed" };
+  }
+}
+
+/**
+ * AI-powered template generation: user selects category + prompt, we return a new design (sceneData) and open in editor.
+ * Uses Nebius (NEBIUS_API_KEY) for chat when prompt is provided; otherwise uses smart fallback from default templates.
+ */
+export async function generateAITemplate(brandId: string, category: string, prompt: string, styleInstruction?: string) {
+  "use server";
+  try {
+    const user = await currentUser();
+    if (!user) return { success: false, error: "Not authenticated" };
+
+    const clerk = await clerkClient();
+    const rawRemaining = (user.unsafeMetadata as any)?.remaining;
+    const currentRemaining = typeof rawRemaining === "number" ? rawRemaining : INTERACTIVE_DEFAULT_STARTING_CREDITS;
+    if (typeof rawRemaining !== "number") {
+      await clerk.users.updateUserMetadata(user.id, {
+        unsafeMetadata: { ...(user.unsafeMetadata as any), remaining: currentRemaining },
+      });
+    }
+    if (currentRemaining < INTERACTIVE_GENERATION_COST) {
+      return { success: false, error: "No credits left" };
+    }
+
+    await ensureDbConnected();
+    const brand = await Brand.findOne({ _id: brandId, userId: user.id });
+    if (!brand) return { success: false, error: "Brand not found" };
+
+    const primaryLogo = brand.assets?.find((a: any) => a.category === "logo" || a.subType === "primary_logo");
+    const cat = getTemplateCategory(category);
+    const [defaultWidth, defaultHeight] = cat?.defaultSize ?? [1080, 1080];
+
+    let sceneData: any;
+    const trimmedPrompt = (prompt || "").trim();
+    const nebiusKey = process.env.NEBIUS_API_KEY;
+    const useAI = Boolean(nebiusKey && trimmedPrompt);
+
+    async function useFallback() {
+      const params = {
+        brandName: brand.name,
+        primaryColor: brand.identity?.primary_color || "#2563EB",
+        secondaryColor: brand.identity?.secondary_color || "#FFFFFF",
+        logoUrl: primaryLogo?.imageUrl,
+        website: brand.contactInfo?.website,
+        email: brand.contactInfo?.email,
+        phone: brand.contactInfo?.phone,
+        address: brand.contactInfo?.address,
+      };
+      const templates = await Template.find({ category }).sort({ createdAt: 1 });
+      const templateIndex =
+        templates.length > 0 ? Math.abs((trimmedPrompt || category).split("").reduce((a, c) => a + c.charCodeAt(0), 0)) % Math.max(1, templates.length) : 0;
+
+      if (templates.length > 0) {
+        const selected = templates[templateIndex % templates.length];
+        return hydrateTemplate(selected, brand, primaryLogo);
+      }
+      const fallback = GET_TEMPLATE(category as AssetCategory, templateIndex, params);
+      if (!fallback) {
+        throw new Error(`No template found for category ${category}`);
+      }
+      return fallback;
+    }
+
+    if (useAI) {
+      try {
+        const OpenAI = (await import("openai")).default;
+        const { HELICONE_API_KEY } = process.env;
+        const openai = new OpenAI({
+          apiKey: nebiusKey,
+          baseURL: HELICONE_API_KEY ? "https://nebius.helicone.ai/v1/" : "https://api.studio.nebius.ai/v1/",
+          ...(HELICONE_API_KEY && {
+            defaultHeaders: { "Helicone-Auth": `Bearer ${HELICONE_API_KEY}` },
+          }),
+        });
+        const systemPrompt = AI_TEMPLATE_SCENE_PROMPT.replace(/\{\{category\}\}/g, category)
+          .replace(/\{\{width\}\}/g, String(defaultWidth))
+          .replace(/\{\{height\}\}/g, String(defaultHeight))
+          .replace(/\{\{brandName\}\}/g, brand.name || "Brand")
+          .replace(/\{\{style\}\}/g, styleInstruction || "Modern: contemporary, geometric, clean.")
+          .replace(/\{\{prompt\}\}/g, trimmedPrompt);
+
+        const completion = await openai.chat.completions.create({
+          model: process.env.NEBIUS_TEMPLATE_MODEL || "meta-llama/Llama-3.3-70B-Instruct",
+          messages: [{ role: "user", content: systemPrompt }],
+          temperature: 0.7,
+          max_tokens: 4096,
+        });
+
+        const content = completion.choices[0]?.message?.content?.trim() || "";
+        const jsonMatch = content.match(/\{[\s\S]*\}/);
+        const raw = jsonMatch ? jsonMatch[0] : content;
+        const parsed = JSON.parse(raw) as { width?: number; height?: number; elements?: any[] };
+
+        if (!Array.isArray(parsed.elements) || parsed.elements.length === 0) {
+          throw new Error("AI returned invalid scene: missing elements array");
+        }
+        const width = Number(parsed.width) || defaultWidth;
+        const height = Number(parsed.height) || defaultHeight;
+        const aiTemplate = { width, height, elements: parsed.elements };
+        sceneData = hydrateTemplate(aiTemplate, brand, primaryLogo);
+      } catch (aiErr: any) {
+        console.error("AI template generation failed, using fallback:", aiErr?.message || aiErr);
+        sceneData = await useFallback();
+      }
+    } else {
+      sceneData = await useFallback();
+    }
+
+    let imageUrl: string | undefined;
+    try {
+      const pngBuffer = await renderSceneToPNG(sceneData, 2);
+      imageUrl = `data:image/png;base64,${pngBuffer.toString("base64")}`;
+    } catch (err) {
+      console.error("Failed to render scene preview:", err);
+    }
+
+    const subType = trimmedPrompt ? `${category}: ${trimmedPrompt.slice(0, 50)}` : `AI ${category}`;
+    brand.assets.push({
+      category,
+      subType,
+      prompt: trimmedPrompt || undefined,
+      imageUrl,
+      sceneData,
+      createdAt: new Date(),
+    } as any);
+    await brand.save();
+
+    const newRemaining = currentRemaining - INTERACTIVE_GENERATION_COST;
+    await clerk.users.updateUserMetadata(user.id, {
+      unsafeMetadata: { ...(user.unsafeMetadata as any), remaining: newRemaining },
+    });
+
+    const newAsset = brand.assets[brand.assets.length - 1] as any;
+    const assetId = newAsset?._id?.toString?.() ?? "";
+
+    return { success: true, sceneData, remainingCredits: newRemaining, assetId };
+  } catch (error) {
+    console.error("generateAITemplate error:", error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Failed to generate design",
+    };
   }
 }
 

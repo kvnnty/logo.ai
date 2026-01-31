@@ -26,8 +26,6 @@ Return a JSON object with this exact structure:
 
 // SCENE_DESIGNER_PROMPT removed - using templates now
 
-
-
 export const LOGO_MULTIPLE_CONCEPTS_PROMPT = `
 You are a world-class Logo Designer and Brand Strategist.
 Your goal is to generate 4 FUNDAMENTALLY DISTINCT and MEANINGFUL logo concepts for the following brand.
@@ -72,8 +70,35 @@ Return a JSON object with this exact structure:
 `;
 
 export const LOGO_SET_VARIANTS = {
-  icon: { label: 'Icon Only', subType: 'logo_icon' },
-  text: { label: 'Wordmark', subType: 'logo_text' },
-  horizontal: { label: 'Horizontal', subType: 'logo_horizontal' },
-  vertical: { label: 'Vertical', subType: 'logo_vertical' },
+  icon: { label: "Icon Only", subType: "logo_icon" },
+  text: { label: "Wordmark", subType: "logo_text" },
+  horizontal: { label: "Horizontal", subType: "logo_horizontal" },
+  vertical: { label: "Vertical", subType: "logo_vertical" },
 };
+
+/**
+ * AI template generation: produce a JSON scene (width, height, elements) for the canvas.
+ * Elements use placeholders {{primaryColor}}, {{secondaryColor}}, {{brandName}}, {{logoUrl}}, {{email}}, {{phone}}, {{website}}, {{address}} so we can hydrate with brand data.
+ */
+export const AI_TEMPLATE_SCENE_PROMPT = `You are a professional brand designer. Generate a single design template as JSON for a canvas editor.
+
+RULES:
+- Output ONLY valid JSON. No markdown, no code block wrapper, no explanation.
+- Use these placeholders so we can fill in brand data later: {{primaryColor}}, {{secondaryColor}}, {{brandName}}, {{logoUrl}}, {{email}}, {{phone}}, {{website}}, {{address}}.
+- For any brand-colored shapes or text use {{primaryColor}} or {{secondaryColor}} as the "fill" value.
+- Logo must be an image element with src: "{{logoUrl}}".
+- Element types allowed: "rect", "circle", "text", "image".
+- Each element needs: type, x, y, and either (width, height) or (radius for circle). Use "fill" for rect/circle/text (hex or placeholder). Use "content", "fontSize", "fontWeight", "align", "offsetX" for text. Use "src" for image. Use "cornerRadius", "opacity" where needed.
+- Position elements for elite, professional layout: clear hierarchy, contact info and logo prominently placed, good spacing.
+- Include graphic illustrations (rects, circles) that use {{primaryColor}}/{{secondaryColor}} to create a modern, polished look—e.g. accent bars, geometric shapes, frames.
+
+JSON shape (exactly):
+{"width": number, "height": number, "elements": [{"type": "rect"|"circle"|"text"|"image", ...}]}
+
+Category: {{category}}
+Canvas size (width x height): {{width}} x {{height}}
+Brand name: {{brandName}}
+Visual style: {{style}}
+User request: {{prompt}}
+
+Return only the JSON object.`;
