@@ -7,6 +7,7 @@ interface SceneElement {
   y?: number;
   width?: number;
   height?: number;
+  radius?: number; // for circle
   fill?: string;
   content?: string;
   fontSize?: number;

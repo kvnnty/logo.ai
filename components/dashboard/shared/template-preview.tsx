@@ -95,6 +95,20 @@ export function TemplatePreview({
             ctx.fillRect(x, y, w, h);
           }
           ctx.restore();
+        } else if (el.type === "circle") {
+          const cx = (el.x || 0) + (el.radius || 50);
+          const cy = (el.y || 0) + (el.radius || 50);
+          const r = el.radius || 50;
+          const fill = el.fill || "#000000";
+          const opacity = el.opacity !== undefined ? el.opacity : 1;
+
+          ctx.save();
+          ctx.globalAlpha = opacity;
+          ctx.fillStyle = fill;
+          ctx.beginPath();
+          ctx.arc(cx, cy, r, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.restore();
         } else if (el.type === "text") {
           const x = el.x || 0;
           const y = el.y || 0;

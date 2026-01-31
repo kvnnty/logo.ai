@@ -6,7 +6,7 @@ import { AssetCard } from "./asset-card";
 import { TemplatePreviewCard } from "./template-preview-card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Sparkles, Loader2, Plus, Paperclip, ArrowRight } from "lucide-react";
+import { Sparkles, Loader2, Plus } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "@/hooks/use-toast";
 import { getBrandById, generateInteractiveAsset } from "@/app/actions/brand-actions";
@@ -192,35 +192,59 @@ export function AssetCategoryView({
     });
 
   const brandName = brandData?.name || "your brand";
+  const secondaryColor = brandData?.identity?.secondary_color || primaryColor;
+  const primaryLogo = brandData?.assets?.find((a: any) => a.subType === "primary_logo" || (a.category === "logo" && a.imageUrl));
+  const logoUrl = primaryLogo?.imageUrl;
 
   return (
     <div className="pb-12">
-      {/* Centered heading */}
-      <div className="text-center mb-8">
-        <h2 className="text-2xl font-bold mb-2">
-          What do you want to create for {brandName}?
-        </h2>
-      </div>
+      {/* Centered heading - match brand dashboard */}
+      <h2 className="text-xl text-center font-bold">What do you want to create for {brandName}?</h2>
+      <p className="text-muted-foreground text-sm max-w-2xl mx-auto text-center mt-2 leading-relaxed">
+        Choose what to create, add a short description, and we&apos;ll generate a template you can customize in the editor.
+      </p>
 
-      {/* Main prompt card - centered with max width */}
-      <div className="max-w-2xl mx-auto mb-6">
-        <div className="bg-card border rounded-2xl p-6 shadow-sm">
+      {/* Main prompt card - same layout and styles as brand dashboard */}
+      <div className="max-w-4xl mx-auto space-y-4 mt-4">
+        <div className="bg-card border focus-within:border-primary rounded-2xl p-6 shadow-sm">
           {/* Prompt textarea with Generate button */}
-          <div className="flex flex-col gap-3">
-            <div className="relative">
-              <Paperclip className="absolute left-3 top-3 w-5 h-5 text-muted-foreground" />
-              <Textarea
-                value={prompt}
-                onChange={(e) => setPrompt(e.target.value)}
-                placeholder="E.g. Ski jacket sale this weekend"
-                className="pl-10 pr-4 pt-3 pb-3 min-h-[80px] text-base rounded-lg border-2 resize-y"
-              />
-            </div>
-            <div className="flex justify-end">
+          <div className="space-y-4">
+            <Textarea
+              value={prompt}
+              onChange={(e) => setPrompt(e.target.value)}
+              placeholder="E.g. Bold red flyer for summer sale, minimal business card with geometric shapes, social cover with logo centered"
+              className="w-full min-h-[88px] resize-y rounded-none border-none outline-none focus-visible:ring-0 p-0 shadow-none"
+            />
+            <div className="flex justify-between items-start">
+              <div className="flex flex-wrap gap-3 items-center">
+                <Select value={style} onValueChange={setStyle}>
+                  <SelectTrigger className="w-fit rounded border border-primary bg-primary/10 text-primary focus:ring-0">
+                    <SelectValue placeholder="Style" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="minimal">Minimal</SelectItem>
+                    <SelectItem value="modern">Modern</SelectItem>
+                    <SelectItem value="classic">Classic</SelectItem>
+                    <SelectItem value="bold">Bold</SelectItem>
+                    <SelectItem value="elegant">Elegant</SelectItem>
+                  </SelectContent>
+                </Select>
+                <Select value={format} onValueChange={setFormat}>
+                  <SelectTrigger className="w-fit rounded border border-primary bg-primary/10 text-primary focus:ring-0">
+                    <SelectValue placeholder="Format" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="standard">Standard {title}</SelectItem>
+                    <SelectItem value="instagram-post">Instagram Post</SelectItem>
+                    <SelectItem value="facebook-post">Facebook Post</SelectItem>
+                    <SelectItem value="twitter-post">Twitter Post</SelectItem>
+                    <SelectItem value="linkedin-post">LinkedIn Post</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
               <Button
                 onClick={handleGenerate}
                 disabled={isGenerating || !prompt.trim() || (credits !== null && credits <= 0)}
-                className="h-11 px-6 bg-primary hover:bg-primary/90 rounded-full shadow-md"
               >
                 {isGenerating ? (
                   <>
@@ -229,51 +253,20 @@ export function AssetCategoryView({
                   </>
                 ) : (
                   <>
+                    <Sparkles className="h-4 w-4" />
                     Generate
-                    <ArrowRight className="w-4 h-4 ml-2" />
                   </>
                 )}
               </Button>
             </div>
           </div>
-
-          {/* Style and Format dropdowns */}
-          <div className="flex gap-3">
-            <Select value={style} onValueChange={setStyle}>
-              <SelectTrigger className="w-full rounded-lg border-2 h-10">
-                <SelectValue placeholder="Style" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="minimal">Minimal</SelectItem>
-                <SelectItem value="modern">Modern</SelectItem>
-                <SelectItem value="classic">Classic</SelectItem>
-                <SelectItem value="bold">Bold</SelectItem>
-                <SelectItem value="elegant">Elegant</SelectItem>
-              </SelectContent>
-            </Select>
-
-            <Select value={format} onValueChange={setFormat}>
-              <SelectTrigger className="w-full rounded-lg border-2 h-10">
-                <SelectValue placeholder="Format" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="standard">Standard {title}</SelectItem>
-                <SelectItem value="instagram-post">Instagram Post</SelectItem>
-                <SelectItem value="facebook-post">Facebook Post</SelectItem>
-                <SelectItem value="twitter-post">Twitter Post</SelectItem>
-                <SelectItem value="linkedin-post">LinkedIn Post</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          {/* Credits display */}
+        </div>
+        <div className="text-xs text-muted-foreground text-center">
           {credits !== null && (
-            <div className="flex items-center justify-center gap-2 mt-4 pt-4 border-t">
-              <Sparkles className="w-4 h-4 text-primary" />
-              <span className="text-sm font-medium text-primary">
-                {credits} {credits === 1 ? "Credit" : "Credits"} Remaining
-              </span>
-            </div>
+            <>
+              <Sparkles className="w-3 h-3 inline-block mr-1 align-middle" />
+              {credits} credits · 1 per generation
+            </>
           )}
         </div>
       </div>
@@ -287,6 +280,9 @@ export function AssetCategoryView({
                 key={`template-${i}`}
                 category={category}
                 primaryColor={primaryColor}
+                secondaryColor={secondaryColor}
+                brandName={brandName}
+                logoUrl={logoUrl}
                 onClick={handleGenerate}
               />
             ))}

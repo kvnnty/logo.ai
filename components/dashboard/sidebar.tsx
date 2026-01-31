@@ -141,7 +141,7 @@ export default function DashboardSidebar({ isOpen = false, onClose, brandId, bra
           </button>
 
           {/* Logo Section */}
-          <div className="mb-6 flex-shrink-0">
+          <div className="mb-3 flex-shrink-0">
             <Link href="/" className="flex items-center gap-3 px-3 py-2.5 group" onClick={handleNavClick}>
               <div className="relative">
                 <div className="absolute inset-0 bg-primary/20 blur-xl group-hover:bg-primary/30 transition-colors rounded-xl" />

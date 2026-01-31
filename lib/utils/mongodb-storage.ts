@@ -72,7 +72,7 @@ export async function uploadToMongoDB(options: UploadFileOptions): Promise<strin
 }
 
 /**
- * Get a file from MongoDB GridFS
+ * Get a file from MongoDB GridFS by file ID
  */
 export async function getFileFromMongoDB(fileId: string): Promise<{
   buffer: Buffer;
@@ -85,6 +85,13 @@ export async function getFileFromMongoDB(fileId: string): Promise<{
   return new Promise((resolve, reject) => {
     const downloadStream = bucket.openDownloadStream(new mongoose.Types.ObjectId(fileId));
     const chunks: Buffer[] = [];
+    let contentType = 'application/octet-stream';
+    let metadata: Record<string, string> = {};
+
+    downloadStream.on('file', (file: { contentType?: string; metadata?: Record<string, string> }) => {
+      contentType = file.contentType || contentType;
+      metadata = (file.metadata as Record<string, string>) || {};
+    });
 
     downloadStream.on('data', (chunk: Buffer) => {
       chunks.push(chunk);
@@ -96,8 +103,6 @@ export async function getFileFromMongoDB(fileId: string): Promise<{
 
     downloadStream.on('end', () => {
       const buffer = Buffer.concat(chunks);
-      const contentType = downloadStream.options?.contentType || 'application/octet-stream';
-      const metadata = downloadStream.options?.metadata || {};
       resolve({ buffer, contentType, metadata });
     });
   });
