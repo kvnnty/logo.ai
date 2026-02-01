@@ -138,7 +138,7 @@ export function AIFlow({ onBack }: { onBack: () => void }) {
       setProgress(100);
       // Brief delay to show 100% completion
       await new Promise(resolve => setTimeout(resolve, 500));
-      setCurrentStep(8);
+      setCurrentStep(7);
     } catch (error) {
       toast({
         title: "Error",

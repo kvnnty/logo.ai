@@ -96,32 +96,15 @@ export function ResultsStep({
                   >
                     <img
                       src={concept.iconUrl}
-                      className="w-full h-full max-w-[240px] max-h-[240px] object-contain drop-shadow-lg"
+                      className="w-full h-full max-w-[240px] max-h-[240px] object-contain"
                       alt={`${companyName} logo concept ${idx + 1}`}
                       loading="lazy"
                     />
                   </motion.div>
-
-                  {/* Overlay on hover */}
-                  <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: hoveredIndex === idx ? 1 : 0 }}
-                    className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none"
-                  />
                 </div>
 
                 {/* Info Section */}
                 <div className="p-6 space-y-4 bg-white">
-                  {concept.name && (
-                    <h3 className="font-bold text-lg text-foreground">{concept.name}</h3>
-                  )}
-
-                  {concept.rationale && (
-                    <p className="text-sm text-muted-foreground line-clamp-2 leading-relaxed">
-                      {concept.rationale}
-                    </p>
-                  )}
-
                   {/* Color Palette */}
                   {concept.colors && concept.colors.length > 0 && (
                     <div className="space-y-2">

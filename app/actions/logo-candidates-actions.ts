@@ -33,10 +33,6 @@ export async function generateLogoCandidates(brandId: string, model: string = "b
     const brand = await Brand.findOne({ _id: brandId, userId: user.id });
     if (!brand) return { success: false, error: "Brand not found" };
 
-    function makeCandidateId() {
-      return `cand_${Math.random().toString(36).slice(2, 10)}_${Date.now().toString(36)}`;
-    }
-
     function buildPrompts(input: { name: string; slogan?: string; industry?: string; vibeKeywords?: string[]; style?: string }) {
       const base = [
         `Brand name: "${input.name}"`,
@@ -89,21 +85,26 @@ export async function generateLogoCandidates(brandId: string, model: string = "b
       const imageUrl = image.data?.[0]?.url || "";
       if (!imageUrl) continue;
 
-      const candidateId = makeCandidateId();
+      const logo = await Logo.create({
+        brandId: brand._id,
+        userId: user.id,
+        image_url: imageUrl,
+        isPrimary: false,
+        subType: "candidate",
+        category: "logo",
+        prompt,
+        model,
+      });
       created.push({
-        candidateId,
+        _id: logo._id.toString(),
         imageUrl,
         prompt,
         model,
-        createdAt: new Date(),
+        createdAt: logo.createdAt,
       });
     }
 
-    (brand as any).logoCandidates = Array.isArray((brand as any).logoCandidates) ? [...(brand as any).logoCandidates, ...created] : created;
-    brand.markModified("logoCandidates");
-    await brand.save();
-
-    return { success: true, candidates: created };
+    return { success: true, candidates: JSON.parse(JSON.stringify(created)) };
   } catch (error) {
     console.error("Generate candidates error:", error);
     return { success: false, error: error instanceof Error ? error.message : "Failed to generate candidates" };
@@ -117,42 +118,44 @@ export async function getLogoCandidates(brandId: string) {
     if (!user) return { success: false, error: "Not authenticated" };
 
     await ensureDbConnected();
-    const brand = (await Brand.findOne({ _id: brandId, userId: user.id }).lean()) as any;
-    if (!brand) return { success: false, error: "Brand not found" };
-
-    return { success: true, candidates: brand.logoCandidates || [] };
+    const logos = await Logo.find({ brandId, userId: user.id, subType: "candidate" })
+      .sort({ createdAt: -1 })
+      .lean();
+    const candidates = (logos as any[]).map((l) => ({
+      _id: l._id.toString(),
+      imageUrl: l.image_url,
+      prompt: l.prompt,
+      model: l.model,
+      createdAt: l.createdAt?.toISOString?.(),
+    }));
+    return { success: true, candidates: JSON.parse(JSON.stringify(candidates)) };
   } catch (error) {
     console.error("List candidates error:", error);
     return { success: false, error: error instanceof Error ? error.message : "Failed to list candidates" };
   }
 }
 
-export async function applyLogo(brandId: string, candidateId: string) {
+/** Apply a candidate logo as primary. logoId is the Logo document _id (subType must be 'candidate'). */
+export async function applyLogo(brandId: string, logoId: string) {
   "use server";
   try {
     const user = await currentUser();
     if (!user) return { success: false, error: "Not authenticated" };
 
-    if (!candidateId?.trim()) {
-      return { success: false, error: "Missing candidateId" };
+    if (!logoId?.trim()) {
+      return { success: false, error: "Missing logoId" };
     }
 
     await ensureDbConnected();
     const brand = await Brand.findOne({ _id: brandId, userId: user.id });
     if (!brand) return { success: false, error: "Brand not found" };
 
-    const candidates = Array.isArray((brand as any).logoCandidates) ? (brand as any).logoCandidates : [];
-    const selectedCandidate = candidates.find((c: any) => c.candidateId === candidateId);
-
-    if (!selectedCandidate) {
+    const logo = await Logo.findOne({ _id: logoId, brandId: brand._id, userId: user.id });
+    if (!logo || (logo as any).subType !== "candidate") {
       return { success: false, error: "Candidate not found" };
     }
 
-    // Set active logo candidate
-    (brand as any).activeLogoCandidateId = candidateId;
     brand.status = "active";
-
-    // Initialize brand identity if missing
     if (!brand.identity) {
       brand.identity = {
         primary_color: "#2563eb",
@@ -160,20 +163,15 @@ export async function applyLogo(brandId: string, candidateId: string) {
         visual_style: (brand as any).vibeKeywords?.[0] || "modern",
       };
     }
+    await brand.save();
 
-    // Create primary logo in Logo collection
     await Logo.updateMany({ brandId: brand._id }, { isPrimary: false });
-    await Logo.create({
-      brandId: brand._id,
-      userId: user.id,
-      image_url: selectedCandidate.imageUrl,
-      isPrimary: true,
-      subType: "primary_logo",
-      category: "logo",
-      prompt: selectedCandidate.prompt || "Selected logo candidate",
-    });
+    logo.isPrimary = true;
+    (logo as any).subType = "primary_logo";
+    await logo.save();
 
-    const primaryLogoObj = { imageUrl: selectedCandidate.imageUrl };
+    const imageUrl = (logo as any).image_url;
+    const primaryLogoObj = { imageUrl };
     const starterCategories = ["business_card", "social_post", "letterhead", "email_signature", "social_cover"];
     const templates = await Template.find({ category: { $in: starterCategories } }).sort({ createdAt: 1 });
     const templatesByCategory: Record<string, any[]> = {};

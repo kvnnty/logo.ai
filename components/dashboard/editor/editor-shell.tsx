@@ -127,7 +127,7 @@ export function EditorShell({ brandId, designId, initialDesign, initialPage, tem
   const [history, setHistory] = useState<any[][]>([]);
   const [redoStack, setRedoStack] = useState<any[][]>([]);
   const [exportingFormat, setExportingFormat] = useState<string | null>(null);
-  const [brand, setBrand] = useState<{ name?: string; logos?: Array<{ image_url?: string; imageUrl?: string; category?: string }>; logoCandidates?: Array<{ imageUrl: string }>; activeLogoCandidateId?: string } | null>(null);
+  const [brand, setBrand] = useState<{ name?: string; logos?: Array<{ _id?: string; image_url?: string; imageUrl?: string; category?: string; subType?: string }> } | null>(null);
   const [favoriteDesigns, setFavoriteDesigns] = useState<Array<{ _id: string; name: string; favorite?: boolean }>>([]);
   const [contextMenu, setContextMenu] = useState<{ x: number; y: number; elementIndex: number } | null>(null);
   const copiedElementRef = useRef<any>(null);
@@ -716,32 +716,34 @@ export function EditorShell({ brandId, designId, initialDesign, initialPage, tem
                   <>
                     <p className="text-xs font-medium text-foreground">Logos</p>
                     <div className="flex flex-wrap gap-2">
-                      {brand.logos?.filter((a: any) => a.image_url || a.imageUrl).slice(0, 3).map((asset: any, i: number) => (
-                        <button
-                          key={i}
-                          type="button"
-                          onClick={() => addElement({ type: "image", src: asset.image_url ?? asset.imageUrl, x: 100, y: 100, width: 200, height: 200, draggable: true })}
-                          className="w-14 h-14 rounded border border-border bg-muted flex items-center justify-center overflow-hidden"
-                        >
-                          <img src={asset.imageUrl} alt="" className="max-w-full max-h-full object-contain" />
-                        </button>
-                      ))}
-                      {brand.logoCandidates?.length ? (
-                        (() => {
-                          const active = brand.logoCandidates?.find((c) => (c as any).candidateId === brand.activeLogoCandidateId) ?? brand.logoCandidates[0];
-                          return active?.imageUrl ? (
-                            <button
-                              type="button"
-                              onClick={() => addElement({ type: "image", src: active.imageUrl, x: 100, y: 100, width: 200, height: 200, draggable: true })}
-                              className="w-14 h-14 rounded border border-border bg-muted flex items-center justify-center overflow-hidden"
-                            >
-                              <img src={active.imageUrl} alt="" className="max-w-full max-h-full object-contain" />
-                            </button>
-                          ) : null;
-                        })()
-                      ) : null}
+                      {brand.logos
+                        ?.filter((a: any) => (a.image_url || a.imageUrl) && a.subType !== "candidate")
+                        .slice(0, 3)
+                        .map((asset: any, i: number) => (
+                          <button
+                            key={asset._id ?? i}
+                            type="button"
+                            onClick={() => addElement({ type: "image", src: asset.image_url ?? asset.imageUrl, x: 100, y: 100, width: 200, height: 200, draggable: true })}
+                            className="w-14 h-14 rounded border border-border bg-muted flex items-center justify-center overflow-hidden"
+                          >
+                            <img src={asset.imageUrl ?? asset.image_url} alt="" className="max-w-full max-h-full object-contain" />
+                          </button>
+                        ))}
+                      {brand.logos
+                        ?.filter((a: any) => a.subType === "candidate" && (a.image_url || a.imageUrl))
+                        .slice(0, 3)
+                        .map((asset: any, i: number) => (
+                          <button
+                            key={asset._id ?? `cand-${i}`}
+                            type="button"
+                            onClick={() => addElement({ type: "image", src: asset.image_url ?? asset.imageUrl, x: 100, y: 100, width: 200, height: 200, draggable: true })}
+                            className="w-14 h-14 rounded border border-border bg-muted flex items-center justify-center overflow-hidden"
+                          >
+                            <img src={asset.imageUrl ?? asset.image_url} alt="" className="max-w-full max-h-full object-contain" />
+                          </button>
+                        ))}
                     </div>
-                    {(!brand.logos?.length && !brand.logoCandidates?.length) && <p className="text-xs">No logos in brand yet. Add from Branding.</p>}
+                    {!brand.logos?.length && <p className="text-xs">No logos in brand yet. Add from Branding.</p>}
                     <p className="text-xs text-muted-foreground">Brand colors & fonts (coming later).</p>
                   </>
                 ) : (

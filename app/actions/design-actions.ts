@@ -102,16 +102,15 @@ export async function listDesigns(brandId: string) {
       .sort({ updatedAt: -1 })
       .lean();
 
-    return {
-      success: true,
-      designs: designs.map((d: any) => ({
-        ...d,
-        _id: d._id.toString(),
-        brandId: d.brandId?.toString(),
-        createdAt: d.createdAt?.toISOString?.(),
-        updatedAt: d.updatedAt?.toISOString?.(),
-      })),
-    };
+    const designsPlain = designs.map((d: any) => ({
+      ...d,
+      _id: d._id.toString(),
+      brandId: d.brandId?.toString(),
+      createdAt: d.createdAt?.toISOString?.(),
+      updatedAt: d.updatedAt?.toISOString?.(),
+    }));
+    // Serialize so only plain objects reach Client Components (no BSON/ObjectId/toJSON)
+    return JSON.parse(JSON.stringify({ success: true, designs: designsPlain }));
   } catch (error) {
     console.error("listDesigns:", error);
     return { success: false, error: error instanceof Error ? error.message : "Failed to list designs", designs: [] };

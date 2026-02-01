@@ -2,7 +2,7 @@
 
 import { randomBytes } from "node:crypto";
 import { currentUser, clerkClient } from "@clerk/nextjs/server";
-import { ensureDbConnected, Brand, Logo, Template, BrandUpload, Design } from "@/db";
+import { ensureDbConnected, Brand, Logo, Template, BrandUpload, Design, LinkInBio } from "@/db";
 import { createDesign } from "@/app/actions/design-actions";
 import { setPrimaryLogoByImageUrl as setPrimaryLogoByImageUrlFromLogo } from "@/app/actions/logo-actions";
 import { getTemplateCategory } from "@/constants/template-categories";
@@ -510,8 +510,8 @@ export async function getBrandById(brandId: string) {
       if (imageElement?.src) primaryLogoUrl = imageElement.src;
     }
 
-    return {
-      success: true,
+    const payload = {
+      success: true as const,
       brand: {
         ...brand,
         _id: brand._id.toString(),
@@ -526,6 +526,8 @@ export async function getBrandById(brandId: string) {
         primaryLogoUrl,
       },
     };
+    // Serialize so only plain objects reach Client Components (no BSON/ObjectId/toJSON)
+    return JSON.parse(JSON.stringify(payload));
   } catch (error) {
     return { success: false, error: "Failed" };
   }
@@ -664,13 +666,13 @@ export async function deleteBrand(brandId: string) {
   }
 }
 
-export async function createBrand(data: { name: string; slogan?: string; industry?: string; vibeKeywords?: string[] }) {
+export async function createBrand(data: { name: string; slogan?: string; industry?: string}) {
   "use server";
   try {
     const user = await currentUser();
     if (!user) return { success: false, error: "Not authenticated" };
 
-    const { name, slogan, industry, vibeKeywords } = data;
+    const { name, slogan, industry } = data;
     if (!name?.trim()) return { success: false, error: "Missing brand name" };
 
     await ensureDbConnected();
@@ -682,9 +684,7 @@ export async function createBrand(data: { name: string; slogan?: string; industr
       slug,
       slogan: slogan?.trim() || "",
       industry: industry?.trim() || "",
-      vibeKeywords: Array.isArray(vibeKeywords) ? vibeKeywords.filter(Boolean).slice(0, 12) : [],
       status: "draft",
-      logoCandidates: [],
     });
 
     return { success: true, brandId: brand._id.toString() };
@@ -968,6 +968,18 @@ export async function addUserAsset(brandId: string, imageUrl: string, fileName: 
       imageUrl,
       fileName: fileName || "upload",
     });
+
+    // Also create a Logo from this upload so primaryLogoUrl and logos are available
+    const hasPrimary = await Logo.exists({ brandId, isPrimary: true });
+    await Logo.create({
+      brandId: brand._id,
+      userId: user.id,
+      image_url: imageUrl,
+      isPrimary: !hasPrimary,
+      subType: hasPrimary ? "logo_variation" : "primary_logo",
+      category: "logo",
+    });
+
     return { success: true, assetId: upload._id.toString() };
   } catch (error) {
     console.error("Error adding user asset:", error);
@@ -1000,18 +1012,17 @@ export async function listBrandUploads(brandId: string) {
     const brand = await Brand.findOne({ _id: brandId, userId: user.id });
     if (!brand) return { success: false, error: "Brand not found", uploads: [] };
     const uploads = await BrandUpload.find({ brandId, userId: user.id }).sort({ createdAt: -1 }).lean();
-    return {
-      success: true,
-      uploads: (uploads as any[]).map((u) => ({
-        ...u,
-        _id: u._id?.toString?.(),
-        brandId: u.brandId?.toString?.(),
-        category: "user_upload",
-        subType: u.fileName || "upload",
-        imageUrl: u.imageUrl,
-        createdAt: u.createdAt?.toISOString?.(),
-      })),
-    };
+    const uploadsPlain = (uploads as any[]).map((u) => ({
+      ...u,
+      _id: u._id?.toString?.(),
+      brandId: u.brandId?.toString?.(),
+      category: "user_upload",
+      subType: u.fileName || "upload",
+      imageUrl: u.imageUrl,
+      createdAt: u.createdAt?.toISOString?.(),
+    }));
+    // Serialize so only plain objects reach Client Components (no BSON/ObjectId/toJSON)
+    return JSON.parse(JSON.stringify({ success: true, uploads: uploadsPlain }));
   } catch (error) {
     console.error("listBrandUploads:", error);
     return { success: false, error: error instanceof Error ? error.message : "Failed", uploads: [] };

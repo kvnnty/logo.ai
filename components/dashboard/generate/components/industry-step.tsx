@@ -3,36 +3,36 @@
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import { ArrowRight, Building2, Dumbbell, ShoppingCart, Church, Home, PartyPopper, ChefHat, DollarSign, Heart, PaintRoller, BookOpen, Leaf, Car, PawPrint, MoreHorizontal, Globe, Gavel, Stethoscope, Gamepad2, Sparkles, PlaneTakeoff } from "lucide-react";
+import { INDUSTRIES as INDUSTRIES_DATA } from "@/lib/industries";
 
-interface Industry {
-  id: string;
-  name: string;
-  icon: React.ComponentType<{ className?: string }>;
-}
+const ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
+  travel: PlaneTakeoff,
+  "sports-fitness": Dumbbell,
+  retail: ShoppingCart,
+  religious: Church,
+  "real-estate": Building2,
+  legal: Gavel,
+  internet: Globe,
+  technology: Sparkles,
+  "home-family": Home,
+  events: PartyPopper,
+  "medical-dental": Stethoscope,
+  restaurant: ChefHat,
+  finance: DollarSign,
+  nonprofit: Heart,
+  entertainment: Gamepad2,
+  construction: PaintRoller,
+  education: BookOpen,
+  "beauty-spa": Leaf,
+  automotive: Car,
+  "animals-pets": PawPrint,
+  others: MoreHorizontal,
+};
 
-const INDUSTRIES: Industry[] = [
-  { id: "travel", name: "Travel", icon: PlaneTakeoff },
-  { id: "sports-fitness", name: "Sports Fitness", icon: Dumbbell },
-  { id: "retail", name: "Retail", icon: ShoppingCart },
-  { id: "religious", name: "Religious", icon: Church },
-  { id: "real-estate", name: "Real Estate", icon: Building2 },
-  { id: "legal", name: "Legal", icon: Gavel },
-  { id: "internet", name: "Internet", icon: Globe },
-  { id: "technology", name: "Technology", icon: Sparkles },
-  { id: "home-family", name: "Home Family", icon: Home },
-  { id: "events", name: "Events", icon: PartyPopper },
-  { id: "medical-dental", name: "Medical Dental", icon: Stethoscope },
-  { id: "restaurant", name: "Restaurant", icon: ChefHat },
-  { id: "finance", name: "Finance", icon: DollarSign },
-  { id: "nonprofit", name: "Nonprofit", icon: Heart },
-  { id: "entertainment", name: "Entertainment", icon: Gamepad2 },
-  { id: "construction", name: "Construction", icon: PaintRoller },
-  { id: "education", name: "Education", icon: BookOpen },
-  { id: "beauty-spa", name: "Beauty Spa", icon: Leaf },
-  { id: "automotive", name: "Automotive", icon: Car },
-  { id: "animals-pets", name: "Animals Pets", icon: PawPrint },
-  { id: "others", name: "Others", icon: MoreHorizontal },
-];
+const INDUSTRIES = INDUSTRIES_DATA.map((item) => ({
+  ...item,
+  icon: ICONS[item.id] ?? MoreHorizontal,
+}));
 
 interface StepIndustryProps {
   selectedIndustries: string[];

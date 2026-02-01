@@ -1,7 +1,7 @@
 'use server';
 
 import { currentUser, clerkClient } from "@clerk/nextjs/server";
-import { ensureDbConnected, Brand } from '@/db';
+import { ensureDbConnected, Brand, LinkInBio } from '@/db';
 
 const DEFAULT_STARTING_CREDITS = 10;
 const PUBLISH_COST = 1; // Cost to publish link-in-bio
@@ -11,6 +11,8 @@ export async function saveLinkInBio(brandId: string, data: {
   profileTitle?: string;
   description?: string;
   blocks?: any[];
+  links?: any[];
+  contentBlocks?: any[];
   socialIcons?: any[];
   styles?: any;
   settings?: any;
@@ -23,15 +25,22 @@ export async function saveLinkInBio(brandId: string, data: {
     const brand = await Brand.findOne({ _id: brandId, userId: user.id });
     if (!brand) return { success: false, error: 'Brand not found' };
 
-    // Merge with existing linkInBio data
-    const existing = (brand as any).linkInBio || {};
-    (brand as any).linkInBio = {
-      ...existing,
+    const doc = await LinkInBio.findOne({ brandId });
+    const payload = {
+      ...(doc ? doc.toObject() : {}),
       ...data,
+      brandId: brand._id,
+      userId: user.id,
       updatedAt: new Date(),
     };
+    delete (payload as any)._id;
 
-    await brand.save();
+    if (doc) {
+      doc.set(payload);
+      await doc.save();
+    } else {
+      await LinkInBio.create({ ...payload, createdAt: new Date() });
+    }
     return { success: true };
   } catch (error) {
     console.error('Save link-in-bio error:', error);
@@ -42,43 +51,60 @@ export async function saveLinkInBio(brandId: string, data: {
 export async function getLinkInBio(brandId: string, isPublic: boolean = false) {
   try {
     await ensureDbConnected();
-    
+
     if (isPublic) {
-      // Public access - no authentication required
-      const brand = await Brand.findOne({ _id: brandId }).lean() as any;
-      if (!brand) return { success: false, error: 'Brand not found' };
-      
-      // Only return if published
-      if (!brand.linkInBio?.published) {
-        return { success: false, error: 'Link-in-bio not published' };
-      }
-
-      const linkInBio = brand.linkInBio || { blocks: [] };
-      return { 
-        success: true, 
-        data: linkInBio,
-      };
-    } else {
-      // Private access - requires authentication
-      const user = await currentUser();
-      if (!user) return { success: false, error: 'Not authenticated' };
-
-      const brand = await Brand.findOne({ _id: brandId, userId: user.id }).lean() as any;
-      if (!brand) return { success: false, error: 'Brand not found' };
-
-      const linkInBio = brand.linkInBio || { blocks: [] };
-      const publicUrl = brand.linkInBio?.publicUrl || null;
-
-      return { 
-        success: true, 
-        data: linkInBio,
-        publicUrl 
-      };
+      const doc = await LinkInBio.findOne({ brandId }).lean() as any;
+      if (!doc) return { success: false, error: 'Link-in-bio not found' };
+      if (!doc.published) return { success: false, error: 'Link-in-bio not published' };
+      return { success: true, data: toPlainData(doc) };
     }
+
+    const user = await currentUser();
+    if (!user) return { success: false, error: 'Not authenticated' };
+
+    const brand = await Brand.findOne({ _id: brandId, userId: user.id });
+    if (!brand) return { success: false, error: 'Brand not found' };
+
+    const doc = await LinkInBio.findOne({ brandId }).lean() as any;
+    const data = doc ? toPlainData(doc) : toPlainData({ blocks: [], links: [], contentBlocks: [] });
+    const publicUrl = doc?.publicUrl ?? null;
+    return { success: true, data, publicUrl };
   } catch (error) {
     console.error('Get link-in-bio error:', error);
     return { success: false, error: error instanceof Error ? error.message : 'Failed to load' };
   }
+}
+
+function toPlainData(doc: any): {
+  profileImage?: string;
+  profileTitle?: string;
+  description?: string;
+  blocks: any[];
+  links?: any[];
+  contentBlocks?: any[];
+  socialIcons?: any[];
+  styles?: any;
+  settings?: any;
+  publicUrl?: string;
+  published?: boolean;
+  publishedAt?: any;
+  updatedAt?: any;
+} {
+  return {
+    profileImage: doc?.profileImage,
+    profileTitle: doc?.profileTitle,
+    description: doc?.description,
+    blocks: doc?.blocks ?? [],
+    links: doc?.links,
+    contentBlocks: doc?.contentBlocks,
+    socialIcons: doc?.socialIcons,
+    styles: doc?.styles,
+    settings: doc?.settings,
+    publicUrl: doc?.publicUrl,
+    published: doc?.published,
+    publishedAt: doc?.publishedAt,
+    updatedAt: doc?.updatedAt,
+  };
 }
 
 export async function publishLinkInBio(brandId: string) {
@@ -86,7 +112,6 @@ export async function publishLinkInBio(brandId: string) {
     const user = await currentUser();
     if (!user) return { success: false, error: 'Not authenticated' };
 
-    // Check credits
     const clerk = await clerkClient();
     const rawRemaining = (user.unsafeMetadata as any)?.remaining;
     const currentRemaining = typeof rawRemaining === 'number' ? rawRemaining : DEFAULT_STARTING_CREDITS;
@@ -99,24 +124,16 @@ export async function publishLinkInBio(brandId: string) {
     const brand = await Brand.findOne({ _id: brandId, userId: user.id });
     if (!brand) return { success: false, error: 'Brand not found' };
 
-    // Generate public URL
+    const doc = await LinkInBio.findOne({ brandId });
+    if (!doc) return { success: false, error: 'No link-in-bio data to publish' };
+
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
     const publicUrl = `${baseUrl}/link/${brandId}`;
+    const wasAlreadyPublished = (doc as any).published;
 
-    if (!(brand as any).linkInBio) {
-      return { success: false, error: 'No link-in-bio data to publish' };
-    }
+    doc.set({ publicUrl, published: true, publishedAt: new Date(), updatedAt: new Date() });
+    await doc.save();
 
-    // Check if already published (no credit deduction for republish)
-    const wasAlreadyPublished = (brand as any).linkInBio.published;
-
-    (brand as any).linkInBio.publicUrl = publicUrl;
-    (brand as any).linkInBio.published = true;
-    (brand as any).linkInBio.publishedAt = new Date();
-
-    await brand.save();
-
-    // Deduct credits only for first-time publish
     if (!wasAlreadyPublished) {
       const newRemaining = currentRemaining - PUBLISH_COST;
       await clerk.users.updateUserMetadata(user.id, {

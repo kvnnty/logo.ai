@@ -7,17 +7,6 @@ export async function ensureDbConnected() {
   await mongoose.connect(MONGODB_URI);
 }
 
-const LogoCandidateSchema = new mongoose.Schema({
-  candidateId: { type: String, index: true },
-  imageUrl: String,
-  prompt: String,
-  model: String,
-  style: String,
-  // Optional: later we can store palette/font suggestions here
-  meta: mongoose.Schema.Types.Mixed,
-  createdAt: { type: Date, default: Date.now },
-});
-
 const BrandSchema = new mongoose.Schema({
   userId: { type: String, required: true, index: true },
   name: { type: String, required: true },
@@ -39,56 +28,6 @@ const BrandSchema = new mongoose.Schema({
   },
   strategy: mongoose.Schema.Types.Mixed,
   identity: mongoose.Schema.Types.Mixed,
-  logoCandidates: [LogoCandidateSchema],
-  activeLogoCandidateId: String,
-  linkInBio: {
-    // Profile Information
-    profileImage: String,
-    profileTitle: String,
-    description: String,
-    // Content Blocks
-    blocks: [mongoose.Schema.Types.Mixed],
-    socialIcons: [mongoose.Schema.Types.Mixed],
-    // Styles
-    styles: {
-      template: { type: String, default: 'minimal' }, // minimal, standout
-      background: {
-        style: { type: String, default: 'color' }, // color, image
-        color: { type: String, default: '#FFFFFF' },
-        imageUrl: String,
-      },
-      buttons: {
-        color: { type: String, default: '#0F2A35' },
-        textColor: { type: String, default: '#FFFFFF' },
-        iconColor: { type: String, default: '#FFFFFF' },
-        shadowColor: { type: String, default: '#000000' },
-        style: { type: String, default: 'filled' }, // filled, outline, drop-shadow-hard, drop-shadow-soft, glow-soft
-        shape: { type: String, default: 'rounded' }, // rounded, rounded-none, rounded-lg, rounded-full
-      },
-      socialIcons: {
-        style: { type: String, default: 'outline' }, // outline, filled, etc.
-        iconColor: { type: String, default: '#0F2A35' },
-      },
-      fonts: {
-        fontColor: { type: String, default: '#0F2A35' },
-        fontFamily: { type: String, default: 'Inter' },
-      },
-    },
-    // Settings
-    settings: {
-      customDomain: String,
-      metaTags: {
-        title: String,
-        description: String,
-        image: String,
-      },
-    },
-    // Publishing
-    publicUrl: String,
-    published: { type: Boolean, default: false },
-    publishedAt: Date,
-    updatedAt: { type: Date, default: Date.now },
-  },
   status: { type: String, default: 'draft', index: true }, // draft | active
   pageViewCount: { type: Number, default: 0 },
   pageLastViewedAt: Date,
@@ -101,14 +40,16 @@ const LogoSchema = new mongoose.Schema({
   userId: { type: String, required: true, index: true },
   image_url: String,
   isPrimary: { type: Boolean, default: false, index: true },
-  subType: String, // 'primary_logo' | 'logo_variation' | etc.
+  subType: String, // 'primary_logo' | 'logo_variation' | 'candidate' | etc.
   category: { type: String, default: 'logo' },
   prompt: String,
+  model: String, // AI model used (e.g. for candidates)
   layout: String,
   sceneData: mongoose.Schema.Types.Mixed,
   primary_color: String,
   background_color: String,
   username: String,
+  meta: mongoose.Schema.Types.Mixed,
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },
 });
@@ -121,9 +62,59 @@ const BrandUploadSchema = new mongoose.Schema({
   createdAt: { type: Date, default: Date.now },
 });
 
+const LinkInBioSchema = new mongoose.Schema({
+  brandId: { type: mongoose.Schema.Types.ObjectId, ref: 'Brand', required: true, unique: true, index: true },
+  userId: { type: String, required: true, index: true },
+  profileImage: String,
+  profileTitle: String,
+  description: String,
+  blocks: [mongoose.Schema.Types.Mixed],
+  links: [mongoose.Schema.Types.Mixed],
+  contentBlocks: [mongoose.Schema.Types.Mixed],
+  socialIcons: [mongoose.Schema.Types.Mixed],
+  styles: {
+    template: { type: String, default: 'minimal' },
+    background: {
+      style: { type: String, default: 'color' },
+      color: { type: String, default: '#FFFFFF' },
+      imageUrl: String,
+    },
+    buttons: {
+      color: { type: String, default: '#0F2A35' },
+      textColor: { type: String, default: '#FFFFFF' },
+      iconColor: { type: String, default: '#FFFFFF' },
+      shadowColor: { type: String, default: '#000000' },
+      style: { type: String, default: 'filled' },
+      shape: { type: String, default: 'rounded' },
+    },
+    socialIcons: {
+      style: { type: String, default: 'outline' },
+      iconColor: { type: String, default: '#0F2A35' },
+    },
+    fonts: {
+      fontColor: { type: String, default: '#0F2A35' },
+      fontFamily: { type: String, default: 'Inter' },
+    },
+  },
+  settings: {
+    customDomain: String,
+    metaTags: {
+      title: String,
+      description: String,
+      image: String,
+    },
+  },
+  publicUrl: String,
+  published: { type: Boolean, default: false },
+  publishedAt: Date,
+  updatedAt: { type: Date, default: Date.now },
+  createdAt: { type: Date, default: Date.now },
+});
+
 export const Brand = mongoose.models.Brand || mongoose.model('Brand', BrandSchema);
 export const Logo = mongoose.models.Logo || mongoose.model('Logo', LogoSchema);
 export const BrandUpload = mongoose.models.BrandUpload || mongoose.model('BrandUpload', BrandUploadSchema);
+export const LinkInBio = mongoose.models.LinkInBio || mongoose.model('LinkInBio', LinkInBioSchema);
 
 export interface IBrand {
   _id: any;
@@ -138,16 +129,6 @@ export interface IBrand {
   contactInfo?: any;
   strategy: any;
   identity: any;
-  logoCandidates?: Array<{
-    candidateId: string;
-    imageUrl: string;
-    prompt: string;
-    model?: string;
-    style?: string;
-    meta?: any;
-    createdAt: Date;
-  }>;
-  activeLogoCandidateId?: string;
   status?: string;
   pageViewCount?: number;
   pageLastViewedAt?: Date;
@@ -164,13 +145,35 @@ export interface ILogo {
   subType?: string;
   category?: string;
   prompt?: string;
+  model?: string;
   layout?: string;
   sceneData?: any;
   primary_color?: string;
   background_color?: string;
   username?: string;
+  meta?: any;
   createdAt: Date;
   updatedAt: Date;
+}
+
+export interface ILinkInBio {
+  _id: any;
+  brandId: any;
+  userId: string;
+  profileImage?: string;
+  profileTitle?: string;
+  description?: string;
+  blocks?: any[];
+  links?: any[];
+  contentBlocks?: any[];
+  socialIcons?: any[];
+  styles?: any;
+  settings?: any;
+  publicUrl?: string;
+  published?: boolean;
+  publishedAt?: Date;
+  updatedAt: Date;
+  createdAt: Date;
 }
 
 export interface IBrandUpload {
