@@ -12,6 +12,7 @@ import {
   IconLink,
   IconMessageCircle,
   IconPalette,
+  IconShoppingBag,
   IconSparkles,
   IconTarget,
   IconX
@@ -78,6 +79,11 @@ function getNavItems(brandId?: string): NavItem[] {
         { title: "Cards", href: `${brandPrefix}/marketing/cards` },
         { title: "Business Cards", href: `${brandPrefix}/marketing/id-cards` },
       ],
+    },
+    {
+      title: "Merch",
+      href: `${brandPrefix}/merch`,
+      icon: IconShoppingBag,
     },
     {
       title: "About Your Brand",

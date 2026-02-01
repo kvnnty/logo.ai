@@ -3,6 +3,8 @@
 import { currentUser } from "@clerk/nextjs/server";
 import { ensureDbConnected, Brand, Template } from '@/db';
 import { hydrateTemplate } from '@/lib/templates/brand-kit-templates';
+import { getPrimaryLogoForBrand } from '@/app/actions/logo-actions';
+import { createDesign } from '@/app/actions/design-actions';
 
 /**
  * Get templates for a category with preview images
@@ -86,8 +88,8 @@ export async function generateTemplateWithImages(
     }
 
     // Hydrate template
-    const primaryLogo = brand.assets?.find((a: any) => a.subType === 'primary_logo');
-    const sceneData = hydrateTemplate(selectedTemplate, brand, primaryLogo ? { imageUrl: primaryLogo.imageUrl } : null);
+    const { logo: primaryLogo } = await getPrimaryLogoForBrand(brandId);
+    const sceneData = hydrateTemplate(selectedTemplate, brand, primaryLogo ? { imageUrl: primaryLogo.image_url ?? primaryLogo.imageUrl } : null);
 
     // Add images to scene data if available
     if (Object.keys(images).length > 0) {
@@ -119,16 +121,12 @@ export async function generateTemplateWithImages(
       });
     }
 
-    // Save asset
-    brand.assets.push({
-      category,
-      subType,
-      sceneData,
-      createdAt: new Date(),
-    } as any);
-
-    await brand.save();
-    return { success: true, sceneData };
+    // Save as Design
+    const designResult = await createDesign(brandId, { name: subType, initialScene: sceneData });
+    if (!designResult.success) {
+      return { success: false, error: designResult.error || 'Failed to create design' };
+    }
+    return { success: true, sceneData, designId: designResult.designId };
   } catch (error) {
     console.error('Generate template with images error:', error);
     return { success: false, error: error instanceof Error ? error.message : 'Failed to generate template' };

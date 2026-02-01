@@ -64,3 +64,12 @@ export const TEMPLATE_PLACEHOLDERS = [
   "{{phone}}",
   "{{address}}",
 ] as const;
+
+/** Empty canvas scene for "New Design" — white background, no elements. */
+export const EMPTY_SCENE_DATA: SceneData = {
+  width: 1080,
+  height: 1080,
+  elements: [
+    { type: "rect", x: 0, y: 0, width: 1080, height: 1080, fill: "#ffffff", draggable: false },
+  ],
+};

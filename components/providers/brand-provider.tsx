@@ -5,20 +5,26 @@ import { createContext, useContext, ReactNode } from "react";
 export interface BrandContextType {
   _id: string;
   name: string;
+  slug?: string | null;
+  listedPublicly?: boolean;
   description?: string;
   strategy?: any;
   identity?: any;
-  assets?: Array<{
-    category: string;
-    subType: string;
-    imageUrl: string;
-    sceneData?: any;
-    prompt: string;
-    createdAt: string | Date;
+  primaryLogoUrl?: string | null;
+  logos?: Array<{
+    _id: string;
+    category?: string;
+    subType?: string;
+    imageUrl?: string;
+    image_url?: string;
+    isPrimary?: boolean;
+    createdAt?: string | Date;
   }>;
   createdAt: string | Date;
   updatedAt: string | Date;
   industry?: string;
+  pageViewCount?: number;
+  pageLastViewedAt?: string | Date;
   contactInfo?: {
     website?: string;
     email?: string;

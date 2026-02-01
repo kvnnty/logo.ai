@@ -7,18 +7,6 @@ export async function ensureDbConnected() {
   await mongoose.connect(MONGODB_URI);
 }
 
-const ImageAssetSchema = new mongoose.Schema({
-  category: String,
-  subType: String,
-  imageUrl: String,
-  prompt: String,
-  sceneData: mongoose.Schema.Types.Mixed,
-  conceptId: String,
-  conceptColors: [String],
-  layout: String, // horizontal, vertical, stacked, icon-only, wordmark-only
-  createdAt: { type: Date, default: Date.now },
-});
-
 const LogoCandidateSchema = new mongoose.Schema({
   candidateId: { type: String, index: true },
   imageUrl: String,
@@ -33,6 +21,8 @@ const LogoCandidateSchema = new mongoose.Schema({
 const BrandSchema = new mongoose.Schema({
   userId: { type: String, required: true, index: true },
   name: { type: String, required: true },
+  slug: { type: String, unique: true, sparse: true, index: true },
+  listedPublicly: { type: Boolean, default: true, index: true },
   slogan: String,
   description: String,
   industry: String,
@@ -49,7 +39,6 @@ const BrandSchema = new mongoose.Schema({
   },
   strategy: mongoose.Schema.Types.Mixed,
   identity: mongoose.Schema.Types.Mixed,
-  assets: [ImageAssetSchema],
   logoCandidates: [LogoCandidateSchema],
   activeLogoCandidateId: String,
   linkInBio: {
@@ -101,39 +90,47 @@ const BrandSchema = new mongoose.Schema({
     updatedAt: { type: Date, default: Date.now },
   },
   status: { type: String, default: 'draft', index: true }, // draft | active
+  pageViewCount: { type: Number, default: 0 },
+  pageLastViewedAt: Date,
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },
 });
 
 const LogoSchema = new mongoose.Schema({
-  brandId: { type: mongoose.Schema.Types.ObjectId, ref: 'Brand' },
+  brandId: { type: mongoose.Schema.Types.ObjectId, ref: 'Brand', required: true, index: true },
+  userId: { type: String, required: true, index: true },
   image_url: String,
+  isPrimary: { type: Boolean, default: false, index: true },
+  subType: String, // 'primary_logo' | 'logo_variation' | etc.
+  category: { type: String, default: 'logo' },
+  prompt: String,
+  layout: String,
+  sceneData: mongoose.Schema.Types.Mixed,
   primary_color: String,
   background_color: String,
   username: String,
-  userId: String,
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },
 });
 
+const BrandUploadSchema = new mongoose.Schema({
+  brandId: { type: mongoose.Schema.Types.ObjectId, ref: 'Brand', required: true, index: true },
+  userId: { type: String, required: true, index: true },
+  imageUrl: { type: String, required: true },
+  fileName: String,
+  createdAt: { type: Date, default: Date.now },
+});
+
 export const Brand = mongoose.models.Brand || mongoose.model('Brand', BrandSchema);
 export const Logo = mongoose.models.Logo || mongoose.model('Logo', LogoSchema);
-
-export interface IBrandAsset {
-  category: string;
-  subType: string;
-  imageUrl: string;
-  prompt: string;
-  sceneData?: any;
-  conceptId?: string;
-  conceptColors?: string[];
-  createdAt: Date;
-}
+export const BrandUpload = mongoose.models.BrandUpload || mongoose.model('BrandUpload', BrandUploadSchema);
 
 export interface IBrand {
   _id: any;
   userId: string;
   name: string;
+  slug?: string;
+  listedPublicly?: boolean;
   slogan?: string;
   description: string;
   industry?: string;
@@ -141,7 +138,6 @@ export interface IBrand {
   contactInfo?: any;
   strategy: any;
   identity: any;
-  assets: IBrandAsset[];
   logoCandidates?: Array<{
     candidateId: string;
     imageUrl: string;
@@ -153,20 +149,37 @@ export interface IBrand {
   }>;
   activeLogoCandidateId?: string;
   status?: string;
+  pageViewCount?: number;
+  pageLastViewedAt?: Date;
   createdAt: Date;
   updatedAt: Date;
 }
 
 export interface ILogo {
   _id: any;
-  brandId?: any;
-  image_url: string;
-  primary_color: string;
-  background_color: string;
-  username: string;
+  brandId: any;
   userId: string;
+  image_url?: string;
+  isPrimary?: boolean;
+  subType?: string;
+  category?: string;
+  prompt?: string;
+  layout?: string;
+  sceneData?: any;
+  primary_color?: string;
+  background_color?: string;
+  username?: string;
   createdAt: Date;
   updatedAt: Date;
+}
+
+export interface IBrandUpload {
+  _id: any;
+  brandId: any;
+  userId: string;
+  imageUrl: string;
+  fileName?: string;
+  createdAt: Date;
 }
 
 const TemplateSchema = new mongoose.Schema({
@@ -184,6 +197,50 @@ const TemplateSchema = new mongoose.Schema({
 });
 
 export const Template = mongoose.models.Template || mongoose.model('Template', TemplateSchema);
+
+/** Canva-style design document: custom, AI, or template-based. One doc per design; pages[] for multipage. */
+const DesignPageSchema = new mongoose.Schema({
+  sceneData: mongoose.Schema.Types.Mixed, // { width, height, elements[] } - same as existing scene format
+  name: String,
+  thumbnailUrl: String,
+  createdAt: { type: Date, default: Date.now },
+});
+
+const DesignSchema = new mongoose.Schema({
+  userId: { type: String, required: true, index: true },
+  brandId: { type: mongoose.Schema.Types.ObjectId, ref: 'Brand', required: true, index: true },
+  name: { type: String, default: 'Untitled design' },
+  pages: { type: [DesignPageSchema], default: [] }, // multipage; backward compat: single page = pages[0]
+  thumbnailUrl: String,
+  favorite: { type: Boolean, default: false },
+  source: { type: String, default: 'blank' }, // 'blank' | 'template' | 'ai' | 'import'
+  templateId: String,
+  createdAt: { type: Date, default: Date.now },
+  updatedAt: { type: Date, default: Date.now },
+});
+
+export const Design = mongoose.models.Design || mongoose.model('Design', DesignSchema);
+
+export interface IDesignPage {
+  sceneData: any;
+  name?: string;
+  thumbnailUrl?: string;
+  createdAt?: Date;
+}
+
+export interface IDesign {
+  _id: any;
+  userId: string;
+  brandId: any;
+  name: string;
+  pages: IDesignPage[];
+  thumbnailUrl?: string;
+  favorite?: boolean;
+  source?: string;
+  templateId?: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
 
 export interface ITemplate {
   _id: any;

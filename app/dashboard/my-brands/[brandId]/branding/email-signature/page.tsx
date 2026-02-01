@@ -41,7 +41,7 @@ export default function EmailSignaturePage() {
   };
 
   return (
-    <div className="container mx-auto p-6 max-w-5xl">
+    <div>
       <PageHeader
         heading="Email Signatures"
         description="Professional email signatures to boost your brand visibility."

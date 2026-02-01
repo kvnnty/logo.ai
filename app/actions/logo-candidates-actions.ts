@@ -2,7 +2,8 @@
 
 import OpenAI from "openai";
 import { currentUser } from "@clerk/nextjs/server";
-import { ensureDbConnected, Brand, Template } from "@/db";
+import { ensureDbConnected, Brand, Logo, Template } from "@/db";
+import { createDesign } from "@/app/actions/design-actions";
 import { hydrateTemplate } from "@/lib/templates/brand-kit-templates";
 
 const apiKey = process.env.NEBIUS_API_KEY || "";
@@ -160,57 +161,36 @@ export async function applyLogo(brandId: string, candidateId: string) {
       };
     }
 
-    // Create primary logo asset from selected candidate
-    const primaryLogoAsset = {
-      category: "logo",
+    // Create primary logo in Logo collection
+    await Logo.updateMany({ brandId: brand._id }, { isPrimary: false });
+    await Logo.create({
+      brandId: brand._id,
+      userId: user.id,
+      image_url: selectedCandidate.imageUrl,
+      isPrimary: true,
       subType: "primary_logo",
-      imageUrl: selectedCandidate.imageUrl,
+      category: "logo",
       prompt: selectedCandidate.prompt || "Selected logo candidate",
-      createdAt: new Date(),
-    };
+    });
 
-    // Initialize assets array if needed
-    if (!Array.isArray(brand.assets)) {
-      (brand as any).assets = [];
-    }
-
-    // Add primary logo
-    brand.assets.push(primaryLogoAsset as any);
-
-    // Generate starter kit assets
+    const primaryLogoObj = { imageUrl: selectedCandidate.imageUrl };
     const starterCategories = ["business_card", "social_post", "letterhead", "email_signature", "social_cover"];
-
-    const templates = await Template.find({
-      category: { $in: starterCategories },
-    }).sort({ createdAt: 1 });
-
+    const templates = await Template.find({ category: { $in: starterCategories } }).sort({ createdAt: 1 });
     const templatesByCategory: Record<string, any[]> = {};
     templates.forEach((t) => {
       if (!templatesByCategory[t.category]) templatesByCategory[t.category] = [];
       templatesByCategory[t.category].push(t);
     });
 
-    const primaryLogoObj = { imageUrl: selectedCandidate.imageUrl };
-
+    const brandIdStr = brand._id.toString();
     for (const category of starterCategories) {
       const categoryTemplates = templatesByCategory[category] || [];
-      // Generate up to 3 variations per category
       for (let i = 0; i < Math.min(3, categoryTemplates.length); i++) {
         const template = categoryTemplates[i];
         const sceneData = hydrateTemplate(template, brand, primaryLogoObj);
-
-        brand.assets.push({
-          category: category,
-          subType: `Starter ${i + 1}`,
-          sceneData: sceneData,
-          createdAt: new Date(),
-          prompt: `Auto-generated ${category}`,
-        } as any);
+        await createDesign(brandIdStr, { name: `Starter ${i + 1} ${category}`, initialScene: sceneData });
       }
     }
-
-    brand.markModified("assets");
-    await brand.save();
 
     return {
       success: true,

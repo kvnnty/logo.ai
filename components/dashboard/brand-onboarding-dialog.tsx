@@ -7,9 +7,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Sparkles, ArrowRight, ArrowLeft, Check, Info, Globe, Mail, Phone, MapPin, Smartphone, Facebook, Instagram, Twitter } from "lucide-react";
+import { Sparkles, ArrowRight, ArrowLeft, Check, Info, Globe, Mail, Phone, MapPin, Smartphone, Facebook, Instagram, Twitter, Link2 } from "lucide-react";
 import { updateBrandDetails } from "@/app/actions/brand-actions";
 import { useToast } from "@/hooks/use-toast";
+import Link from "next/link";
 
 interface BrandOnboardingDialogProps {
   brand: {
@@ -295,6 +296,23 @@ export function BrandOnboardingDialog({ brand, isOpen, onClose }: BrandOnboardin
                   <p className="text-[11px] text-muted-foreground">
                     All fields are optional. You can update this information anytime from your settings.
                   </p>
+                </div>
+
+                <div className="bg-primary/5 p-4 rounded-2xl border border-primary/10 flex gap-3 text-sm">
+                  <Link2 className="h-5 w-5 text-primary shrink-0 mt-0.5" />
+                  <div className="space-y-2">
+                    <p className="font-bold text-primary">Public brand page</p>
+                    <p className="text-muted-foreground leading-snug">
+                      Your brand gets a unique link where anyone can see your logo and details. By default it also appears in our Brand Directory so everyone can discover it—you can turn that off and share your link only with who you choose.
+                    </p>
+                    <Link
+                      href={`/dashboard/my-brands/${brandId}/about-your-brand`}
+                      className="inline-flex items-center gap-1 text-primary font-medium hover:underline text-xs"
+                    >
+                      Manage in About your brand
+                      <ArrowRight className="h-3.5 w-3.5" />
+                    </Link>
+                  </div>
                 </div>
               </motion.div>
             )}

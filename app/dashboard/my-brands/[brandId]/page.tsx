@@ -1,6 +1,7 @@
 "use client";
 
-import { getDefaultTemplateScene, generateAITemplate } from "@/app/actions/brand-actions";
+import { generateAITemplate } from "@/app/actions/brand-actions";
+import { listDesigns } from "@/app/actions/design-actions";
 import { getCredits } from "@/app/actions/credits-actions";
 import { TEMPLATE_CATEGORIES_BY_GROUP, TEMPLATE_STYLE_OPTIONS } from "@/constants/template-categories";
 import { BrandOnboardingDialog } from "@/components/dashboard/brand-onboarding-dialog";
@@ -24,6 +25,7 @@ import { toast } from "@/hooks/use-toast";
 import { getPrimaryLogoUrl } from "@/lib/utils/brand-utils";
 import {
   ArrowRight,
+  Copy,
   Image as ImageIcon,
   Layers,
   Link as LinkIcon,
@@ -53,12 +55,12 @@ export default function BrandDashboardPage() {
     defaultCategory?: string;
     defaultSubType?: string;
   } | null>(null);
-  const [createDesignLoading, setCreateDesignLoading] = useState(false);
   const [credits, setCredits] = useState<CreditInfo>({ remaining: 0 });
   const [aiCategory, setAiCategory] = useState<string>("business_card");
   const [aiPrompt, setAiPrompt] = useState("");
   const [aiStyle, setAiStyle] = useState<string>("modern");
   const [aiGenerating, setAiGenerating] = useState(false);
+  const [latestDesigns, setLatestDesigns] = useState<any[]>([]);
 
   useEffect(() => {
     if (!brand.industry || brand.industry.trim() === "") {
@@ -74,51 +76,30 @@ export default function BrandDashboardPage() {
     fetchCredits();
   }, []);
 
-  const logoUrl = getPrimaryLogoUrl(brand.assets);
+  useEffect(() => {
+    if (!brand?._id) return;
+    listDesigns(brand._id).then((r) => {
+      if (r.success && r.designs) setLatestDesigns((r.designs as any[]).slice(0, 5));
+    });
+  }, [brand?._id]);
+
+  const logoUrl = brand.primaryLogoUrl ?? getPrimaryLogoUrl(brand.logos);
   const primaryColor = brand.identity?.primary_color || "#2563eb";
   const secondaryColor = brand.identity?.secondary_color || "#2563eb";
 
-  // Recent projects: assets that have sceneData (editable), newest first
-  const recentProjects = (brand.assets || [])
-    .filter((a: any) => a.sceneData)
-    .sort((a: any, b: any) => {
-      const ta = a.createdAt ? new Date(a.createdAt).getTime() : 0;
-      const tb = b.createdAt ? new Date(b.createdAt).getTime() : 0;
-      return tb - ta;
-    })
-    .slice(0, 12);
-
-  const openEditor = (asset: any) => {
-    if (asset.sceneData) {
-      setActiveEditorAsset({ sceneData: asset.sceneData, assetId: asset._id });
-    } else {
-      toast({
-        title: "Cannot edit",
-        description: "This asset has no editable design.",
-        variant: "destructive",
-      });
-    }
+  const copyPublicLink = () => {
+    const slug = brand.slug;
+    if (!slug) return;
+    const url = typeof window !== "undefined" ? `${window.location.origin}/brand/${slug}` : `/brand/${slug}`;
+    navigator.clipboard.writeText(url).then(() => toast({ title: "Copied", description: "Public page URL copied to clipboard." }));
   };
 
-  const handleCreateDesign = async () => {
-    setCreateDesignLoading(true);
-    try {
-      const result = await getDefaultTemplateScene(brand._id, "business_card");
-      if (result.success && result.sceneData) {
-        setActiveEditorAsset({
-          sceneData: result.sceneData,
-          assetId: "new",
-          defaultCategory: "business_card",
-          defaultSubType: "New Design",
-        });
-      } else {
-        toast({ title: "Error", description: result.error || "Could not load template", variant: "destructive" });
-      }
-    } catch (e: any) {
-      toast({ title: "Error", description: e?.message || "Failed to open editor", variant: "destructive" });
-    } finally {
-      setCreateDesignLoading(false);
-    }
+  const openEditor = (design: any) => {
+    if (design._id) router.push(`/dashboard/my-brands/${brand._id}/editor/${design._id}`);
+  };
+
+  const handleCreateDesign = () => {
+    router.push(`/dashboard/my-brands/${brand._id}/editor`);
   };
 
   const handleGenerateAIDesign = async () => {
@@ -130,7 +111,14 @@ export default function BrandDashboardPage() {
     try {
       const styleInstruction = TEMPLATE_STYLE_OPTIONS.find((s) => s.id === aiStyle)?.promptInstruction;
       const result = await generateAITemplate(brand._id, aiCategory, aiPrompt, styleInstruction);
-      if (result.success && result.sceneData) {
+      if (result.success && (result as any).designId) {
+        if (typeof (result as any).remainingCredits === "number") {
+          setCredits({ remaining: (result as any).remainingCredits });
+        }
+        toast({ title: "Design generated", description: "Opening in editor…" });
+        setAiPrompt("");
+        router.push(`/dashboard/my-brands/${brand._id}/editor/${(result as any).designId}`);
+      } else if (result.success && result.sceneData) {
         if (typeof (result as any).remainingCredits === "number") {
           setCredits({ remaining: (result as any).remainingCredits });
         }
@@ -200,6 +188,12 @@ export default function BrandDashboardPage() {
             </div>
           </div>
           <div className="flex items-center gap-3 flex-shrink-0">
+            {brand.slug && (
+              <Button variant="outline" size="sm" onClick={copyPublicLink} className="gap-1.5">
+                <Copy className="h-4 w-4" />
+                Copy public link
+              </Button>
+            )}
             <Button variant="outline" size="sm" onClick={() => setIsEditDialogOpen(true)}>
               <Settings className="h-4 w-4" />
               Settings
@@ -344,22 +338,31 @@ export default function BrandDashboardPage() {
           </div>
         </section>
 
-        {/* Your recent projects */}
+        {/* Designs — single row of latest */}
         <section className="space-y-4">
-          <h2 className="text-xl font-bold">Your recent projects</h2>
-          <div className="flex gap-5 overflow-x-auto pb-2 scrollbar-thin scrollbar-track-transparent scrollbar-thumb-border -mx-6 px-6">
-            {recentProjects.map((asset: any) => (
+          <div className="flex items-center justify-between">
+            <h2 className="text-xl font-bold">Designs</h2>
+            <Link
+              href={`/dashboard/my-brands/${brand._id}/my-designs`}
+              className="text-sm font-medium text-primary hover:underline flex items-center gap-1"
+            >
+              View all my designs
+              <ArrowRight className="h-4 w-4" />
+            </Link>
+          </div>
+          <div className="flex items-start gap-5 overflow-x-auto pb-2 scrollbar-thin scrollbar-track-transparent scrollbar-thumb-border -mx-6 px-6">
+            {latestDesigns.map((design: any) => (
               <button
-                key={asset._id}
+                key={design._id}
                 type="button"
-                onClick={() => openEditor(asset)}
+                onClick={() => openEditor(design)}
                 className="flex-shrink-0 w-[200px] text-left group"
               >
                 <div className="rounded-xl border-2 bg-card overflow-hidden transition-all group-hover:border-primary/50 group-hover:shadow-md aspect-[4/3] flex items-center justify-center">
-                  {asset.imageUrl ? (
+                  {design.thumbnailUrl ? (
                     <img
-                      src={asset.imageUrl}
-                      alt={asset.subType || "Project"}
+                      src={design.thumbnailUrl}
+                      alt={design.name || "Design"}
                       className="w-full h-full object-cover"
                     />
                   ) : (
@@ -371,28 +374,20 @@ export default function BrandDashboardPage() {
                   )}
                 </div>
                 <p className="mt-2 text-sm font-medium truncate">
-                  {asset.subType?.replace(/_/g, " ") || "Untitled"}
+                  {design.name || "Untitled"}
                 </p>
               </button>
             ))}
-            {/* Create Design card - opens editor with default template */}
             <button
               type="button"
               onClick={handleCreateDesign}
-              disabled={createDesignLoading}
               className="flex-shrink-0 w-[200px] block group text-left"
             >
               <div className="rounded-xl border-2 border-dashed border-muted-foreground/30 bg-muted/20 overflow-hidden transition-all group-hover:border-primary/50 group-hover:bg-muted/30 aspect-[4/3] flex flex-col items-center justify-center gap-2">
-                {createDesignLoading ? (
-                  <span className="text-sm text-muted-foreground">Loading...</span>
-                ) : (
-                  <>
-                    <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center text-primary">
-                      <Plus className="w-7 h-7" />
-                    </div>
-                    <span className="text-sm font-medium">Create Design</span>
-                  </>
-                )}
+                <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+                  <Plus className="w-7 h-7" />
+                </div>
+                <span className="text-sm font-medium">Create Design</span>
               </div>
             </button>
           </div>

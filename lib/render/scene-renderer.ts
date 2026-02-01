@@ -91,7 +91,13 @@ export function renderSceneToSVG(sceneData: SceneData): string {
 </svg>`;
 }
 
-export async function renderSceneToPNG(sceneData: SceneData, scale: number = 2): Promise<Buffer> {
+export async function renderSceneToPNG(
+  sceneData: SceneData,
+  scale: number = 2,
+  options?: { transparent?: boolean }
+): Promise<Buffer> {
+  const transparent = options?.transparent ?? false;
+  const bg = transparent ? { r: 0, g: 0, b: 0, alpha: 0 } : { r: 255, g: 255, b: 255, alpha: 1 };
   try {
     const svg = renderSceneToSVG(sceneData);
     const png = await sharp(Buffer.from(svg), {
@@ -99,7 +105,7 @@ export async function renderSceneToPNG(sceneData: SceneData, scale: number = 2):
     })
       .resize(Math.round(sceneData.width * scale), Math.round(sceneData.height * scale), {
         fit: "contain",
-        background: { r: 255, g: 255, b: 255, alpha: 1 },
+        background: bg,
       })
       .png()
       .toBuffer();
@@ -110,8 +116,8 @@ export async function renderSceneToPNG(sceneData: SceneData, scale: number = 2):
       create: {
         width: sceneData.width * scale,
         height: sceneData.height * scale,
-        channels: 4,
-        background: { r: 255, g: 255, b: 255, alpha: 1 },
+        channels: transparent ? 4 : 4,
+        background: bg,
       },
     })
       .png()

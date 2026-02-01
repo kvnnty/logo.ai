@@ -21,9 +21,10 @@ interface ElementProps {
   isSelected: boolean;
   onSelect: () => void;
   onChange: (newAttrs: any) => void;
+  onContextMenu?: (ev: MouseEvent) => void;
 }
 
-const ImageElement = ({ element, isSelected, onSelect, onChange }: ElementProps) => {
+const ImageElement = ({ element, isSelected, onSelect, onChange, onContextMenu }: ElementProps) => {
   const [img] = useImage(element.src);
   const shapeRef = React.useRef<any>(null);
   const trRef = React.useRef<any>(null);
@@ -41,6 +42,7 @@ const ImageElement = ({ element, isSelected, onSelect, onChange }: ElementProps)
         image={img}
         onClick={onSelect}
         onTap={onSelect}
+        onContextMenu={onContextMenu ? (e) => { e.evt.preventDefault(); onContextMenu(e.evt); } : undefined}
         ref={shapeRef}
         {...element}
         draggable
@@ -82,7 +84,7 @@ const ImageElement = ({ element, isSelected, onSelect, onChange }: ElementProps)
   );
 };
 
-const TextElement = ({ element, isSelected, onSelect, onChange }: ElementProps) => {
+const TextElement = ({ element, isSelected, onSelect, onChange, onContextMenu }: ElementProps) => {
   const shapeRef = React.useRef<any>(null);
   const trRef = React.useRef<any>(null);
 
@@ -166,6 +168,7 @@ const TextElement = ({ element, isSelected, onSelect, onChange }: ElementProps) 
       <Text
         onClick={onSelect}
         onTap={onSelect}
+        onContextMenu={onContextMenu ? (e) => { e.evt.preventDefault(); onContextMenu(e.evt); } : undefined}
         ref={shapeRef}
         {...element}
         draggable
@@ -206,7 +209,7 @@ const TextElement = ({ element, isSelected, onSelect, onChange }: ElementProps) 
   );
 };
 
-const ShapeElement = ({ element, isSelected, onSelect, onChange }: ElementProps) => {
+const ShapeElement = ({ element, isSelected, onSelect, onChange, onContextMenu }: ElementProps) => {
   const shapeRef = React.useRef<any>(null);
   const trRef = React.useRef<any>(null);
 
@@ -221,6 +224,7 @@ const ShapeElement = ({ element, isSelected, onSelect, onChange }: ElementProps)
     ...element,
     onClick: onSelect,
     onTap: onSelect,
+    onContextMenu: onContextMenu ? (e: any) => { e.evt.preventDefault(); onContextMenu(e.evt); } : undefined,
     ref: shapeRef,
     draggable: true,
     onDragEnd: (e: any) => {
@@ -291,10 +295,11 @@ interface CanvasRendererProps {
   selectedId: any;
   onSelect: (id: any) => void;
   onUpdateElement: (id: any, newAttrs: any) => void;
+  onElementContextMenu?: (index: number, ev: MouseEvent) => void;
   scale?: number;
 }
 
-export const CanvasRenderer = React.forwardRef(({ sceneData, selectedId, onSelect, onUpdateElement, scale = 0.5 }: CanvasRendererProps, ref: any) => {
+export const CanvasRenderer = React.forwardRef(({ sceneData, selectedId, onSelect, onUpdateElement, onElementContextMenu, scale = 0.5 }: CanvasRendererProps, ref: any) => {
   if (!sceneData) return null;
 
   return (
@@ -310,6 +315,13 @@ export const CanvasRenderer = React.forwardRef(({ sceneData, selectedId, onSelec
           onSelect(null);
         }
       }}
+      onContextMenu={(e) => {
+        const clickedOnEmpty = e.target === e.target.getStage();
+        if (clickedOnEmpty && onElementContextMenu) {
+          e.evt.preventDefault();
+          onElementContextMenu(-1, e.evt);
+        }
+      }}
     >
       <Layer>
         {sceneData.elements?.map((el: any, i: number) => {
@@ -318,12 +330,13 @@ export const CanvasRenderer = React.forwardRef(({ sceneData, selectedId, onSelec
             element: el,
             isSelected,
             onSelect: () => onSelect(i),
-            onChange: (newAttrs: any) => onUpdateElement(i, newAttrs)
+            onChange: (newAttrs: any) => onUpdateElement(i, newAttrs),
+            onContextMenu: onElementContextMenu ? (ev: MouseEvent) => onElementContextMenu(i, ev) : undefined
           };
 
           if (el.type === 'text') return <TextElement key={i} {...commonProps} />;
           if (el.type === 'image') return <ImageElement key={i} {...commonProps} />;
-          if (el.type === 'rect' || el.type === 'shape') return <ShapeElement key={i} {...commonProps} />;
+          if (el.type === 'rect' || el.type === 'shape' || el.type === 'circle') return <ShapeElement key={i} {...commonProps} />;
           return null;
         })}
       </Layer>

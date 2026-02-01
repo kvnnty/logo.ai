@@ -172,7 +172,7 @@ export default function LinkInBioPage() {
   useEffect(() => {
     async function load() {
       const result = await getLinkInBio(brand._id);
-      const logoUrl = getPrimaryLogoUrl(brand.assets) || '';
+      const logoUrl = brand.primaryLogoUrl ?? getPrimaryLogoUrl(brand.logos) ?? '';
 
       if (result.success && result.data) {
         // Migrate legacy blocks structure to new structure
@@ -221,7 +221,7 @@ export default function LinkInBioPage() {
       setCredits(creditsData.remaining || 0);
     }
     load();
-  }, [brand._id, brand.assets, brand.name, brand.description]);
+  }, [brand._id, brand.logos, brand.primaryLogoUrl, brand.name, brand.description]);
 
   const updateData = (updates: Partial<LinkInBioData>) => {
     setData(prev => ({ ...prev, ...updates }));
@@ -435,7 +435,7 @@ export default function LinkInBioPage() {
   // Profile image uses brand's primary logo - no upload needed
 
   // Get brand's primary logo for profile image
-  const brandLogoUrl = getPrimaryLogoUrl(brand.assets) || '';
+  const brandLogoUrl = brand.primaryLogoUrl ?? getPrimaryLogoUrl(brand.logos) ?? '';
   const profileImageUrl = data.profileImage || brandLogoUrl;
 
   // Update data with brand logo if not set
@@ -1463,7 +1463,7 @@ export default function LinkInBioPage() {
       <SelectLogoDialog
         open={selectLogoDialogOpen}
         onOpenChange={setSelectLogoDialogOpen}
-        logos={brand.assets?.filter((a: any) => a.category === 'logo' && a.imageUrl) || []}
+        logos={(brand.logos || []).filter((a: any) => (a.imageUrl || a.image_url)).map((a: any) => ({ ...a, imageUrl: a.imageUrl || a.image_url }))}
         selectedLogoUrl={profileImageUrl}
         onSelect={(logoUrl) => {
           updateData({ profileImage: logoUrl });

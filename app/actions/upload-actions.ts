@@ -2,6 +2,7 @@
 
 import { currentUser } from "@clerk/nextjs/server";
 import { ensureDbConnected, Brand } from '@/db';
+import { ensureBrandSlug } from '@/app/actions/brand-actions';
 import OpenAI from 'openai';
 import dedent from 'dedent';
 
@@ -89,7 +90,7 @@ export async function createBrandFromUpload(data: {
 
     const brandData = JSON.parse(content);
 
-    // 2. Create Brand Record
+    // 2. Create Brand Record (slug populated below for uniqueness)
     const newBrand = await Brand.create({
       userId: user.id,
       name: data.companyName,
@@ -107,6 +108,7 @@ export async function createBrandFromUpload(data: {
     });
 
     const brandId = newBrand._id.toString();
+    await ensureBrandSlug(brandId);
 
     return { success: true, brandId };
   } catch (error) {

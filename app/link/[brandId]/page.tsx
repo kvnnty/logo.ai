@@ -94,7 +94,7 @@ export default function PublicLinkInBioPage() {
   }
 
   // Get brand's primary logo
-  const brandLogoUrl = getPrimaryLogoUrl(brand.assets) || '';
+  const brandLogoUrl = brand.primaryLogoUrl ?? getPrimaryLogoUrl(brand.logos) ?? '';
   const profileImageUrl = linkInBioData.profileImage || brandLogoUrl;
 
   const styles = linkInBioData.styles || {};

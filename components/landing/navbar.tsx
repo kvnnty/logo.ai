@@ -31,6 +31,7 @@ export default function Navbar() {
 
   const navItems = [
     { label: "Features", href: "/#features" },
+    { label: "Brand directory", href: "/brand-directory" },
     { label: "FAQs", href: "/#faq" },
     { label: "Example", href: "/example" },
   ];

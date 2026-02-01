@@ -3,12 +3,13 @@
 import { IconSparkles, IconMenu2, IconBrandAsana } from "@tabler/icons-react";
 import Link from "next/link";
 import { useState, useEffect, useRef } from "react";
-import { ChevronLeft, ChevronRight, RefreshCcw, ChevronDown, Check } from "lucide-react";
+import { ChevronLeft, ChevronRight, RefreshCcw, ChevronDown, Check, Plus } from "lucide-react";
 import { getCredits } from "@/app/actions/credits-actions";
 import { getUserBrands } from "@/app/actions/brand-actions";
 import { Button } from "../ui/button";
 import { useBrand } from "../providers/brand-provider";
 import { useRouter } from "next/navigation";
+import { CreateNewDialog } from "./create-new-dialog";
 
 interface DashboardTopbarProps {
   onMenuClick?: () => void;
@@ -25,6 +26,7 @@ export default function DashboardTopbar({ onMenuClick }: DashboardTopbarProps) {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [brands, setBrands] = useState<BrandSummary[]>([]);
   const [isBrandDropdownOpen, setIsBrandDropdownOpen] = useState(false);
+  const [isCreateNewOpen, setIsCreateNewOpen] = useState(false);
   const brand = useBrand();
   const router = useRouter();
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -180,12 +182,16 @@ export default function DashboardTopbar({ onMenuClick }: DashboardTopbarProps) {
         <div className="flex-1" />
 
         <div className="flex items-center gap-2 lg:gap-3">
-          <Link href="/dashboard/my-brands/create">
-            <Button>
-              <IconSparkles className="h-4 w-4" />
-              <span>Generate</span>
-            </Button>
-          </Link>
+          <Button onClick={() => setIsCreateNewOpen(true)}>
+            <Plus className="h-4 w-4" />
+            <span>Create new</span>
+          </Button>
+          <CreateNewDialog
+            open={isCreateNewOpen}
+            onOpenChange={setIsCreateNewOpen}
+            brandId={brand._id}
+            brandName={brand.name}
+          />
           <div className="flex items-center gap-2 px-2 py-2 rounded-xl bg-primary/10 border border-primary/20 h-9">
             <IconSparkles className="h-4 w-4 text-primary" />
             <span className="text-xs lg:text-sm font-semibold text-primary whitespace-nowrap">

@@ -27,6 +27,11 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "pictures-storage.storage.eu-north1.nebius.cloud",
       },
+      {
+        protocol: "https",
+        hostname: "images.unsplash.com",
+        pathname: "/**",
+      },
     ],
   },
   eslint: {

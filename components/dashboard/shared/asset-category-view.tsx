@@ -181,20 +181,23 @@ export function AssetCategoryView({
 
   const primaryColor = brandData.identity?.primary_color || "#2563eb";
 
-  // Find generated assets for this category
-  const categoryAssets = (Array.isArray(brandData.assets) ? brandData.assets : [])
+  // Designs for this category come from Design collection (passed or empty)
+  const categoryAssets = (Array.isArray((brandData as any).designs) ? (brandData as any).designs : [])
     .filter((a: any) => {
-      // Loose matching for categories
-      const catMatch = a.category?.toLowerCase() === category.toLowerCase() ||
-        a.category?.includes(category.toLowerCase()) ||
-        category.toLowerCase().includes(a.category?.toLowerCase() || "");
-      return catMatch;
+      const name = (a.name || "").toLowerCase();
+      const cat = category.toLowerCase();
+      return name.includes(cat) || (a.source || "").toLowerCase().includes(cat);
     });
 
   const brandName = brandData?.name || "your brand";
   const secondaryColor = brandData?.identity?.secondary_color || primaryColor;
-  const primaryLogo = brandData?.assets?.find((a: any) => a.subType === "primary_logo" || (a.category === "logo" && a.imageUrl));
-  const logoUrl = primaryLogo?.imageUrl;
+  const logoUrl =
+    (brandData as any).primaryLogoUrl ??
+    (() => {
+      const logos = (brandData as any).logos || [];
+      const primary = logos.find((a: any) => a.isPrimary || a.subType === "primary_logo") ?? logos[0];
+      return primary?.image_url ?? primary?.imageUrl ?? null;
+    })();
 
   return (
     <div className="pb-12">

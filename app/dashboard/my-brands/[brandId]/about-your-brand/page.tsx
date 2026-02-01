@@ -11,9 +11,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useState, useEffect } from "react";
 import { toast } from "@/hooks/use-toast";
 import { useBrand } from "@/components/providers/brand-provider";
-import { updateBrandDetails } from "@/app/actions/brand-actions";
+import { updateBrandDetails, updateBrandPublicProfile } from "@/app/actions/brand-actions";
 import { useRouter } from "next/navigation";
-import { Sparkles } from "lucide-react";
+import Link from "next/link";
+import { Sparkles, Copy, ExternalLink, Share2, Eye, Clock } from "lucide-react";
 
 export default function AboutBrandPage() {
   const brand = useBrand();
@@ -36,6 +37,8 @@ export default function AboutBrandPage() {
       twitter: brand.contactInfo?.twitter || "",
     }
   });
+  const [listedPublicly, setListedPublicly] = useState<boolean>(brand.listedPublicly ?? true);
+  const [publicProfileUpdating, setPublicProfileUpdating] = useState(false);
 
   // Update form data if brand changes
   useEffect(() => {
@@ -54,7 +57,68 @@ export default function AboutBrandPage() {
         twitter: brand.contactInfo?.twitter || "",
       }
     });
+    setListedPublicly(brand.listedPublicly ?? true);
   }, [brand]);
+
+  const publicSlug = brand.slug ?? null;
+  const publicUrl = typeof window !== "undefined" && publicSlug ? `${window.location.origin}/brand/${publicSlug}` : (publicSlug ? `/brand/${publicSlug}` : null);
+
+  const handleToggleListedPublicly = async () => {
+    setPublicProfileUpdating(true);
+    try {
+      const result = await updateBrandPublicProfile(brand._id, { listedPublicly: !listedPublicly });
+      if (result.success) {
+        setListedPublicly(!listedPublicly);
+        toast({ title: listedPublicly ? "Removed from directory" : "Listed in directory", description: listedPublicly ? "Your brand is no longer visible in the public directory." : "Your brand now appears in the brand directory." });
+        router.refresh();
+      } else {
+        toast({ title: "Error", description: result.error ?? "Failed to update", variant: "destructive" });
+      }
+    } catch (e: any) {
+      toast({ title: "Error", description: e?.message ?? "Failed", variant: "destructive" });
+    } finally {
+      setPublicProfileUpdating(false);
+    }
+  };
+
+  const copyPublicUrl = () => {
+    const url = publicSlug && typeof window !== "undefined" ? `${window.location.origin}/brand/${publicSlug}` : (publicSlug ? `/brand/${publicSlug}` : "");
+    if (!url) return;
+    navigator.clipboard.writeText(url).then(() => toast({ title: "Copied", description: "Public page URL copied to clipboard." }));
+  };
+
+  const handleShare = async () => {
+    const url = publicSlug && typeof window !== "undefined" ? `${window.location.origin}/brand/${publicSlug}` : null;
+    if (!url) return;
+    if (typeof navigator !== "undefined" && navigator.share) {
+      try {
+        await navigator.share({ title: brand.name, url, text: `Check out ${brand.name} on LogoAIpro` });
+        toast({ title: "Shared", description: "Thanks for sharing your brand!" });
+      } catch (err: any) {
+        if (err?.name !== "AbortError") {
+          copyPublicUrl();
+        }
+      }
+    } else {
+      copyPublicUrl();
+    }
+  };
+
+  const formatLastViewed = (date: string | Date | undefined) => {
+    if (!date) return null;
+    const d = typeof date === "string" ? new Date(date) : date;
+    if (Number.isNaN(d.getTime())) return null;
+    const now = new Date();
+    const diffMs = now.getTime() - d.getTime();
+    const diffMins = Math.floor(diffMs / 60000);
+    const diffHours = Math.floor(diffMs / 3600000);
+    const diffDays = Math.floor(diffMs / 86400000);
+    if (diffMins < 1) return "Just now";
+    if (diffMins < 60) return `${diffMins} min ago`;
+    if (diffHours < 24) return `${diffHours} hr ago`;
+    if (diffDays < 7) return `${diffDays} days ago`;
+    return d.toLocaleDateString(undefined, { dateStyle: "medium" }) + " at " + d.toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" });
+  };
 
   const handleSave = async () => {
     setIsSaving(true);
@@ -96,7 +160,7 @@ export default function AboutBrandPage() {
   };
 
   return (
-    <div className="container mx-auto p-6 max-w-5xl">
+    <div>
       <PageHeader
         heading="About Your Brand"
         description="Manage your brand's core identity and details."
@@ -273,6 +337,84 @@ export default function AboutBrandPage() {
                     />
                   </div>
                 </div>
+              </CardContent>
+            </Card>
+
+            <Card className="mt-6 rounded-2xl shadow-sm border-none shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
+              <CardHeader>
+                <CardTitle>Public brand page</CardTitle>
+                <CardDescription className="space-y-2">
+                  <span className="block">
+                    Your brand gets a unique link (e.g. yoursite.com/brand/your-brand) where anyone can see your logo, colors, and contact info—like a mini brand guidelines page.
+                  </span>
+                  <span className="block">
+                    Making your brand public helps your brand reach a wider audience in our Brand Directory, showcasing it alongside other brands using LogoAI Pro. When enabled, anyone can discover and explore your brand. If turned off, your brand page stays live and accessible only through your direct link.
+                  </span>
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                {publicSlug ? (
+                  <div className="flex flex-wrap gap-2">
+                    <Button variant="outline" size="sm" onClick={handleShare} className="gap-2">
+                      <Share2 className="h-4 w-4" />
+                      Share public
+                    </Button>
+                    <Button variant="outline" size="sm" onClick={copyPublicUrl} className="gap-2">
+                      <Copy className="h-4 w-4" />
+                      Copy public
+                    </Button>
+                    <Link href={`/brand/${publicSlug}`} target="_blank" rel="noopener noreferrer">
+                      <Button variant="outline" size="sm" className="gap-2">
+                        <ExternalLink className="h-4 w-4" />
+                        Preview
+                      </Button>
+                    </Link>
+                  </div>
+                ) : null}
+                <div className="flex flex-wrap items-center justify-between gap-4">
+                  <Label className="text-sm font-medium">List in public directory</Label>
+                  <button
+                    type="button"
+                    role="switch"
+                    aria-checked={listedPublicly}
+                    disabled={publicProfileUpdating}
+                    onClick={handleToggleListedPublicly}
+                    className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 ${listedPublicly ? "bg-primary" : "bg-muted"}`}
+                  >
+                    <span className={`pointer-events-none block h-5 w-5 rounded-full bg-background shadow-lg ring-0 transition-transform ${listedPublicly ? "translate-x-5" : "translate-x-0.5"} mt-0.5`} />
+                  </button>
+                </div>
+                {publicSlug ? (
+                  <div className="space-y-2">
+                    <Label className="text-xs text-muted-foreground">Your public page link</Label>
+                    <code className="block text-xs bg-muted px-3 py-2 rounded-lg truncate max-w-full sm:max-w-[400px]">
+                      {typeof window !== "undefined" ? `${window.location.origin}/brand/${publicSlug}` : `/brand/${publicSlug}`}
+                    </code>
+                  </div>
+                ) : (
+                  <p className="text-sm text-muted-foreground">
+                    Your public link will be available when you turn on List in directory.
+                  </p>
+                )}
+                {(brand.pageViewCount !== undefined && brand.pageViewCount > 0) || brand.pageLastViewedAt ? (
+                  <div className="pt-4 border-t border-border space-y-2">
+                    <Label className="text-xs text-muted-foreground">Page views</Label>
+                    <div className="flex flex-wrap items-center gap-4 text-sm">
+                      {(brand.pageViewCount ?? 0) > 0 && (
+                        <span className="flex items-center gap-1.5 text-muted-foreground">
+                          <Eye className="h-4 w-4" />
+                          {(brand.pageViewCount ?? 0).toLocaleString()} view{(brand.pageViewCount ?? 0) === 1 ? "" : "s"}
+                        </span>
+                      )}
+                      {formatLastViewed(brand.pageLastViewedAt) && (
+                        <span className="flex items-center gap-1.5 text-muted-foreground">
+                          <Clock className="h-4 w-4" />
+                          Last viewed {formatLastViewed(brand.pageLastViewedAt)}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                ) : null}
               </CardContent>
             </Card>
           </TabsContent>
