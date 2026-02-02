@@ -434,7 +434,7 @@ export async function getUserBrands() {
     const primaryLogos = await Logo.find({ brandId: { $in: brandIds }, isPrimary: true }).lean();
     const primaryByBrand = new Map<string, string>();
     primaryLogos.forEach((l: any) => {
-      const url = l.image_url || (l.sceneData?.elements?.find((el: any) => el.type === "image")?.src);
+      const url = l.image_url || l.sceneData?.elements?.find((el: any) => el.type === "image")?.src;
       if (url) primaryByBrand.set(l.brandId?.toString(), url);
     });
     const logoCounts = await Logo.aggregate([{ $match: { brandId: { $in: brandIds } } }, { $group: { _id: "$brandId", count: { $sum: 1 } } }]);
@@ -463,14 +463,16 @@ export async function getUserBrands() {
 
 /** Generate URL-safe slug from name (lowercase, hyphenated). */
 function slugFromName(name: string): string {
-  return (name || "")
-    .trim()
-    .toLowerCase()
-    .replace(/[^a-z0-9\s-]/g, "")
-    .replace(/\s+/g, "-")
-    .replace(/-+/g, "-")
-    .replace(/^-|-$/g, "")
-    .slice(0, 80) || "brand";
+  return (
+    (name || "")
+      .trim()
+      .toLowerCase()
+      .replace(/[^a-z0-9\s-]/g, "")
+      .replace(/\s+/g, "-")
+      .replace(/-+/g, "-")
+      .replace(/^-|-$/g, "")
+      .slice(0, 80) || "brand"
+  );
 }
 
 /** Random 6-char alphanumeric suffix (e.g. 1sqcga) to avoid guessable slugs / indexing. */
@@ -577,13 +579,23 @@ export async function getBrandBySlug(slug: string) {
   }
 }
 
+/** Escape special regex chars for safe text search. */
+function escapeRegex(s: string): string {
+  return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
 /** Public: list brands that are listed publicly (for /brand-directory). */
-export async function getPublicBrands(options?: { industry?: string; limit?: number; skip?: number }) {
+export async function getPublicBrands(options?: { industry?: string; limit?: number; skip?: number; search?: string }) {
   "use server";
   try {
     await ensureDbConnected();
     const query: any = { listedPublicly: true, slug: { $exists: true, $ne: "" } };
     if (options?.industry?.trim()) query.industry = new RegExp(options.industry.trim(), "i");
+    if (options?.search?.trim()) {
+      const safe = escapeRegex(options.search.trim());
+      const re = new RegExp(safe, "i");
+      query.$or = [{ name: re }, { slug: re }, { description: re }];
+    }
     const limit = Math.min(100, options?.limit ?? 24);
     const skip = Math.max(0, options?.skip ?? 0);
     const brands = await Brand.find(query).sort({ updatedAt: -1 }).skip(skip).limit(limit).lean();
@@ -591,7 +603,7 @@ export async function getPublicBrands(options?: { industry?: string; limit?: num
     const primaryLogos = await Logo.find({ brandId: { $in: brandIds }, isPrimary: true }).lean();
     const primaryByBrand = new Map<string, string>();
     primaryLogos.forEach((l: any) => {
-      const url = l.image_url || (l.sceneData?.elements?.find((el: any) => el.type === "image")?.src);
+      const url = l.image_url || l.sceneData?.elements?.find((el: any) => el.type === "image")?.src;
       if (url) primaryByBrand.set(l.brandId?.toString(), url);
     });
     const list = (brands as any[]).map((b: any) => ({
@@ -601,6 +613,7 @@ export async function getPublicBrands(options?: { industry?: string; limit?: num
       description: b.description ?? "",
       industry: b.industry ?? "",
       primaryLogoUrl: primaryByBrand.get(b._id?.toString()) ?? null,
+      primaryColor: b.identity?.primary_color ?? null,
     }));
     return { success: true, brands: list };
   } catch (error) {
@@ -638,7 +651,13 @@ export async function updateBrandPublicProfile(brandId: string, data: { slug?: s
     if (!brand) return { success: false, error: "Brand not found" };
     if (data.listedPublicly !== undefined) brand.listedPublicly = data.listedPublicly;
     if (data.slug !== undefined && data.slug !== null) {
-      const raw = (data.slug as string).trim().toLowerCase().replace(/[^a-z0-9-]/g, "-").replace(/-+/g, "-").replace(/^-|-$/g, "").slice(0, 80);
+      const raw = (data.slug as string)
+        .trim()
+        .toLowerCase()
+        .replace(/[^a-z0-9-]/g, "-")
+        .replace(/-+/g, "-")
+        .replace(/^-|-$/g, "")
+        .slice(0, 80);
       const slug = raw || slugFromName(brand.name);
       brand.slug = await ensureUniqueSlug(slug, brandId);
     } else if (data.listedPublicly === true && !brand.slug) {
@@ -666,7 +685,7 @@ export async function deleteBrand(brandId: string) {
   }
 }
 
-export async function createBrand(data: { name: string; slogan?: string; industry?: string}) {
+export async function createBrand(data: { name: string; slogan?: string; industry?: string }) {
   "use server";
   try {
     const user = await currentUser();
@@ -825,8 +844,8 @@ export async function exportBrandKit(brandId: string) {
           exportedAt: new Date().toISOString(),
         },
         null,
-        2,
-      ),
+        2
+      )
     );
 
     const logos = await Logo.find({ brandId: brand._id }).lean();
@@ -916,8 +935,8 @@ export async function exportBrandKit(brandId: string) {
           ],
         },
         null,
-        2,
-      ),
+        2
+      )
     );
 
     const out = await zip.generateAsync({ type: "nodebuffer" });

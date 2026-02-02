@@ -101,7 +101,7 @@ export default function CreditsPage() {
   ];
 
   return (
-    <div className="container mx-auto p-6 max-w-6xl">
+    <div className="container mx-auto p-6 max-w-6xl flex-1 overflow-y-auto">
       <div className="mb-5 pb-5 border-b border-border/40">
         <Logo />
       </div>

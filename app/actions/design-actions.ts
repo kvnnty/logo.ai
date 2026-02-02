@@ -5,10 +5,7 @@ import { ensureDbConnected, Brand, Design } from "@/db";
 import { renderSceneToPNG, renderSceneToSVG, renderSceneToPDF } from "@/lib/render/scene-renderer";
 
 /** Create a new design (blank or from initial scene). Returns designId. */
-export async function createDesign(
-  brandId: string,
-  options?: { name?: string; initialScene?: any }
-) {
+export async function createDesign(brandId: string, options?: { name?: string; initialScene?: any; source?: string }) {
   try {
     const user = await currentUser();
     if (!user) return { success: false, error: "Not authenticated" };
@@ -28,7 +25,7 @@ export async function createDesign(
       brandId,
       name: options?.name ?? "Untitled design",
       pages: [{ sceneData: scene }],
-      source: "blank",
+      source: options?.initialScene ? options.source ?? "template" : "blank",
     });
 
     return { success: true, designId: design._id.toString() };
@@ -65,10 +62,7 @@ export async function getDesign(designId: string) {
 }
 
 /** Update design name, pages, favorite, etc. */
-export async function updateDesign(
-  designId: string,
-  updates: { name?: string; pages?: any[]; favorite?: boolean; thumbnailUrl?: string }
-) {
+export async function updateDesign(designId: string, updates: { name?: string; pages?: any[]; favorite?: boolean; thumbnailUrl?: string }) {
   try {
     const user = await currentUser();
     if (!user) return { success: false, error: "Not authenticated" };
@@ -91,6 +85,24 @@ export async function updateDesign(
   }
 }
 
+/** Delete a design (must belong to user). */
+export async function deleteDesign(designId: string) {
+  try {
+    const user = await currentUser();
+    if (!user) return { success: false, error: "Not authenticated" };
+
+    await ensureDbConnected();
+    const design = await Design.findOne({ _id: designId, userId: user.id });
+    if (!design) return { success: false, error: "Design not found" };
+
+    await Design.findByIdAndDelete(designId);
+    return { success: true };
+  } catch (error) {
+    console.error("deleteDesign:", error);
+    return { success: false, error: error instanceof Error ? error.message : "Failed to delete design" };
+  }
+}
+
 /** List designs for a brand (user's designs). */
 export async function listDesigns(brandId: string) {
   try {
@@ -98,9 +110,7 @@ export async function listDesigns(brandId: string) {
     if (!user) return { success: false, error: "Not authenticated", designs: [] };
 
     await ensureDbConnected();
-    const designs = await Design.find({ brandId, userId: user.id })
-      .sort({ updatedAt: -1 })
-      .lean();
+    const designs = await Design.find({ brandId, userId: user.id }).sort({ updatedAt: -1 }).lean();
 
     const designsPlain = designs.map((d: any) => ({
       ...d,
@@ -120,11 +130,7 @@ export async function listDesigns(brandId: string) {
 export type ExportFormat = "png" | "svg" | "pdf";
 
 /** Export current scene to file. Returns data URL and suggested filename. */
-export async function exportSceneToFile(
-  sceneData: any,
-  format: ExportFormat,
-  options?: { scale?: number; transparent?: boolean }
-) {
+export async function exportSceneToFile(sceneData: any, format: ExportFormat, options?: { scale?: number; transparent?: boolean }) {
   try {
     const user = await currentUser();
     if (!user) return { success: false, error: "Not authenticated" };

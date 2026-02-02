@@ -1,18 +1,17 @@
 "use client";
 
 import { useParams } from "next/navigation";
-import { AssetCategoryView } from "@/components/dashboard/shared/asset-category-view";
+import { PolotnoTemplateGrid } from "@/components/dashboard/shared/polotno-template-grid";
 
 export default function YoutubeThumbnailsPage() {
   const { brandId } = useParams();
 
   return (
-    <AssetCategoryView
+    <PolotnoTemplateGrid
       brandId={brandId as string}
-      category="youtube_thumbnail"
+      categoryId="youtube_thumbnail"
       title="YouTube Thumbnails"
-      description="5 high-impact thumbnails designed to drive clicks and maintain brand consistency."
-      aspectRatio="video"
+      description="Choose a template to customize in the editor."
     />
   );
 }

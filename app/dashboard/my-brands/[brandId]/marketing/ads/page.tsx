@@ -1,18 +1,17 @@
 "use client";
 
 import { useParams } from "next/navigation";
-import { AssetCategoryView } from "@/components/dashboard/shared/asset-category-view";
+import { PolotnoTemplateGrid } from "@/components/dashboard/shared/polotno-template-grid";
 
 export default function AdsPage() {
   const { brandId } = useParams();
 
   return (
-    <AssetCategoryView
+    <PolotnoTemplateGrid
       brandId={brandId as string}
-      category="ads"
-      title="Marketing Ads"
-      description="5 high-converting ad templates designed for various platforms."
-      aspectRatio="video"
+      categoryId="ads"
+      title="Ads"
+      description="Choose a template to customize in the editor."
     />
   );
 }

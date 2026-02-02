@@ -1,18 +1,17 @@
 "use client";
 
 import { useParams } from "next/navigation";
-import { AssetCategoryView } from "@/components/dashboard/shared/asset-category-view";
+import { PolotnoTemplateGrid } from "@/components/dashboard/shared/polotno-template-grid";
 
 export default function BusinessCardsPage() {
   const { brandId } = useParams();
 
   return (
-    <AssetCategoryView
+    <PolotnoTemplateGrid
       brandId={brandId as string}
-      category="business_card"
+      categoryId="business_card"
       title="Business Cards"
-      description="5 unique business card designs maintaining your brand's professional identity."
-      aspectRatio="video"
+      description="Choose a template to customize in the editor."
     />
   );
 }

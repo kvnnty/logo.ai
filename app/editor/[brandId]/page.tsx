@@ -1,31 +1,48 @@
 "use client";
 
 import { createDesign } from "@/app/actions/design-actions";
-import { useParams, useRouter } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Loader2 } from "lucide-react";
+import { polotnoTemplateToScene } from "@/lib/polotno-template";
 
-/** New design: create a design doc and redirect to editor/[designId]. */
+/** New design: create a design doc (blank or from templateUrl) and redirect to editor/[designId]. */
 export default function NewEditorPage() {
   const params = useParams();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const brandId = params?.brandId as string;
+  const templateUrl = searchParams.get("templateUrl");
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!brandId) return;
     let cancelled = false;
     (async () => {
-      const result = await createDesign(brandId);
+      let initialScene: { width: number; height: number; elements: any[] } | undefined;
+      if (templateUrl) {
+        try {
+          const decoded = decodeURIComponent(templateUrl);
+          const res = await fetch(decoded);
+          if (!res.ok) throw new Error(`Template fetch failed: ${res.status}`);
+          const template = await res.json();
+          initialScene = polotnoTemplateToScene(template);
+        } catch (e) {
+          if (cancelled) return;
+          setError(e instanceof Error ? e.message : "Failed to load template");
+          return;
+        }
+      }
+      const result = await createDesign(brandId, initialScene ? { initialScene } : undefined);
       if (cancelled) return;
       if (result.success && result.designId) {
-        router.replace(`/dashboard/my-brands/${brandId}/editor/${result.designId}`);
+        router.replace(`/editor/${brandId}/${result.designId}`);
       } else {
         setError(result.error || "Failed to create design");
       }
     })();
     return () => { cancelled = true; };
-  }, [brandId, router]);
+  }, [brandId, router, templateUrl]);
 
   if (error) {
     return (

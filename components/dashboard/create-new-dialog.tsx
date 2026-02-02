@@ -39,7 +39,7 @@ interface ShortcutItem {
 function getShortcuts(brandId: string): ShortcutItem[] {
   const prefix = `/dashboard/my-brands/${brandId}`;
   return [
-    { id: "logo-files", title: "Logo Files", href: `${prefix}/my-designs`, icon: IconPalette },
+    { id: "logo-files", title: "Logo Files", href: `${prefix}/my-designs?tab=logos`, icon: IconPalette },
     { id: "website", title: "Website", href: `${prefix}/link-in-bio`, icon: IconWorldWww, tag: "Popular" },
     { id: "brand-guidelines", title: "Brand Guidelines", href: `${prefix}/branding/brand-book`, icon: IconBook },
     { id: "domains", title: "Domains", href: `${prefix}/link-in-bio`, icon: IconWorldWww },

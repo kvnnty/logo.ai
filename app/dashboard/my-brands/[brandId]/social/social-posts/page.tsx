@@ -1,18 +1,17 @@
 "use client";
 
 import { useParams } from "next/navigation";
-import { AssetCategoryView } from "@/components/dashboard/shared/asset-category-view";
+import { PolotnoTemplateGrid } from "@/components/dashboard/shared/polotno-template-grid";
 
 export default function SocialPostsPage() {
   const { brandId } = useParams();
 
   return (
-    <AssetCategoryView
+    <PolotnoTemplateGrid
       brandId={brandId as string}
-      category="social_post"
-      title="Social Media Posts"
-      description="5 high-engagement social media post templates tailored to your brand identity."
-      aspectRatio="square"
+      categoryId="social_post"
+      title="Social Posts"
+      description="Choose a template to customize in the editor."
     />
   );
 }

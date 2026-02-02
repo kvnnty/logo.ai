@@ -43,6 +43,27 @@ export function getTemplateCategory(id: string): TemplateCategoryOption | undefi
   return TEMPLATE_CATEGORIES.find((c) => c.id === id);
 }
 
+/** Map our category id to Polotno API / client-side filter query (e.g. for YouTube Thumbnails → "youtube thumbnail"). */
+export const POLOTNO_QUERY_BY_CATEGORY: Record<string, string> = {
+  business_card: "business card",
+  letterhead: "letterhead",
+  email_signature: "email signature",
+  favicon: "favicon",
+  brand_book: "brand book",
+  branding_license: "license certificate",
+  social_story: "story",
+  social_post: "social post",
+  social_cover: "cover profile",
+  social_profile: "profile avatar",
+  youtube_thumbnail: "youtube thumbnail",
+  ads: "ad",
+  marketing_flyer: "flyer",
+  marketing_poster: "poster",
+  id_card: "id card",
+  cards: "card",
+  merch: "merch",
+};
+
 /**
  * Style options for AI template generation. "promptInstruction" is injected into the AI prompt.
  */
@@ -55,8 +76,16 @@ export interface TemplateStyleOption {
 export const TEMPLATE_STYLE_OPTIONS: TemplateStyleOption[] = [
   { id: "minimal", label: "Minimal", promptInstruction: "Minimal: clean, lots of whitespace, simple shapes, no clutter, understated." },
   { id: "bold", label: "Bold", promptInstruction: "Bold: strong colors, large typography, high contrast, confident, attention-grabbing." },
-  { id: "illustration", label: "Illustration", promptInstruction: "Illustration-led: graphic illustrations, icons, flat or hand-drawn style, decorative shapes, friendly." },
-  { id: "photorealistic", label: "Photorealistic", promptInstruction: "Photorealistic: realistic photography-style imagery, lifelike, premium, use image placeholders for photos." },
+  {
+    id: "illustration",
+    label: "Illustration",
+    promptInstruction: "Illustration-led: graphic illustrations, icons, flat or hand-drawn style, decorative shapes, friendly.",
+  },
+  {
+    id: "photorealistic",
+    label: "Photorealistic",
+    promptInstruction: "Photorealistic: realistic photography-style imagery, lifelike, premium, use image placeholders for photos.",
+  },
   { id: "elegant", label: "Elegant", promptInstruction: "Elegant: refined, subtle, serif or classic typography, sophisticated, luxury feel." },
   { id: "modern", label: "Modern", promptInstruction: "Modern: contemporary, geometric, sans-serif, tech-forward, crisp." },
   { id: "classic", label: "Classic", promptInstruction: "Classic: traditional, timeless, professional, trusted." },

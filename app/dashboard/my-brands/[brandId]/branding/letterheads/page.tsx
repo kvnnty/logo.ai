@@ -1,18 +1,17 @@
 "use client";
 
 import { useParams } from "next/navigation";
-import { AssetCategoryView } from "@/components/dashboard/shared/asset-category-view";
+import { PolotnoTemplateGrid } from "@/components/dashboard/shared/polotno-template-grid";
 
 export default function LetterheadsPage() {
   const { brandId } = useParams();
 
   return (
-    <AssetCategoryView
+    <PolotnoTemplateGrid
       brandId={brandId as string}
-      category="letterhead"
-      title="Brand Letterheads"
-      description="5 official letterhead templates for your corporate communication."
-      aspectRatio="portrait"
+      categoryId="letterhead"
+      title="Letterheads"
+      description="Choose a template to customize in the editor."
     />
   );
 }

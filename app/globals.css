@@ -67,3 +67,11 @@ body {
 ::-webkit-scrollbar-thumb:hover {
   background: hsla(var(--muted-foreground) / 0.5);
 }
+
+.hidden-scrollbar {
+  scrollbar-width: none !important;
+}
+
+.hidden-scrollbar::-webkit-scrollbar {
+  display: none !important;
+}

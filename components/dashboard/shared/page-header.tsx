@@ -23,7 +23,7 @@ export function PageHeader({
   const router = useRouter();
 
   return (
-    <div className={cn("flex items-center justify-between space-y-2 mb-8", className)}>
+    <div className={cn("flex flex-col sm:flex-row sm:items-center justify-between space-y-2 mb-8", className)}>
       <div className="space-y-2">
         {backButton && (
           <Button

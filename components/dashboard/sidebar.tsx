@@ -18,8 +18,9 @@ import {
   IconX
 } from "@tabler/icons-react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 import { useState } from "react";
+import Logo from "../shared/Logo";
 
 interface NavItem {
   title: string;
@@ -38,8 +39,13 @@ function getNavItems(brandId?: string): NavItem[] {
       icon: IconHome2,
     },
     {
+      title: "My logos & designs",
+      href: `${brandPrefix}/my-designs?tab=logos`,
+      icon: IconSparkles,
+    },
+    {
       title: "My Designs",
-      href: `${brandPrefix}/my-designs`,
+      href: `${brandPrefix}/my-designs?tab=designs`,
       icon: IconPalette,
     },
     {
@@ -102,10 +108,12 @@ interface DashboardSidebarProps {
 
 export default function DashboardSidebar({ isOpen = false, onClose, brandId, brandName }: DashboardSidebarProps) {
   const pathname = usePathname();
+  const searchParams = useSearchParams();
   const { user } = useUser();
-  const [expandedSections, setExpandedSections] = useState<string[]>(["Branding", "Social", "Marketing"]);
+  const [expandedSections, setExpandedSections] = useState<string[]>([]);
 
   const navItems = getNavItems(brandId);
+  const myDesignsTab = pathname?.includes("/my-designs") ? searchParams.get("tab") : null;
 
   const toggleSection = (title: string) => {
     setExpandedSections((prev) =>
@@ -133,10 +141,10 @@ export default function DashboardSidebar({ isOpen = false, onClose, brandId, bra
 
       {/* Sidebar */}
       <aside className={cn(
-        "fixed left-0 top-0 z-50 h-screen w-72 p-4 transition-transform duration-300 lg:translate-x-0",
+        "fixed left-0 top-0 z-50 h-screen w-72 transition-transform duration-300 lg:translate-x-0",
         isOpen ? "translate-x-0" : "-translate-x-full"
       )}>
-        <div className="h-full bg-card transition-all duration-300 flex flex-col overflow-hidden">
+        <div className="h-full bg-card transition-all duration-300 flex flex-col overflow-hidden p-4">
           {/* Close button for mobile */}
           <button
             onClick={onClose}
@@ -147,23 +155,24 @@ export default function DashboardSidebar({ isOpen = false, onClose, brandId, bra
           </button>
 
           {/* Logo Section */}
-          <div className="mb-3 flex-shrink-0">
-            <Link href="/" className="flex items-center gap-3 px-3 py-2.5 group" onClick={handleNavClick}>
-              <div className="relative">
-                <div className="absolute inset-0 bg-primary/20 blur-xl group-hover:bg-primary/30 transition-colors rounded-xl" />
-                <div className="relative bg-gradient-to-br from-primary to-primary/80 text-primary-foreground w-9 h-9 rounded-xl flex items-center justify-center font-bold text-lg shadow-lg">
-                  L
-                </div>
-              </div>
-              <span className="text-xl font-bold">LogoAIpro</span>
-            </Link>
+          <div className="mb-5 flex-shrink-0" onClick={handleNavClick}>
+            <Logo />
           </div>
 
           {/* Navigation Items */}
           <nav className="flex-1 space-y-1 overflow-y-auto pr-2 custom-scrollbar">
             {navItems.map((item) => {
               const Icon = item.icon;
-              const isActive = item.href ? pathname === item.href : false;
+              let isActive = false;
+              if (item.href) {
+                if (item.href.includes("?tab=logos")) {
+                  isActive = pathname === item.href.split("?")[0] && myDesignsTab === "logos";
+                } else if (item.href.includes("?tab=designs")) {
+                  isActive = pathname === item.href.split("?")[0] && (myDesignsTab === "designs" || myDesignsTab === null);
+                } else {
+                  isActive = pathname === item.href;
+                }
+              }
               const isExpanded = expandedSections.includes(item.title);
               const hasChildren = item.items && item.items.length > 0;
 

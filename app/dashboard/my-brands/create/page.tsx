@@ -25,7 +25,7 @@ export default function BrandsCreatePage() {
   }
 
   return (
-    <div className="py-8 px-4 sm:px-6 w-full max-w-7xl mx-auto">
+    <div className="py-8 px-4 sm:px-6 w-full max-w-7xl mx-auto flex-1 overflow-y-auto">
       <div className="mb-6 flex justify-center">
         <Logo />
       </div>

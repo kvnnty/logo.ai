@@ -1,18 +1,17 @@
 "use client";
 
 import { useParams } from "next/navigation";
-import { AssetCategoryView } from "@/components/dashboard/shared/asset-category-view";
+import { PolotnoTemplateGrid } from "@/components/dashboard/shared/polotno-template-grid";
 
 export default function FlyersPage() {
   const { brandId } = useParams();
 
   return (
-    <AssetCategoryView
+    <PolotnoTemplateGrid
       brandId={brandId as string}
-      category="marketing_flyer"
-      title="Marketing Flyers"
-      description="5 professional flyer designs for your brand's promotional needs."
-      aspectRatio="portrait"
+      categoryId="marketing_flyer"
+      title="Flyers"
+      description="Choose a template to customize in the editor."
     />
   );
 }

@@ -3,7 +3,6 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { AssetCard } from "./asset-card";
-import { TemplatePreviewCard } from "./template-preview-card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Sparkles, Loader2, Plus } from "lucide-react";
@@ -275,23 +274,6 @@ export function AssetCategoryView({
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-8">
-        {/* Show template previews first if no assets exist */}
-        {categoryAssets.length === 0 && (
-          <>
-            {[0, 1, 2].map((i) => (
-              <TemplatePreviewCard
-                key={`template-${i}`}
-                category={category}
-                primaryColor={primaryColor}
-                secondaryColor={secondaryColor}
-                brandName={brandName}
-                logoUrl={logoUrl}
-                onClick={handleGenerate}
-              />
-            ))}
-          </>
-        )}
-
         {categoryAssets.map((asset: any) => {
           // If asset has sceneData but no imageUrl, we need to render it
           // For now, show a placeholder or generate preview

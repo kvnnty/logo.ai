@@ -15,6 +15,7 @@ import { Loader2, MoreVertical, Plus, Settings2, Sparkles, Trash2 } from "lucide
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { formatDistanceToNow } from "date-fns";
+import { SignedIn, UserButton } from "@clerk/nextjs";
 
 interface BrandSummary {
   _id: string;
@@ -68,9 +69,18 @@ export default function BrandsPage() {
   }
 
   return (
-    <div className="container mx-auto py-8 px-4 max-w-6xl">
-      <div className="mb-5 pb-5 border-b border-border/40">
+    <div className="container mx-auto py-8 px-4 max-w-6xl flex-1 overflow-y-auto">
+      <div className="mb-5 pb-5 border-b border-border/40 flex items-center justify-between">
         <Logo />
+        <SignedIn>
+          <UserButton
+            appearance={{
+              elements: {
+                avatarBox: "w-10 h-10 rounded-lg"
+              }
+            }}
+          />
+        </SignedIn>
       </div>
 
       <div className="flex items-center justify-between mb-8">

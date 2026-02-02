@@ -62,6 +62,69 @@ import { formatDistanceToNow } from "date-fns";
 
 const MAX_HISTORY = 50;
 
+/** Polotno API returns { items: [ { json, preview } ], hits, totalPages } */
+function PolotnoTemplatesPanel({ brandId, onSelectTemplate }: { brandId: string; onSelectTemplate: (templateUrl: string) => void }) {
+  const [items, setItems] = useState<Array<{ json: string; preview: string }>>([]);
+  const [page, setPage] = useState(1);
+  const [loading, setLoading] = useState(false);
+  const [totalPages, setTotalPages] = useState(1);
+
+  const fetchTemplates = useCallback(async (p: number) => {
+    setLoading(true);
+    try {
+      const res = await fetch(`/api/polotno-templates?page=${p}`);
+      const data = await res.json();
+      if (res.ok && Array.isArray(data.items)) {
+        setItems(data.items);
+        setTotalPages(data.totalPages ?? 1);
+      }
+    } catch {
+      setItems([]);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchTemplates(page);
+  }, [page, fetchTemplates]);
+
+  return (
+    <div className="space-y-3">
+      <p className="text-muted-foreground text-xs">Start from a Polotno template.</p>
+      {loading ? (
+        <div className="flex justify-center py-6">
+          <div className="h-6 w-6 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+        </div>
+      ) : (
+        <div className="grid grid-cols-2 gap-1.5 max-h-[320px] overflow-y-auto">
+          {items.map((item, i) => (
+            <button
+              key={item.json + i}
+              type="button"
+              className="aspect-video rounded border border-border overflow-hidden hover:ring-2 hover:ring-primary focus:outline-none focus:ring-2 focus:ring-primary"
+              onClick={() => onSelectTemplate(item.json)}
+            >
+              <img src={item.preview} alt="" className="w-full h-full object-cover" />
+            </button>
+          ))}
+        </div>
+      )}
+      {totalPages > 1 && (
+        <div className="flex gap-1 justify-center">
+          <Button variant="outline" size="sm" className="h-7" onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={page <= 1}>
+            Prev
+          </Button>
+          <span className="text-xs self-center px-1">{page} / {totalPages}</span>
+          <Button variant="outline" size="sm" className="h-7" onClick={() => setPage((p) => Math.min(totalPages, p + 1))} disabled={page >= totalPages}>
+            Next
+          </Button>
+        </div>
+      )}
+    </div>
+  );
+}
+
 const SIDEBAR_TABS = [
   { id: "templates", label: "Templates", icon: Sparkles },
   { id: "elements", label: "Elements", icon: Box },
@@ -131,6 +194,10 @@ export function EditorShell({ brandId, designId, initialDesign, initialPage, tem
   const [favoriteDesigns, setFavoriteDesigns] = useState<Array<{ _id: string; name: string; favorite?: boolean }>>([]);
   const [contextMenu, setContextMenu] = useState<{ x: number; y: number; elementIndex: number } | null>(null);
   const copiedElementRef = useRef<any>(null);
+  const [unsplashQuery, setUnsplashQuery] = useState("");
+  const [unsplashPage, setUnsplashPage] = useState(1);
+  const [unsplashResults, setUnsplashResults] = useState<Array<{ id: string; urls: { regular: string; small: string; thumb: string }; width: number; height: number; alt_description?: string }>>([]);
+  const [unsplashLoading, setUnsplashLoading] = useState(false);
   designRef.current = design;
 
   useEffect(() => {
@@ -449,6 +516,53 @@ export function EditorShell({ brandId, designId, initialDesign, initialPage, tem
     input.click();
   };
 
+  const fetchUnsplash = useCallback(async (query: string, page: number = 1) => {
+    setUnsplashLoading(true);
+    try {
+      const params = new URLSearchParams({ per_page: "20", page: String(page) });
+      if (query.trim()) params.set("query", query.trim());
+      const res = await fetch(`/api/unsplash?${params.toString()}`);
+      const data = await res.json();
+      if (!res.ok) {
+        toast({ title: "Unsplash search failed", description: data.error ?? "Try again", variant: "destructive" });
+        setUnsplashResults([]);
+        return;
+      }
+      const results = (data.results ?? []).map((r: any) => ({
+        id: r.id,
+        urls: r.urls ?? {},
+        width: r.width ?? 1080,
+        height: r.height ?? 1080,
+        alt_description: r.alt_description,
+      }));
+      setUnsplashResults(results);
+    } catch (e) {
+      toast({ title: "Unsplash search failed", description: e instanceof Error ? e.message : "Try again", variant: "destructive" });
+      setUnsplashResults([]);
+    } finally {
+      setUnsplashLoading(false);
+    }
+  }, []);
+
+  const addUnsplashImage = useCallback(
+    (url: string, width: number, height: number) => {
+      const maxSize = 400;
+      const ratio = Math.min(maxSize / width, maxSize / height, 1);
+      const w = Math.round(width * ratio);
+      const h = Math.round(height * ratio);
+      addElement({ type: "image", src: url, x: 100, y: 100, width: w, height: h, draggable: true });
+    },
+    [addElement]
+  );
+
+  const unsplashFetchedRef = useRef(false);
+  useEffect(() => {
+    if (activeSidebarTab === "uploads" && !unsplashFetchedRef.current) {
+      unsplashFetchedRef.current = true;
+      fetchUnsplash("", 1);
+    }
+  }, [activeSidebarTab, fetchUnsplash]);
+
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (selectedId !== null && (e.key === "Delete" || e.key === "Backspace")) {
@@ -656,15 +770,13 @@ export function EditorShell({ brandId, designId, initialDesign, initialPage, tem
           </div>
           <div className="flex-1 overflow-y-auto p-4 text-sm text-muted-foreground">
             {activeSidebarTab === "templates" && (
-              <div className="space-y-3">
-                <p className="text-muted-foreground">Start from a template or generate with AI.</p>
-                <Button size="sm" className="w-full gap-2" disabled>
-                  <Sparkles className="h-4 w-4" />
-                  Generate design
-                </Button>
-                <p className="text-xs">AI generation (coming later).</p>
-                <p className="text-xs">Browse by size/category (coming later).</p>
-              </div>
+              <PolotnoTemplatesPanel
+                brandId={brandId}
+                onSelectTemplate={(templateUrl) => {
+                  const url = `/editor/${brandId}?templateUrl=${encodeURIComponent(templateUrl)}`;
+                  window.location.href = url;
+                }}
+              />
             )}
             {activeSidebarTab === "elements" && (
               <div className="space-y-3">
@@ -766,7 +878,47 @@ export function EditorShell({ brandId, designId, initialDesign, initialPage, tem
                   <Upload className="h-4 w-4" />
                   Upload image
                 </Button>
-                <p className="text-xs text-muted-foreground">Paste from URL (coming later). Brand assets appear in Brand Kit.</p>
+                <div className="border-t border-border pt-3 space-y-2">
+                  <p className="text-xs font-medium text-foreground">Unsplash</p>
+                  <div className="flex gap-1.5">
+                    <Input
+                      placeholder="Search photos..."
+                      value={unsplashQuery}
+                      onChange={(e) => setUnsplashQuery(e.target.value)}
+                      onKeyDown={(e) => e.key === "Enter" && fetchUnsplash(unsplashQuery, 1)}
+                      className="h-8 text-xs flex-1"
+                    />
+                    <Button size="sm" variant="secondary" className="h-8 px-2" onClick={() => fetchUnsplash(unsplashQuery, 1)} disabled={unsplashLoading}>
+                      <Search className="h-4 w-4" />
+                    </Button>
+                  </div>
+                  {unsplashLoading && (
+                    <div className="flex items-center justify-center py-6">
+                      <div className="h-6 w-6 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+                    </div>
+                  )}
+                  {!unsplashLoading && unsplashResults.length > 0 && (
+                    <div className="grid grid-cols-2 gap-1.5 max-h-[280px] overflow-y-auto">
+                      {unsplashResults.map((photo) => (
+                        <button
+                          key={photo.id}
+                          type="button"
+                          className="aspect-square rounded border border-border overflow-hidden hover:ring-2 hover:ring-primary focus:outline-none focus:ring-2 focus:ring-primary"
+                          onClick={() => addUnsplashImage(photo.urls.regular ?? photo.urls.small ?? photo.urls.thumb, photo.width, photo.height)}
+                        >
+                          <img
+                            src={photo.urls.thumb ?? photo.urls.small}
+                            alt={photo.alt_description ?? ""}
+                            className="w-full h-full object-cover"
+                          />
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                  {!unsplashLoading && unsplashResults.length === 0 && (
+                    <p className="text-xs text-muted-foreground">Search for free photos to add to your design.</p>
+                  )}
+                </div>
               </div>
             )}
             {activeSidebarTab === "layers" && (
@@ -849,7 +1001,7 @@ export function EditorShell({ brandId, designId, initialDesign, initialPage, tem
                   <ul className="space-y-1">
                     {favoriteDesigns.filter((d) => d._id !== designId).map((d) => (
                       <li key={d._id}>
-                        <Link href={`/dashboard/my-brands/${brandId}/editor/${d._id}`} className="text-xs text-primary hover:underline truncate block">
+                        <Link href={`/editor/${brandId}/${d._id}`} className="text-xs text-primary hover:underline truncate block">
                           {d.name || "Untitled"}
                         </Link>
                       </li>

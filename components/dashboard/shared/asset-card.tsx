@@ -2,7 +2,7 @@
 
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Download, Edit, MoreVertical, Eye, Share2, Sparkles } from "lucide-react";
+import { Download, Edit, MoreVertical, Eye, Share2, Sparkles, Trash2 } from "lucide-react";
 import Image from "next/image";
 import {
   DropdownMenu,
@@ -23,6 +23,7 @@ interface AssetCardProps {
   onPreview?: () => void;
   onAction?: () => void;
   actionLabel?: string;
+  onDelete?: () => void;
   className?: string;
   downloading?: boolean;
   actionLoading?: boolean;
@@ -39,6 +40,7 @@ export function AssetCard({
   onPreview,
   onAction,
   actionLabel,
+  onDelete,
   className,
   downloading = false,
   actionLoading = false,
@@ -50,29 +52,47 @@ export function AssetCard({
     portrait: "aspect-[3/4]",
   };
 
+  const handleImageClick = () => {
+    if (onPreview) onPreview();
+  };
+
   return (
-    <Card className={cn("overflow-hidden group hover:shadow-lg transition-all duration-300 border-2", className)}>
-      <div className={cn("relative overflow-hidden bg-muted/20", aspectRatioClass[aspectRatio])}>
+    <Card className={cn("py-0 overflow-hidden group hover:shadow-lg transition-all duration-300 border-2", className)}>
+      <div
+        className={cn(
+          "relative overflow-hidden bg-muted/20",
+          aspectRatioClass[aspectRatio],
+          onPreview && "cursor-pointer"
+        )}
+        onClick={onPreview ? handleImageClick : undefined}
+        role={onPreview ? "button" : undefined}
+        tabIndex={onPreview ? 0 : undefined}
+        onKeyDown={onPreview ? (e) => e.key === "Enter" && handleImageClick() : undefined}
+      >
         <Image
           src={imageUrl}
           alt={title}
           fill
-          className="object-cover transition-transform duration-500 group-hover:scale-105"
+          className="object-cover transition-transform duration-500 group-hover:scale-105 pointer-events-none"
         />
-        {/* Overlay Actions */}
-        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center gap-2">
+        {/* Overlay Actions - click overlay background to preview, or use buttons */}
+        <div
+          className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center gap-2"
+          onClick={(e) => { if (e.target === e.currentTarget && onPreview) onPreview(); }}
+          role={onPreview ? "button" : undefined}
+        >
           {onPreview && (
-            <Button size="icon" variant="secondary" className="rounded-full" onClick={onPreview}>
+            <Button size="icon" variant="secondary" className="rounded-full" onClick={(e) => { e.stopPropagation(); onPreview(); }}>
               <Eye className="w-4 h-4" />
             </Button>
           )}
           {onDownload && (
-            <Button size="icon" variant="secondary" className="rounded-full" onClick={onDownload} disabled={downloading}>
+            <Button size="icon" variant="secondary" className="rounded-full" onClick={(e) => { e.stopPropagation(); onDownload(); }} disabled={downloading}>
               <Download className={cn("w-4 h-4", downloading && "animate-pulse")} />
             </Button>
           )}
           {onAction && (
-            <Button variant="secondary" className="rounded-full px-4 h-9 text-xs font-bold" onClick={onAction} disabled={actionLoading}>
+            <Button variant="secondary" className="rounded-full px-4 h-9 text-xs font-bold" onClick={(e) => { e.stopPropagation(); onAction(); }} disabled={actionLoading}>
               {actionLoading ? "Processing..." : actionLabel || "Select"}
             </Button>
           )}
@@ -110,6 +130,12 @@ export function AssetCard({
                 <DropdownMenuItem onClick={onAction} disabled={actionLoading}>
                   <Sparkles className="w-4 h-4 mr-2" />
                   {actionLabel || "Select"}
+                </DropdownMenuItem>
+              )}
+              {onDelete && (
+                <DropdownMenuItem onClick={onDelete} className="text-destructive focus:text-destructive">
+                  <Trash2 className="w-4 h-4 mr-2" />
+                  Delete
                 </DropdownMenuItem>
               )}
               <DropdownMenuItem>

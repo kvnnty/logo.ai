@@ -90,13 +90,18 @@ export default function DashboardTopbar({ onMenuClick }: DashboardTopbarProps) {
     <header className="z-30 w-full border-b border-border/50 bg-card relative">
       <div className="flex items-center justify-between h-14 px-4 lg:px-6 gap-3">
         <div className="flex items-center gap-2">
-          {/* Mobile Menu Button */}
+          {/* Mobile Menu Button - visible on small screens, opens sidebar */}
           <button
-            onClick={onMenuClick}
-            className="lg:hidden p-2 rounded-lg hover:bg-accent transition-colors"
+            type="button"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              onMenuClick?.();
+            }}
+            className="lg:hidden flex items-center justify-center min-w-[44px] min-h-[44px] p-2 -ml-2 rounded-lg hover:bg-accent active:bg-accent/80 transition-colors touch-manipulation"
             aria-label="Open menu"
           >
-            <IconMenu2 className="h-5 w-5" />
+            <IconMenu2 className="h-6 w-6" />
           </button>
 
           {/* Breadcrumb */}
@@ -167,7 +172,7 @@ export default function DashboardTopbar({ onMenuClick }: DashboardTopbarProps) {
                           className="w-full flex items-center gap-3 px-3 py-2 rounded-md hover:bg-accent transition-colors text-left"
                         >
                           <IconBrandAsana className="h-4 w-4" />
-                          <span className="font-medium">View All Brands</span>
+                          <span className="font-medium">View all my brands</span>
                         </button>
                       </Link>
                     </div>
@@ -184,7 +189,7 @@ export default function DashboardTopbar({ onMenuClick }: DashboardTopbarProps) {
         <div className="flex items-center gap-2 lg:gap-3">
           <Button onClick={() => setIsCreateNewOpen(true)}>
             <Plus className="h-4 w-4" />
-            <span>Create new</span>
+            <span className="hidden sm:inline">Create new</span>
           </Button>
           <CreateNewDialog
             open={isCreateNewOpen}

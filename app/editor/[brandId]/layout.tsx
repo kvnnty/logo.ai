@@ -1,9 +1,8 @@
 import { getBrandById } from "@/app/actions/brand-actions";
 import { BrandProvider } from "@/components/providers/brand-provider";
 import { notFound } from "next/navigation";
-import { BrandDashboardWrapper } from "@/components/dashboard/brand-dashboard-wrapper";
 
-export default async function BrandLayout({
+export default async function EditorLayout({
   children,
   params,
 }: {
@@ -19,9 +18,9 @@ export default async function BrandLayout({
 
   return (
     <BrandProvider brand={result.brand}>
-      <BrandDashboardWrapper brandId={brandId} brandName={result.brand.name}>
+      <div className="h-screen w-screen overflow-hidden">
         {children}
-      </BrandDashboardWrapper>
+      </div>
     </BrandProvider>
   );
 }

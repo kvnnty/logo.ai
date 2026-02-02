@@ -7,7 +7,7 @@ import { TEMPLATE_CATEGORIES_BY_GROUP, TEMPLATE_STYLE_OPTIONS } from "@/constant
 import { BrandOnboardingDialog } from "@/components/dashboard/brand-onboarding-dialog";
 import { BrandCanvasEditor } from "@/components/dashboard/canvas/brand-canvas-editor";
 import { EditBrandDialog } from "@/components/dashboard/shared/edit-brand-dialog";
-import { GetStartedScrollWithBrand } from "@/components/dashboard/shared/get-started-scroll";
+import { PolotnoTemplateGrid } from "@/components/dashboard/shared/polotno-template-grid";
 import { useBrand } from "@/components/providers/brand-provider";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -63,7 +63,7 @@ export default function BrandDashboardPage() {
   const [latestDesigns, setLatestDesigns] = useState<any[]>([]);
 
   useEffect(() => {
-    if (!brand.industry || brand.industry.trim() === "") {
+    if (!brand.industry || brand.industry.trim() === "" || !brand.contactInfo?.email || brand.contactInfo?.email.trim() === "") {
       setIsOnboardingOpen(true);
     }
   }, [brand.industry]);
@@ -95,11 +95,11 @@ export default function BrandDashboardPage() {
   };
 
   const openEditor = (design: any) => {
-    if (design._id) router.push(`/dashboard/my-brands/${brand._id}/editor/${design._id}`);
+    if (design._id) router.push(`/editor/${brand._id}/${design._id}`);
   };
 
   const handleCreateDesign = () => {
-    router.push(`/dashboard/my-brands/${brand._id}/editor`);
+    router.push(`/editor/${brand._id}`);
   };
 
   const handleGenerateAIDesign = async () => {
@@ -117,7 +117,7 @@ export default function BrandDashboardPage() {
         }
         toast({ title: "Design generated", description: "Opening in editor…" });
         setAiPrompt("");
-        router.push(`/dashboard/my-brands/${brand._id}/editor/${(result as any).designId}`);
+        router.push(`/editor/${brand._id}/${(result as any).designId}`);
       } else if (result.success && result.sceneData) {
         if (typeof (result as any).remainingCredits === "number") {
           setCredits({ remaining: (result as any).remainingCredits });
@@ -149,7 +149,7 @@ export default function BrandDashboardPage() {
             {logoUrl ? (
               <div className="w-28 h-28 bg-white border-2 border-border/50 p-4 flex items-center justify-center flex-shrink-0">
                 <img src={logoUrl} alt={brand.name} className="w-full h-full object-contain rounded-xl" width={112} height={112} />
-            </div>
+              </div>
             ) : (
               <div className="w-24 h-24 bg-gradient-to-br from-primary/10 to-primary/5 border-2 border-dashed border-primary/30 flex items-center justify-center flex-shrink-0">
                 <Sparkles className="h-10 w-10 text-primary/40" />
@@ -213,9 +213,9 @@ export default function BrandDashboardPage() {
       {/* Main Content */}
       <div className="space-y-10">
         {/* Quick Actions - moved up, compact UI */}
-        <div className="space-y-2">
-          <span className="text-sm font-medium text-muted-foreground mr-2">Quick actions</span>
-          <div className="flex flex-wrap items-center gap-2">
+        <div className="space-y-2 flex flex-col justify-center items-center">
+          <span className="text-sm text-center font-medium text-muted-foreground mr-2">Quick actions</span>
+          <div className="flex flex-wrap justify-center items-center gap-2 overflow-x-auto">
             <Button
               variant="secondary"
               size="sm"
@@ -229,7 +229,16 @@ export default function BrandDashboardPage() {
               variant="secondary"
               size="sm"
               className="rounded-full"
-              onClick={() => router.push(`/dashboard/my-brands/${brand._id}/my-designs`)}
+              onClick={() => router.push(`/dashboard/my-brands/${brand._id}/my-designs?tab=logos`)}
+            >
+              <Sparkles className="h-4 w-4 mr-1.5" />
+              Logos
+            </Button>
+            <Button
+              variant="secondary"
+              size="sm"
+              className="rounded-full"
+              onClick={() => router.push(`/dashboard/my-brands/${brand._id}/my-designs?tab=designs`)}
             >
               <Layers className="h-4 w-4 mr-1.5" />
               My Designs
@@ -341,16 +350,28 @@ export default function BrandDashboardPage() {
         {/* Designs — single row of latest */}
         <section className="space-y-4">
           <div className="flex items-center justify-between">
-            <h2 className="text-xl font-bold">Designs</h2>
+            <h2 className="text-xl font-bold">Recent designs</h2>
             <Link
-              href={`/dashboard/my-brands/${brand._id}/my-designs`}
+              href={`/dashboard/my-brands/${brand._id}/my-designs?tab=designs`}
               className="text-sm font-medium text-primary hover:underline flex items-center gap-1"
             >
-              View all my designs
+              View all designs
               <ArrowRight className="h-4 w-4" />
             </Link>
           </div>
           <div className="flex items-start gap-5 overflow-x-auto pb-2 scrollbar-thin scrollbar-track-transparent scrollbar-thumb-border -mx-6 px-6">
+            <button
+              type="button"
+              onClick={handleCreateDesign}
+              className="flex-shrink-0 w-[200px] block group text-left"
+            >
+              <div className="rounded-xl border-2 border-dashed border-muted-foreground/30 bg-muted/20 overflow-hidden transition-all group-hover:border-primary/50 group-hover:bg-muted/30 aspect-[4/3] flex flex-col items-center justify-center gap-2">
+                <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+                  <Plus className="w-7 h-7" />
+                </div>
+                <span className="text-sm font-medium">Create Design</span>
+              </div>
+            </button>
             {latestDesigns.map((design: any) => (
               <button
                 key={design._id}
@@ -367,104 +388,26 @@ export default function BrandDashboardPage() {
                     />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center bg-muted/50">
-                      <div className="w-20 h-20 rounded-lg border-2 border-dashed border-muted-foreground/30 flex items-center justify-center shadow-sm">
-                        <ImageIcon className="w-8 h-8 text-muted-foreground/50" />
-                      </div>
+                      <ImageIcon className="w-8 h-8 text-muted-foreground/50" />
                     </div>
                   )}
                 </div>
                 <p className="mt-2 text-sm font-medium truncate">
                   {design.name || "Untitled"}
                 </p>
+
               </button>
             ))}
-            <button
-              type="button"
-              onClick={handleCreateDesign}
-              className="flex-shrink-0 w-[200px] block group text-left"
-            >
-              <div className="rounded-xl border-2 border-dashed border-muted-foreground/30 bg-muted/20 overflow-hidden transition-all group-hover:border-primary/50 group-hover:bg-muted/30 aspect-[4/3] flex flex-col items-center justify-center gap-2">
-                <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center text-primary">
-                  <Plus className="w-7 h-7" />
-                </div>
-                <span className="text-sm font-medium">Create Design</span>
-              </div>
-            </button>
+
           </div>
         </section>
 
-        {/* Get started - horizontal scroll */}
-        <section className="space-y-4">
-          <h2 className="text-xl font-bold">Set up your business</h2>
-          <GetStartedScrollWithBrand
-            logoUrl={logoUrl}
-            brandName={brand.name}
-            email={brand.contactInfo?.email}
-            domainName={brand.contactInfo?.website?.replace(/^https?:\/\//, "").replace(/\/$/, "")}
-            primaryColor={primaryColor}
-            onDomainClick={() => {
-              toast({ title: "Coming Soon", description: "Domain management will be available soon" });
-            }}
-            onEmailClick={() => {
-              toast({ title: "Coming Soon", description: "Business email setup will be available soon" });
-            }}
-            onSignatureClick={() =>
-              router.push(`/dashboard/my-brands/${brand._id}/branding/email-signature`)
-            }
-            onWebsiteClick={() =>
-              toast({ title: "Coming Soon", description: "Website builder will be available soon" })
-            }
-            onLinkInBioClick={() => router.push(`/dashboard/my-brands/${brand._id}/link-in-bio`)}
-          />
-        </section>
-
-        {/* Brand Boards - horizontal scroll */}
-        <section className="space-y-4">
-          <div className="flex items-center justify-between">
-            <h2 className="text-xl font-bold">Brand Boards</h2>
-            <Link
-              href={`/dashboard/my-brands/${brand._id}/my-designs`}
-              className="text-sm font-medium text-primary hover:underline flex items-center gap-1"
-            >
-              View more
-              <ArrowRight className="h-4 w-4" />
-            </Link>
-          </div>
-          <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-thin scrollbar-track-transparent scrollbar-thumb-border -mx-6 px-6">
-            {[
-              { id: "1", title: "Simple and Clean Brand Board", subtitle: "2550×3300 Brand Boards" },
-              { id: "2", title: "Elegant Brand Board", subtitle: "2550×3300 Brand Boards" },
-              { id: "3", title: "Color Gradients Brand Board", subtitle: "2550×3300 Brand Boards" },
-              { id: "4", title: "Logo Versions Brand Board", subtitle: "2550×3300 Brand Boards" },
-            ].map((board) => (
-              <button
-                key={board.id}
-                type="button"
-                onClick={() => router.push(`/dashboard/my-brands/${brand._id}/my-designs`)}
-                className="flex-shrink-0 w-[280px] rounded-xl border-2 bg-card overflow-hidden hover:border-primary/50 hover:shadow-lg transition-all text-left group"
-              >
-                <div className="aspect-[2550/3300] max-h-[320px] bg-muted/30 flex items-center justify-center relative">
-                  <span className="text-xs font-medium text-muted-foreground absolute top-2 left-2 px-2 py-0.5 rounded bg-background/80">
-                    Pro
-                  </span>
-                  {logoUrl ? (
-                    <img
-                      src={logoUrl}
-                      alt=""
-                      className="max-w-[120px] max-h-16 object-contain opacity-90"
-                    />
-                  ) : (
-                    <div className="w-24 h-12 rounded bg-muted-foreground/20" />
-                  )}
-                </div>
-                <div className="p-3 border-t">
-                  <p className="font-semibold text-sm truncate">{board.title}</p>
-                  <p className="text-xs text-muted-foreground">{board.subtitle}</p>
-                </div>
-              </button>
-            ))}
-          </div>
-        </section>
+        {/* Templates from Polotno */}
+        <PolotnoTemplateGrid
+          brandId={brand._id}
+          title="Templates"
+          description="Start from a template and customize it in the editor."
+        />
       </div >
 
       {/* Dialogs */}

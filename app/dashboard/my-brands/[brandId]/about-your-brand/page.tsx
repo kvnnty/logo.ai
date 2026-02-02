@@ -11,10 +11,18 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useState, useEffect } from "react";
 import { toast } from "@/hooks/use-toast";
 import { useBrand } from "@/components/providers/brand-provider";
-import { updateBrandDetails, updateBrandPublicProfile } from "@/app/actions/brand-actions";
+import { updateBrandDetails, updateBrandPublicProfile, deleteBrand } from "@/app/actions/brand-actions";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Sparkles, Copy, ExternalLink, Share2, Eye, Clock } from "lucide-react";
+import { Sparkles, Copy, ExternalLink, Share2, Eye, Clock, Trash2 } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 export default function AboutBrandPage() {
   const brand = useBrand();
@@ -39,6 +47,8 @@ export default function AboutBrandPage() {
   });
   const [listedPublicly, setListedPublicly] = useState<boolean>(brand.listedPublicly ?? true);
   const [publicProfileUpdating, setPublicProfileUpdating] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   // Update form data if brand changes
   useEffect(() => {
@@ -157,6 +167,36 @@ export default function AboutBrandPage() {
         [field]: value,
       },
     }));
+  };
+
+  const handleDeleteBrand = async () => {
+    setIsDeleting(true);
+    try {
+      const result = await deleteBrand(brand._id);
+      if (result.success) {
+        toast({
+          title: "Brand deleted",
+          description: "Your brand has been permanently deleted.",
+        });
+        router.push("/dashboard/my-brands");
+      } else {
+        toast({
+          title: "Error",
+          description: result.error || "Failed to delete brand.",
+          variant: "destructive",
+        });
+        setIsDeleteDialogOpen(false);
+      }
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to delete brand.",
+        variant: "destructive",
+      });
+      setIsDeleteDialogOpen(false);
+    } finally {
+      setIsDeleting(false);
+    }
   };
 
   return (
@@ -441,7 +481,55 @@ export default function AboutBrandPage() {
             </Card>
           </TabsContent>
         </Tabs>
+
+        {/* Danger Zone */}
+        <Card className="mt-6 rounded-2xl shadow-sm border-none shadow-[0_8px_30px_rgb(0,0,0,0.04)] border-destructive/20">
+          <CardHeader>
+            <CardTitle className="text-destructive">Danger Zone</CardTitle>
+            <CardDescription>
+              Permanently delete your brand and all associated data. This action cannot be undone.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Button
+              variant="destructive"
+              onClick={() => setIsDeleteDialogOpen(true)}
+              className="gap-2"
+            >
+              <Trash2 className="h-4 w-4" />
+              Delete Brand
+            </Button>
+          </CardContent>
+        </Card>
       </div>
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Delete Brand</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to delete <strong>{brand.name}</strong>? This will permanently delete your brand and all associated logos, designs, and data. This action cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setIsDeleteDialogOpen(false)}
+              disabled={isDeleting}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={handleDeleteBrand}
+              disabled={isDeleting}
+            >
+              {isDeleting ? "Deleting..." : "Delete Brand"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

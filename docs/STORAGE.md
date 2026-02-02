@@ -15,10 +15,9 @@ This app uses **MongoDB GridFS** for file storage. **No S3 or AWS is required.**
 
 ## Where it’s used
 
-- Logo upload (create brand from upload)
+- Logo upload (create brand from uploading already existing logo)
 - Link-in-bio image blocks (profile / block images)
 - Any flow that calls `uploadFile()` from `@/lib/utils/upload` (client) or `uploadToMongoDB()` from `@/lib/utils/mongodb-storage` (server)
 
-## S3
 
-The repo still contains `lib/utils/s3.ts` for optional AWS S3 use. The app does **not** use it by default; all upload/serve flows go through GridFS and `/api/upload` / `/api/files`.
+- All upload/serve flows go through GridFS and `/api/upload` / `/api/files`.
