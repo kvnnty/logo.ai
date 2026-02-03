@@ -2,6 +2,14 @@ import { NextRequest, NextResponse } from "next/server";
 
 const POLOTNO_GET_TEMPLATES_URL = "https://api.polotno.com/api/get-templates";
 
+export const dynamic = "force-dynamic";
+
+/**
+ * GET /api/polotno-templates
+ * Proxies Polotno get-templates API. Supports:
+ * - page: pagination (default 1)
+ * - query: text search (e.g. "youtube", "birthday", "fitness", "instagram story")
+ */
 export async function GET(request: NextRequest) {
   const key = process.env.POLOTNO_API_KEY || process.env.POLOTNO_UNSPLASH_KEY;
   if (!key) {

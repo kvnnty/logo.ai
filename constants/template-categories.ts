@@ -43,19 +43,19 @@ export function getTemplateCategory(id: string): TemplateCategoryOption | undefi
   return TEMPLATE_CATEGORIES.find((c) => c.id === id);
 }
 
-/** Map our category id to Polotno API / client-side filter query (e.g. for YouTube Thumbnails → "youtube thumbnail"). */
+/** Map our category id to Polotno API query. Fallback to no-query fetch if empty (see PolotnoTemplateGrid). */
 export const POLOTNO_QUERY_BY_CATEGORY: Record<string, string> = {
   business_card: "business card",
   letterhead: "letterhead",
-  email_signature: "email signature",
+  email_signature: "email",
   favicon: "favicon",
-  brand_book: "brand book",
-  branding_license: "license certificate",
+  brand_book: "brand",
+  branding_license: "certificate",
   social_story: "story",
-  social_post: "social post",
-  social_cover: "cover profile",
-  social_profile: "profile avatar",
-  youtube_thumbnail: "youtube thumbnail",
+  social_post: "instagram",
+  social_cover: "cover",
+  social_profile: "profile",
+  youtube_thumbnail: "youtube",
   ads: "ad",
   marketing_flyer: "flyer",
   marketing_poster: "poster",

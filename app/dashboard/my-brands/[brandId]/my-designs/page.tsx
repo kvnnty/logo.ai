@@ -264,7 +264,7 @@ export default function MyDesignsPage() {
   const openDesignViewer = (project: any) => {
     setImageViewer({
       open: true,
-      url: project.thumbnailUrl || "",
+      url: project.thumbnailUrl || `/api/designs/${project._id}/thumbnail`,
       title: project.name || "Untitled",
       variant: "design",
       design: project,
@@ -362,7 +362,7 @@ export default function MyDesignsPage() {
           <Link href={`/editor/${brandId}`}>
             <Button size="sm" className="gap-2 rounded-full shadow-md">
               <Plus className="h-4 w-4" />
-              Create Design
+              Create  design
             </Button>
           </Link>
         </div>
@@ -495,9 +495,9 @@ export default function MyDesignsPage() {
                       <AssetCard
                         title={project.name || "Untitled"}
                         description={formatDistanceToNowStrict(new Date(project.updatedAt || project.createdAt), { addSuffix: true })}
-                        imageUrl={project.thumbnailUrl || ""}
+                        imageUrl={project.thumbnailUrl || `/api/designs/${project._id}/thumbnail`}
                         date={formatDistanceToNowStrict(new Date(project.updatedAt || project.createdAt), { addSuffix: true })}
-                        onPreview={() => project.thumbnailUrl && openDesignViewer(project)}
+                        onPreview={() => openDesignViewer(project)}
                         onEdit={() => router.push(`/editor/${brandId}/${project._id}`)}
                         onAction={() => router.push(`/editor/${brandId}/${project._id}`)}
                         actionLabel="Open in Editor"

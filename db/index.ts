@@ -1,6 +1,6 @@
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 
-const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/logo-ai';
+const MONGODB_URI = process.env.MONGODB_URI || "mongodb://localhost:27017/logo-ai";
 
 export async function ensureDbConnected() {
   if (mongoose.connection.readyState === 1) return;
@@ -28,7 +28,7 @@ const BrandSchema = new mongoose.Schema({
   },
   strategy: mongoose.Schema.Types.Mixed,
   identity: mongoose.Schema.Types.Mixed,
-  status: { type: String, default: 'draft', index: true }, // draft | active
+  status: { type: String, default: "draft", index: true }, // draft | active
   pageViewCount: { type: Number, default: 0 },
   pageLastViewedAt: Date,
   createdAt: { type: Date, default: Date.now },
@@ -36,12 +36,12 @@ const BrandSchema = new mongoose.Schema({
 });
 
 const LogoSchema = new mongoose.Schema({
-  brandId: { type: mongoose.Schema.Types.ObjectId, ref: 'Brand', required: true, index: true },
+  brandId: { type: mongoose.Schema.Types.ObjectId, ref: "Brand", required: true, index: true },
   userId: { type: String, required: true, index: true },
   image_url: String,
   isPrimary: { type: Boolean, default: false, index: true },
   subType: String, // 'primary_logo' | 'logo_variation' | 'candidate' | etc.
-  category: { type: String, default: 'logo' },
+  category: { type: String, default: "logo" },
   prompt: String,
   model: String, // AI model used (e.g. for candidates)
   layout: String,
@@ -55,7 +55,7 @@ const LogoSchema = new mongoose.Schema({
 });
 
 const BrandUploadSchema = new mongoose.Schema({
-  brandId: { type: mongoose.Schema.Types.ObjectId, ref: 'Brand', required: true, index: true },
+  brandId: { type: mongoose.Schema.Types.ObjectId, ref: "Brand", required: true, index: true },
   userId: { type: String, required: true, index: true },
   imageUrl: { type: String, required: true },
   fileName: String,
@@ -63,7 +63,7 @@ const BrandUploadSchema = new mongoose.Schema({
 });
 
 const LinkInBioSchema = new mongoose.Schema({
-  brandId: { type: mongoose.Schema.Types.ObjectId, ref: 'Brand', required: true, unique: true, index: true },
+  brandId: { type: mongoose.Schema.Types.ObjectId, ref: "Brand", required: true, unique: true, index: true },
   userId: { type: String, required: true, index: true },
   profileImage: String,
   profileTitle: String,
@@ -73,27 +73,27 @@ const LinkInBioSchema = new mongoose.Schema({
   contentBlocks: [mongoose.Schema.Types.Mixed],
   socialIcons: [mongoose.Schema.Types.Mixed],
   styles: {
-    template: { type: String, default: 'minimal' },
+    template: { type: String, default: "minimal" },
     background: {
-      style: { type: String, default: 'color' },
-      color: { type: String, default: '#FFFFFF' },
+      style: { type: String, default: "color" },
+      color: { type: String, default: "#FFFFFF" },
       imageUrl: String,
     },
     buttons: {
-      color: { type: String, default: '#0F2A35' },
-      textColor: { type: String, default: '#FFFFFF' },
-      iconColor: { type: String, default: '#FFFFFF' },
-      shadowColor: { type: String, default: '#000000' },
-      style: { type: String, default: 'filled' },
-      shape: { type: String, default: 'rounded' },
+      color: { type: String, default: "#0F2A35" },
+      textColor: { type: String, default: "#FFFFFF" },
+      iconColor: { type: String, default: "#FFFFFF" },
+      shadowColor: { type: String, default: "#000000" },
+      style: { type: String, default: "filled" },
+      shape: { type: String, default: "rounded" },
     },
     socialIcons: {
-      style: { type: String, default: 'outline' },
-      iconColor: { type: String, default: '#0F2A35' },
+      style: { type: String, default: "outline" },
+      iconColor: { type: String, default: "#0F2A35" },
     },
     fonts: {
-      fontColor: { type: String, default: '#0F2A35' },
-      fontFamily: { type: String, default: 'Inter' },
+      fontColor: { type: String, default: "#0F2A35" },
+      fontFamily: { type: String, default: "Inter" },
     },
   },
   settings: {
@@ -111,10 +111,10 @@ const LinkInBioSchema = new mongoose.Schema({
   createdAt: { type: Date, default: Date.now },
 });
 
-export const Brand = mongoose.models.Brand || mongoose.model('Brand', BrandSchema);
-export const Logo = mongoose.models.Logo || mongoose.model('Logo', LogoSchema);
-export const BrandUpload = mongoose.models.BrandUpload || mongoose.model('BrandUpload', BrandUploadSchema);
-export const LinkInBio = mongoose.models.LinkInBio || mongoose.model('LinkInBio', LinkInBioSchema);
+export const Brand = mongoose.models.Brand || mongoose.model("Brand", BrandSchema);
+export const Logo = mongoose.models.Logo || mongoose.model("Logo", LogoSchema);
+export const BrandUpload = mongoose.models.BrandUpload || mongoose.model("BrandUpload", BrandUploadSchema);
+export const LinkInBio = mongoose.models.LinkInBio || mongoose.model("LinkInBio", LinkInBioSchema);
 
 export interface IBrand {
   _id: any;
@@ -187,11 +187,11 @@ export interface IBrandUpload {
 
 const TemplateSchema = new mongoose.Schema({
   category: { type: String, required: true, index: true },
-  style: { type: String, default: 'modern', index: true },
+  style: { type: String, default: "modern", index: true },
   name: String,
   dimensions: {
     width: Number,
-    height: Number
+    height: Number,
   },
   elements: [mongoose.Schema.Types.Mixed], // Flexible JSON structure for Fabric.js/Canvas
   previewImageUrl: String, // Preview image with transparent background
@@ -199,7 +199,7 @@ const TemplateSchema = new mongoose.Schema({
   createdAt: { type: Date, default: Date.now },
 });
 
-export const Template = mongoose.models.Template || mongoose.model('Template', TemplateSchema);
+export const Template = mongoose.models.Template || mongoose.model("Template", TemplateSchema);
 
 /** Canva-style design document: custom, AI, or template-based. One doc per design; pages[] for multipage. */
 const DesignPageSchema = new mongoose.Schema({
@@ -211,18 +211,19 @@ const DesignPageSchema = new mongoose.Schema({
 
 const DesignSchema = new mongoose.Schema({
   userId: { type: String, required: true, index: true },
-  brandId: { type: mongoose.Schema.Types.ObjectId, ref: 'Brand', required: true, index: true },
-  name: { type: String, default: 'Untitled design' },
+  brandId: { type: mongoose.Schema.Types.ObjectId, ref: "Brand", required: true, index: true },
+  name: { type: String, default: "Untitled design" },
   pages: { type: [DesignPageSchema], default: [] }, // multipage; backward compat: single page = pages[0]
+  polotnoJson: { type: mongoose.Schema.Types.Mixed }, // full Polotno store JSON when edited via Polotno editor
   thumbnailUrl: String,
   favorite: { type: Boolean, default: false },
-  source: { type: String, default: 'blank' }, // 'blank' | 'template' | 'ai' | 'import'
+  source: { type: String, default: "blank" }, // 'blank' | 'template' | 'ai' | 'import'
   templateId: String,
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },
 });
 
-export const Design = mongoose.models.Design || mongoose.model('Design', DesignSchema);
+export const Design = mongoose.models.Design || mongoose.model("Design", DesignSchema);
 
 export interface IDesignPage {
   sceneData: any;
@@ -237,6 +238,7 @@ export interface IDesign {
   brandId: any;
   name: string;
   pages: IDesignPage[];
+  polotnoJson?: any;
   thumbnailUrl?: string;
   favorite?: boolean;
   source?: string;

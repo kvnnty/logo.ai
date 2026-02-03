@@ -73,6 +73,7 @@ export function AssetCard({
           src={imageUrl}
           alt={title}
           fill
+          unoptimized={imageUrl.startsWith("/api/")}
           className="object-cover transition-transform duration-500 group-hover:scale-105 pointer-events-none"
         />
         {/* Overlay Actions - click overlay background to preview, or use buttons */}

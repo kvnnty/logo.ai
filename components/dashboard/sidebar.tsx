@@ -41,11 +41,6 @@ function getNavItems(brandId?: string): NavItem[] {
     {
       title: "My logos & designs",
       href: `${brandPrefix}/my-designs?tab=logos`,
-      icon: IconSparkles,
-    },
-    {
-      title: "My Designs",
-      href: `${brandPrefix}/my-designs?tab=designs`,
       icon: IconPalette,
     },
     {

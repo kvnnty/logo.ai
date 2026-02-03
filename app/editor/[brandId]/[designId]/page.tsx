@@ -1,22 +1,23 @@
 "use client";
 
 import { getDesign } from "@/app/actions/design-actions";
-import { useParams, useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
-import { EditorShell } from "@/components/dashboard/editor/editor-shell";
+import { useParams, useRouter } from "next/navigation";
+import { useEffect, useState, useMemo } from "react";
 import { Loader2 } from "lucide-react";
+import dynamic from "next/dynamic";
+import { sceneToPolotnoJson } from "@/lib/polotno-template";
+
+const PolotnoEditor = dynamic(
+  () => import("@/components/dashboard/editor/polotno-editor"),
+  { ssr: false }
+);
 
 export default function EditorDesignPage() {
   const params = useParams();
   const router = useRouter();
-  const searchParams = useSearchParams();
   const brandId = params?.brandId as string;
   const designId = params?.designId as string;
-  const pageParam = searchParams.get("page");
-  const templateParam = searchParams.get("template");
-  const initialPage = pageParam ? Math.max(0, parseInt(pageParam, 10) || 0) : undefined;
   const [design, setDesign] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -34,9 +35,18 @@ export default function EditorDesignPage() {
     return () => { cancelled = true; };
   }, [designId, brandId]);
 
-  useEffect(() => {
-    if (!loading) setLoading(false);
-  }, [design, error]);
+  const initialJson = useMemo(() => {
+    if (!design) return null;
+    if (design.polotnoJson && Object.keys(design.polotnoJson).length > 0) {
+      return design.polotnoJson;
+    }
+    const firstPage = design.pages?.[0];
+    const sceneData = firstPage?.sceneData;
+    if (sceneData && sceneData.width != null && sceneData.elements) {
+      return sceneToPolotnoJson(sceneData);
+    }
+    return null;
+  }, [design]);
 
   if (error) {
     return (
@@ -63,12 +73,11 @@ export default function EditorDesignPage() {
   }
 
   return (
-    <EditorShell
+    <PolotnoEditor
       brandId={brandId}
       designId={designId}
-      initialDesign={design}
-      initialPage={initialPage}
-      templateId={templateParam ?? undefined}
+      designName={design.name}
+      initialJson={initialJson}
     />
   );
 }

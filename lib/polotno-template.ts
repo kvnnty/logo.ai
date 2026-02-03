@@ -5,6 +5,7 @@
  */
 
 export interface PolotnoTemplate {
+  version?: number;
   width: number;
   height: number;
   pages?: Array<{
@@ -59,6 +60,28 @@ function convertPolotnoElement(el: Record<string, unknown>): Record<string, unkn
     };
   }
 
+  if (type === "figure") {
+    const figure = (el.figure as string) ?? "rect";
+    const fill = (el.fill as string) ?? "#000000";
+    const opacity = el.opacity !== undefined ? Number(el.opacity) : undefined;
+    const cornerRadius = el.cornerRadius !== undefined ? Number(el.cornerRadius) : undefined;
+    if (figure === "ellipse") {
+      const radius = Math.min(w, h) / 2;
+      return { type: "circle", x, y, radius, fill, opacity, draggable: true };
+    }
+    return {
+      type: "rect",
+      x,
+      y,
+      width: w,
+      height: h,
+      fill,
+      cornerRadius,
+      opacity,
+      draggable: true,
+    };
+  }
+
   return null;
 }
 
@@ -87,4 +110,93 @@ export function polotnoTemplateToScene(template: PolotnoTemplate): OurSceneData 
   }
 
   return { width, height, elements };
+}
+
+/** Convert our scene format to Polotno store JSON (design.pages[].children). */
+export function sceneToPolotnoJson(scene: OurSceneData): PolotnoTemplate {
+  const width = scene.width ?? 1080;
+  const height = scene.height ?? 1080;
+  const elements = scene.elements ?? [];
+  let background = "#ffffff";
+  const children: Array<Record<string, unknown>> = [];
+
+  for (const el of elements) {
+    const type = (el.type as string) ?? "";
+    if (type === "rect") {
+      const fill = (el.fill as string) ?? "#ffffff";
+      const x = Number(el.x) ?? 0;
+      const y = Number(el.y) ?? 0;
+      const w = Number(el.width) ?? 100;
+      const h = Number(el.height) ?? 100;
+      if (x === 0 && y === 0 && w === width && h === height) {
+        background = fill;
+        continue;
+      }
+      children.push({
+        type: "figure",
+        figure: "rect",
+        x,
+        y,
+        width: w,
+        height: h,
+        fill,
+        cornerRadius: el.cornerRadius !== undefined ? Number(el.cornerRadius) : 0,
+        opacity: el.opacity !== undefined ? Number(el.opacity) : 1,
+      });
+      continue;
+    }
+    if (type === "circle") {
+      const radius = Number(el.radius) ?? 50;
+      const cx = Number(el.x) ?? 0;
+      const cy = Number(el.y) ?? 0;
+      children.push({
+        type: "figure",
+        figure: "ellipse",
+        x: cx,
+        y: cy,
+        width: radius * 2,
+        height: radius * 2,
+        fill: (el.fill as string) ?? "#000000",
+        opacity: el.opacity !== undefined ? Number(el.opacity) : 1,
+      });
+      continue;
+    }
+    if (type === "text") {
+      children.push({
+        type: "text",
+        text: (el.content as string) ?? "",
+        x: Number(el.x) ?? 0,
+        y: Number(el.y) ?? 0,
+        width: Number(el.width) ?? 200,
+        height: Number(el.height) ?? 100,
+        fontSize: Number(el.fontSize) ?? 40,
+        fill: (el.fill as string) ?? "#000000",
+        fontFamily: (el.fontFamily as string) ?? "Arial",
+        fontWeight: el.fontWeight,
+        fontStyle: el.fontStyle,
+        align: (el.align as string) ?? "left",
+      });
+      continue;
+    }
+    if (type === "image") {
+      const src = (el.src as string) ?? "";
+      if (src) {
+        children.push({
+          type: "image",
+          src,
+          x: Number(el.x) ?? 0,
+          y: Number(el.y) ?? 0,
+          width: Number(el.width) ?? 100,
+          height: Number(el.height) ?? 100,
+        });
+      }
+    }
+  }
+
+  return {
+    version: 1,
+    width,
+    height,
+    pages: [{ id: "page-1", background, children }],
+  };
 }

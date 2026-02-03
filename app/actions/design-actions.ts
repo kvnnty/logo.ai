@@ -45,24 +45,33 @@ export async function getDesign(designId: string) {
     const design = await Design.findOne({ _id: designId, userId: user.id }).lean();
     if (!design) return { success: false, error: "Design not found" };
 
-    return {
-      success: true,
-      design: {
-        ...design,
-        _id: (design as any)._id.toString(),
-        brandId: (design as any).brandId?.toString(),
-        createdAt: (design as any).createdAt?.toISOString?.(),
-        updatedAt: (design as any).updatedAt?.toISOString?.(),
-      },
+    const d = design as any;
+    const designPlain = {
+      ...d,
+      _id: d._id?.toString?.() ?? d._id,
+      brandId: d.brandId?.toString?.() ?? d.brandId,
+      createdAt: d.createdAt?.toISOString?.() ?? d.createdAt,
+      updatedAt: d.updatedAt?.toISOString?.() ?? d.updatedAt,
+      pages: Array.isArray(d.pages)
+        ? d.pages.map((p: any) => ({
+            sceneData: p.sceneData,
+            name: p.name,
+            thumbnailUrl: p.thumbnailUrl,
+            _id: p._id?.toString?.() ?? (typeof p._id === "string" ? p._id : undefined),
+            createdAt: p.createdAt?.toISOString?.() ?? (typeof p.createdAt === "string" ? p.createdAt : undefined),
+          }))
+        : d.pages,
     };
+    // Ensure only plain objects reach Client Components (no BSON/ObjectId/toJSON)
+    return { success: true, design: JSON.parse(JSON.stringify(designPlain)) };
   } catch (error) {
     console.error("getDesign:", error);
     return { success: false, error: error instanceof Error ? error.message : "Failed to load design" };
   }
 }
 
-/** Update design name, pages, favorite, etc. */
-export async function updateDesign(designId: string, updates: { name?: string; pages?: any[]; favorite?: boolean; thumbnailUrl?: string }) {
+/** Update design name, pages, polotnoJson, favorite, etc. */
+export async function updateDesign(designId: string, updates: { name?: string; pages?: any[]; polotnoJson?: any; favorite?: boolean; thumbnailUrl?: string }) {
   try {
     const user = await currentUser();
     if (!user) return { success: false, error: "Not authenticated" };
@@ -73,6 +82,7 @@ export async function updateDesign(designId: string, updates: { name?: string; p
 
     if (updates.name !== undefined) design.name = updates.name;
     if (updates.pages !== undefined) design.pages = updates.pages;
+    if (updates.polotnoJson !== undefined) (design as any).polotnoJson = updates.polotnoJson;
     if (updates.favorite !== undefined) design.favorite = updates.favorite;
     if (updates.thumbnailUrl !== undefined) design.thumbnailUrl = updates.thumbnailUrl;
     design.updatedAt = new Date();

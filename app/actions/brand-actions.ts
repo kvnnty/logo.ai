@@ -134,6 +134,59 @@ export async function getDefaultTemplateScene(brandId: string, category: string,
 }
 
 /**
+ * Normalize AI-generated scene elements to our canonical format (width, height, elements)
+ * and Polotno-compatible property names so renderer and sceneToPolotnoJson work correctly.
+ */
+function normalizeAISceneElements(elements: any[], width: number, height: number): any[] {
+  return elements.map((el) => {
+    const type = (el.type as string) ?? "rect";
+    const base = {
+      type,
+      x: Number(el.x) ?? 0,
+      y: Number(el.y) ?? 0,
+      fill: (el.fill as string) ?? "#000000",
+      opacity: el.opacity !== undefined ? Number(el.opacity) : undefined,
+      draggable: el.draggable !== false,
+    };
+    if (type === "text") {
+      return {
+        ...base,
+        content: (el.content ?? el.text ?? "") as string,
+        width: Number(el.width) ?? 200,
+        height: Number(el.height) ?? 100,
+        fontSize: Number(el.fontSize) ?? 40,
+        fontFamily: (el.fontFamily as string) ?? "Arial",
+        fontWeight: el.fontWeight,
+        fontStyle: el.fontStyle,
+        align: (el.align as string) ?? "left",
+        offsetX: el.offsetX !== undefined ? Number(el.offsetX) : undefined,
+      };
+    }
+    if (type === "image") {
+      return {
+        ...base,
+        src: (el.src as string) ?? "",
+        width: Number(el.width) ?? 100,
+        height: Number(el.height) ?? 100,
+      };
+    }
+    if (type === "circle") {
+      const radius = Number(el.radius) ?? 50;
+      return { ...base, radius };
+    }
+    if (type === "rect") {
+      return {
+        ...base,
+        width: Number(el.width) ?? 100,
+        height: Number(el.height) ?? 100,
+        cornerRadius: el.cornerRadius !== undefined ? Number(el.cornerRadius) : undefined,
+      };
+    }
+    return { ...base, width: Number(el.width) ?? 100, height: Number(el.height) ?? 100 };
+  });
+}
+
+/**
  * AI-powered template generation: user selects category + prompt, we return a new design (sceneData) and open in editor.
  * Uses Nebius (NEBIUS_API_KEY) for chat when prompt is provided; otherwise uses smart fallback from default templates.
  */
@@ -230,7 +283,8 @@ export async function generateAITemplate(brandId: string, category: string, prom
         }
         const width = Number(parsed.width) || defaultWidth;
         const height = Number(parsed.height) || defaultHeight;
-        const aiTemplate = { width, height, elements: parsed.elements };
+        const normalizedElements = normalizeAISceneElements(parsed.elements, width, height);
+        const aiTemplate = { width, height, elements: normalizedElements };
         sceneData = hydrateTemplate(aiTemplate, brand, primaryLogo);
       } catch (aiErr: any) {
         console.error("AI template generation failed, using fallback:", aiErr?.message || aiErr);
@@ -249,25 +303,31 @@ export async function generateAITemplate(brandId: string, category: string, prom
     }
 
     const subType = trimmedPrompt ? `${category}: ${trimmedPrompt.slice(0, 50)}` : `AI ${category}`;
-    brand.assets.push({
-      category,
-      subType,
-      prompt: trimmedPrompt || undefined,
-      imageUrl,
-      sceneData,
-      createdAt: new Date(),
-    } as any);
-    await brand.save();
+
+    const designResult = await createDesign(brandId, {
+      name: subType,
+      initialScene: sceneData,
+      source: "ai",
+    });
+    if (!designResult.success || !designResult.designId) {
+      return {
+        success: false,
+        error: designResult.error ?? "Failed to create design",
+      };
+    }
 
     const newRemaining = currentRemaining - INTERACTIVE_GENERATION_COST;
     await clerk.users.updateUserMetadata(user.id, {
       unsafeMetadata: { ...(user.unsafeMetadata as any), remaining: newRemaining },
     });
 
-    const newAsset = brand.assets[brand.assets.length - 1] as any;
-    const assetId = newAsset?._id?.toString?.() ?? "";
-
-    return { success: true, sceneData, remainingCredits: newRemaining, assetId };
+    return {
+      success: true,
+      sceneData,
+      remainingCredits: newRemaining,
+      designId: designResult.designId,
+      assetId: designResult.designId,
+    };
   } catch (error) {
     console.error("generateAITemplate error:", error);
     return {

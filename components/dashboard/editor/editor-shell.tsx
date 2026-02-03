@@ -62,17 +62,21 @@ import { formatDistanceToNow } from "date-fns";
 
 const MAX_HISTORY = 50;
 
-/** Polotno API returns { items: [ { json, preview } ], hits, totalPages } */
+/** Polotno API returns { items: [ { json, preview } ], hits, totalPages }. Supports ?query= for search. */
 function PolotnoTemplatesPanel({ brandId, onSelectTemplate }: { brandId: string; onSelectTemplate: (templateUrl: string) => void }) {
   const [items, setItems] = useState<Array<{ json: string; preview: string }>>([]);
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
   const [totalPages, setTotalPages] = useState(1);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [submittedQuery, setSubmittedQuery] = useState("");
 
-  const fetchTemplates = useCallback(async (p: number) => {
+  const fetchTemplates = useCallback(async (p: number, query: string) => {
     setLoading(true);
     try {
-      const res = await fetch(`/api/polotno-templates?page=${p}`);
+      const params = new URLSearchParams({ page: String(p) });
+      if (query.trim()) params.set("query", query.trim());
+      const res = await fetch(`/api/polotno-templates?${params.toString()}`);
       const data = await res.json();
       if (res.ok && Array.isArray(data.items)) {
         setItems(data.items);
@@ -86,15 +90,42 @@ function PolotnoTemplatesPanel({ brandId, onSelectTemplate }: { brandId: string;
   }, []);
 
   useEffect(() => {
-    fetchTemplates(page);
-  }, [page, fetchTemplates]);
+    fetchTemplates(page, submittedQuery);
+  }, [page, submittedQuery, fetchTemplates]);
+
+  const onSearchSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setSubmittedQuery(searchQuery);
+    setPage(1);
+  };
 
   return (
     <div className="space-y-3">
       <p className="text-muted-foreground text-xs">Start from a Polotno template.</p>
+      <form onSubmit={onSearchSubmit} className="flex gap-1.5">
+        <div className="relative flex-1 min-w-0">
+          <Search className="absolute left-2 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground pointer-events-none" />
+          <Input
+            type="search"
+            placeholder="Search (e.g. birthday, fitness, youtube)…"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="h-8 pl-7 text-xs"
+          />
+        </div>
+        <Button type="submit" variant="secondary" size="sm" className="h-8 shrink-0">
+          Search
+        </Button>
+      </form>
       {loading ? (
         <div className="flex justify-center py-6">
           <div className="h-6 w-6 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+        </div>
+      ) : items.length === 0 ? (
+        <div className="rounded-lg border border-dashed border-muted-foreground/25 bg-muted/30 px-4 py-6 text-center">
+          <p className="text-muted-foreground text-xs">
+            No Polotno templates are available right now. Try again later or start with a blank canvas.
+          </p>
         </div>
       ) : (
         <div className="grid grid-cols-2 gap-1.5 max-h-[320px] overflow-y-auto">

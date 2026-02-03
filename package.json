@@ -55,6 +55,7 @@
     "ogl": "^1.0.11",
     "openai": "^4.78.1",
     "pdfkit": "^0.17.2",
+    "polotno": "3.0.0-beta.13",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-icons": "^5.5.0",

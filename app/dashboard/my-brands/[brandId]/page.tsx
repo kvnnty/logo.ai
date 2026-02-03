@@ -380,17 +380,19 @@ export default function BrandDashboardPage() {
                 className="flex-shrink-0 w-[200px] text-left group"
               >
                 <div className="rounded-xl border-2 bg-card overflow-hidden transition-all group-hover:border-primary/50 group-hover:shadow-md aspect-[4/3] flex items-center justify-center">
-                  {design.thumbnailUrl ? (
-                    <img
-                      src={design.thumbnailUrl}
-                      alt={design.name || "Design"}
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center bg-muted/50">
-                      <ImageIcon className="w-8 h-8 text-muted-foreground/50" />
-                    </div>
-                  )}
+                  <img
+                    src={design.thumbnailUrl || `/api/designs/${design._id}/thumbnail`}
+                    alt={design.name || "Design"}
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).style.display = "none";
+                      const fallback = (e.target as HTMLImageElement).nextElementSibling;
+                      if (fallback) (fallback as HTMLElement).style.display = "flex";
+                    }}
+                  />
+                  <div className="w-full h-full hidden items-center justify-center bg-muted/50" style={{ display: "none" }}>
+                    <ImageIcon className="w-8 h-8 text-muted-foreground/50" />
+                  </div>
                 </div>
                 <p className="mt-2 text-sm font-medium truncate">
                   {design.name || "Untitled"}
